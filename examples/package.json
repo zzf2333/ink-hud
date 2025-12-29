@@ -1,0 +1,32 @@
+{
+    "name": "ink-hud-examples",
+    "version": "0.1.0",
+    "private": true,
+    "description": "ink-hud examples",
+    "type": "module",
+    "scripts": {
+        "component:areachart": "node --import tsx basic/areachart.tsx",
+        "component:linechart": "node --import tsx basic/linechart.tsx",
+        "component:barchart": "node --import tsx basic/barchart.tsx",
+        "component:barchart-horizontal": "node --import tsx basic/barchart-horizontal.tsx",
+        "component:piechart": "node --import tsx basic/piechart.tsx",
+        "component:sparkline": "node --import tsx basic/sparkline.tsx",
+        "component:grid": "node --import tsx basic/grid.tsx",
+        "component:panel": "node --import tsx basic/panel.tsx",
+        "component:gauge": "node --import tsx basic/gauge.tsx",
+        "component:bignumber": "node --import tsx basic/bignumber.tsx",
+        "component:heatmap": "node --import tsx basic/heatmap.tsx",
+        "component:logstream": "node --import tsx basic/logstream.tsx",
+        "component:table": "node --import tsx basic/table.tsx",
+        "component:dashboard": "node --import tsx dashboard.tsx"
+    },
+    "dependencies": {
+        "ink": "^5.0.1",
+        "ink-hud": "workspace:*",
+        "react": "^18.3.1"
+    },
+    "devDependencies": {
+        "@types/react": "^18.3.18",
+        "tsx": "^4.19.2"
+    }
+}

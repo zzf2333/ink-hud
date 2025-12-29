@@ -1,0 +1,90 @@
+{
+    "name": "ink-hud",
+    "version": "0.1.0",
+    "description": "Retina-grade terminal data visualization dashboard - High-resolution chart library based on Braille characters",
+    "type": "module",
+    "sideEffects": false,
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs"
+        }
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "dev": "tsup --watch",
+        "build": "tsup",
+        "lint": "biome check .",
+        "lint:fix": "biome check --write .",
+        "format": "biome format --write .",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "test:coverage": "vitest run --coverage",
+        "typecheck": "tsc --noEmit",
+        "prepublishOnly": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+        "release": "pnpm version",
+        "demo": "tsx examples/dashboard.tsx"
+    },
+    "keywords": [
+        "ink",
+        "react",
+        "terminal",
+        "cli",
+        "chart",
+        "visualization",
+        "braille",
+        "dashboard",
+        "hud",
+        "tui",
+        "console",
+        "ascii-art",
+        "data-viz",
+        "sparkline",
+        "gauge",
+        "heatmap"
+    ],
+    "author": "saonian",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/zzf2333/ink-hud.git"
+    },
+    "bugs": {
+        "url": "https://github.com/zzf2333/ink-hud/issues"
+    },
+    "homepage": "https://github.com/zzf2333/ink-hud#readme",
+    "peerDependencies": {
+        "ink": "^4.0.0",
+        "react": "^18.0.0"
+    },
+    "dependencies": {
+        "chalk": "^5.3.0",
+        "d3-scale": "^4.0.2",
+        "tinygradient": "^1.1.5"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^1.9.4",
+        "@types/d3-scale": "^4.0.8",
+        "@types/node": "^20.17.10",
+        "@types/react": "^18.3.18",
+        "@vitest/coverage-v8": "^2.1.8",
+        "ink": "^4.4.1",
+        "ink-testing-library": "^4.0.0",
+        "react": "^18.3.1",
+        "tsup": "^8.3.5",
+        "tsx": "^4.19.2",
+        "typescript": "^5.7.2",
+        "vitest": "^2.1.8"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}

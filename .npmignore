@@ -1,0 +1,29 @@
+# Development files
+test/
+examples/
+docs/
+.github/
+
+# Config files
+tsconfig.json
+tsconfig.test.json
+biome.json
+vitest.config.ts
+tsup.config.ts
+
+# Source code (only publish build output)
+src/
+
+# Other
+*.md
+!README.md
+.DS_Store
+coverage/
+*.log
+*.tsbuildinfo
+.vscode/
+.idea/
+
+# Git
+.git
+.gitignore
