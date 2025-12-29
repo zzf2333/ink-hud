@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-    easeInCubic,
-    easeInOutQuad,
-    easeLinear,
-    easeOutCubic,
-} from '../../src/hooks/useSmooth';
+import { easeInCubic, easeInOutQuad, easeLinear, easeOutCubic } from '../../src/hooks/useSmooth';
 
 describe('easeLinear', () => {
     it('should return linear values', () => {

@@ -104,7 +104,6 @@ export function assignColors(seriesCount: number, palette: ColorPalette = 'one-d
             case 'one-dark-vivid':
                 baseColors = ONE_DARK_PALETTES.vivid;
                 break;
-            case 'one-dark':
             default:
                 baseColors = ONE_DARK_PALETTES.standard;
                 break;

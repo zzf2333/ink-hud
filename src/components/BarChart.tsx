@@ -6,10 +6,7 @@ import { Text } from 'ink';
 import React, { useMemo } from 'react';
 import type { Renderer } from '../core/renderer';
 import { linearScale } from '../utils/scale';
-import {
-    ChartContainer,
-    type AxisConfig,
-} from './common/ChartContainer';
+import { type AxisConfig, ChartContainer } from './common/ChartContainer';
 import type { TimeSeriesChartProps } from './common/chartTypes';
 import {
     type ChartSeries,
@@ -40,8 +37,11 @@ function computeVerticalLayout(params: {
     const { pixelWidth, categoryCount, seriesCount, alignment } = params;
 
     // 1. Calculate max possible group width across the canvas
-    const maxGroupWidth = alignDown(Math.max(alignment, Math.floor(pixelWidth / Math.max(1, categoryCount))), alignment);
-    let groupWidth = maxGroupWidth;
+    const maxGroupWidth = alignDown(
+        Math.max(alignment, Math.floor(pixelWidth / Math.max(1, categoryCount))),
+        alignment,
+    );
+    const groupWidth = maxGroupWidth;
 
     // Internal helper to calculate layout for a specific padding
     const calculateForPadding = (p: number) => {
@@ -50,7 +50,8 @@ function computeVerticalLayout(params: {
         const minNeed = seriesCount * alignment;
         if (available < minNeed) return null;
 
-        const gap = (available >= seriesCount * alignment + (seriesCount - 1) * alignment) ? alignment : 0;
+        const gap =
+            available >= seriesCount * alignment + (seriesCount - 1) * alignment ? alignment : 0;
         const totalGap = gap * (seriesCount - 1);
         const remaining = available - totalGap;
 
@@ -107,7 +108,10 @@ function computeHorizontalLayout(params: {
     const { pixelHeight, categoryCount, seriesCount, alignment } = params;
 
     // 1. Calculate max possible height per category
-    const maxGroupHeight = alignDown(Math.max(alignment, Math.floor(pixelHeight / Math.max(1, categoryCount))), alignment);
+    const maxGroupHeight = alignDown(
+        Math.max(alignment, Math.floor(pixelHeight / Math.max(1, categoryCount))),
+        alignment,
+    );
 
     // 2. Strict Block Logic (High Alignment)
     if (alignment >= 4) {
@@ -125,15 +129,15 @@ function computeHorizontalLayout(params: {
 
         return {
             groupHeight: groupHeight, // Strictly tight
-            barHeight: alignment,     // Min thickness (1 block char)
-            barGap: 0,               // No gaps
-            groupPadding: 0          // No padding
+            barHeight: alignment, // Min thickness (1 block char)
+            barGap: 0, // No gaps
+            groupPadding: 0, // No padding
         };
     }
 
     // 3. Standard Logic (Low Alignment, e.g. Ascii/Braille or purely pixel-based)
     // Similar to vertical logic: try to add padding/gaps if space allows.
-    let padding = alignment;
+    const padding = alignment;
 
     // ... logic similar to vertical but simpler ...
     // For simplicity, just use a compact strategy for horizontal to maximize label readability space usually
@@ -144,7 +148,10 @@ function computeHorizontalLayout(params: {
     if (available > seriesCount * alignment * 1.5) {
         // Enough space for padding
         const gap = alignment;
-        const barHeight = alignDown(Math.floor((available - gap * (seriesCount - 1)) / seriesCount), alignment);
+        const barHeight = alignDown(
+            Math.floor((available - gap * (seriesCount - 1)) / seriesCount),
+            alignment,
+        );
         return { groupHeight: maxGroupHeight, barHeight, barGap: gap, groupPadding: padding };
     }
 
@@ -153,7 +160,6 @@ function computeHorizontalLayout(params: {
     const barHeightCompact = alignDown(Math.floor(availableCompact / seriesCount), alignment);
     return { groupHeight: maxGroupHeight, barHeight: barHeightCompact, barGap: 0, groupPadding: 0 };
 }
-
 
 // ============================================================================
 // Renderers
@@ -181,7 +187,7 @@ function renderVertical(params: {
         pixelWidth,
         categoryCount: maxLength,
         seriesCount: series.length,
-        alignment
+        alignment,
     });
 
     const baselineY = computeBaselineY({ min, max, pixelHeight });
@@ -205,7 +211,10 @@ function renderVertical(params: {
 
             for (let yy = yStart; yy <= yEnd; yy++) {
                 for (let xx = x; xx <= xEnd; xx++) {
-                    renderer.setPixel(canvas, xx, yy, { active: true, ...(color ? { color } : {}) });
+                    renderer.setPixel(canvas, xx, yy, {
+                        active: true,
+                        ...(color ? { color } : {}),
+                    });
                 }
             }
         }
@@ -239,7 +248,7 @@ function renderHorizontal(params: {
         pixelHeight,
         categoryCount: maxLength,
         seriesCount: series.length,
-        alignment
+        alignment,
     });
 
     // Scale X
@@ -275,7 +284,10 @@ function renderHorizontal(params: {
 
             for (let yy = y; yy <= yEnd; yy++) {
                 for (let xx = xStart; xx <= xEndFill; xx++) {
-                    renderer.setPixel(canvas, xx, yy, { active: true, ...(color ? { color } : {}) });
+                    renderer.setPixel(canvas, xx, yy, {
+                        active: true,
+                        ...(color ? { color } : {}),
+                    });
                 }
             }
         }
@@ -283,7 +295,6 @@ function renderHorizontal(params: {
 
     return renderer.renderCanvas(canvas, pixelWidth, pixelHeight);
 }
-
 
 // ============================================================================
 // Main Component
@@ -333,11 +344,25 @@ export const BarChart: React.FC<BarChartProps> = (props) => {
 
         if (orientation === 'horizontal') {
             return renderHorizontal({
-                renderer, series, width: canvasWidth, height: canvasHeight, min, max, maxLength, colors
+                renderer,
+                series,
+                width: canvasWidth,
+                height: canvasHeight,
+                min,
+                max,
+                maxLength,
+                colors,
             });
         }
         return renderVertical({
-            renderer, series, width: canvasWidth, height: canvasHeight, min, max, maxLength, colors
+            renderer,
+            series,
+            width: canvasWidth,
+            height: canvasHeight,
+            min,
+            max,
+            maxLength,
+            colors,
         });
     }, [renderer, series, canvasWidth, canvasHeight, min, max, maxLength, colors, orientation]);
 

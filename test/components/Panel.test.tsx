@@ -1,7 +1,4 @@
 import { Text } from 'ink';
-/** @jsxRuntime classic */
-/** @jsx React.createElement */
-import React from 'react';
 import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
 import { Panel } from '../../src/components/Panel';

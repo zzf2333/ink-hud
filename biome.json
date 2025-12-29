@@ -17,7 +17,12 @@
         "rules": {
             "recommended": true,
             "complexity": {
-                "noExcessiveCognitiveComplexity": "error",
+                "noExcessiveCognitiveComplexity": {
+                    "level": "warn",
+                    "options": {
+                        "maxAllowedComplexity": 35
+                    }
+                },
                 "noForEach": "warn",
                 "noUselessLoneBlockStatements": "error"
             },

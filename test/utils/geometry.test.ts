@@ -38,9 +38,7 @@ describe('midpointCircle', () => {
         for (const [x, y] of points) {
             const symmetricX = 2 * centerX - x;
             const symmetricY = 2 * centerY - y;
-            const hasSymmetric = points.some(
-                ([px, py]) => px === symmetricX && py === symmetricY
-            );
+            const hasSymmetric = points.some(([px, py]) => px === symmetricX && py === symmetricY);
             expect(hasSymmetric).toBe(true);
         }
     });

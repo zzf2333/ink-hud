@@ -116,8 +116,6 @@ function resolveDataItems(
 const TWO_PI = Math.PI * 2;
 const START_ANGLE = -Math.PI / 2;
 
-
-
 function resolveRadius(
     pixelWidth: number,
     pixelHeight: number,
@@ -193,10 +191,7 @@ export const PieChart: React.FC<PieChartProps> = ({
     widthOffset = 0,
 }) => {
     // Parse data input
-    const data = useMemo(
-        () => resolveDataItems(dataProp, labels),
-        [dataProp, labels],
-    );
+    const data = useMemo(() => resolveDataItems(dataProp, labels), [dataProp, labels]);
 
     // 1. Layout calculation (Use simplified API, disable axes)
     const layout = useChartLayoutSimple(
@@ -213,11 +208,7 @@ export const PieChart: React.FC<PieChartProps> = ({
         0,
     );
 
-    const {
-        totalWidth,
-        plotWidth: canvasWidth,
-        plotHeight: canvasHeight,
-    } = layout;
+    const { totalWidth, plotWidth: canvasWidth, plotHeight: canvasHeight } = layout;
 
     const { getRenderer, selectBest } = useInkHud();
 

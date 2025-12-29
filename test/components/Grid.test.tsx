@@ -1,7 +1,6 @@
-import React from 'react';
+import { Text } from 'ink';
 import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
-import { Text } from 'ink';
 import { Grid, GridItem } from '../../src/components/Grid';
 
 describe('Grid', () => {
@@ -14,7 +13,7 @@ describe('Grid', () => {
                 <GridItem>
                     <Text>Item 2</Text>
                 </GridItem>
-            </Grid>
+            </Grid>,
         );
         expect(lastFrame()).toMatch(/Item 1/);
         expect(lastFrame()).toMatch(/Item 2/);

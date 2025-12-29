@@ -103,11 +103,7 @@ export const InkHudProvider: React.FC<InkHudProviderProps> = ({
         };
     }, [detector, forceRenderer]);
 
-    return (
-        <InkHudContext.Provider value={value}>
-            {children}
-        </InkHudContext.Provider>
-    );
+    return <InkHudContext.Provider value={value}>{children}</InkHudContext.Provider>;
 };
 
 /**

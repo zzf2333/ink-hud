@@ -59,13 +59,7 @@ export interface ChartCoreResult {
  * - Legend item construction
  */
 export function useChartCore(props: ChartCoreProps): ChartCoreResult {
-    const {
-        series: seriesProp,
-        data,
-        seriesName,
-        colors: colorsProp,
-        colorPalette,
-    } = props;
+    const { series: seriesProp, data, seriesName, colors: colorsProp, colorPalette } = props;
 
     // 1. Parse series data
     const series = useMemo(
@@ -74,10 +68,7 @@ export function useChartCore(props: ChartCoreProps): ChartCoreResult {
     );
 
     // 2. Calculate data range
-    const { min, max, maxLength } = useMemo(
-        () => computeSeriesExtent(series),
-        [series],
-    );
+    const { min, max, maxLength } = useMemo(() => computeSeriesExtent(series), [series]);
 
     // 3. Assign colors
     const colors = useMemo(

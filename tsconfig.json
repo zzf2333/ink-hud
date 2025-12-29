@@ -2,9 +2,7 @@
     "compilerOptions": {
         // Language and Environment
         "target": "ES2022",
-        "lib": [
-            "ES2022"
-        ],
+        "lib": ["ES2022"],
         "jsx": "react",
         // Module System
         "module": "ESNext",
@@ -32,13 +30,6 @@
         "forceConsistentCasingInFileNames": true,
         "isolatedModules": true
     },
-    "include": [
-        "src/**/*"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist",
-        "**/*.test.ts",
-        "**/*.test.tsx"
-    ]
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.test.tsx"]
 }

@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx React.createElement */
-import React from 'react';
 import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
 import { LineChart } from '../../src/components/LineChart';

@@ -16,8 +16,8 @@ function createPixels(leftHeight: number, rightHeight: number): Pixel[][] {
         // y < leftHeight means we fill the FIRST leftHeight rows... wait.
         // If we want it to be BOTTOM-HEAVY (Standard Mode), we fill py=7, py=6, etc.
         // Fill from bottom (py=7 down to 0)
-        pixels[y][0] = { active: (7 - y) < leftHeight };
-        pixels[y][1] = { active: (7 - y) < rightHeight };
+        pixels[y][0] = { active: 7 - y < leftHeight };
+        pixels[y][1] = { active: 7 - y < rightHeight };
     }
     return pixels;
 }

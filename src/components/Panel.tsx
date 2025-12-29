@@ -78,13 +78,15 @@ export const Panel: React.FC<PanelProps> = ({
     const paddingOverhead = padding * 2;
     const totalOverhead = borderOverhead + paddingOverhead;
 
-    const innerWidth = typeof effectiveWidth === 'number'
-        ? Math.max(0, effectiveWidth - totalOverhead)
-        : undefined;
+    const innerWidth =
+        typeof effectiveWidth === 'number'
+            ? Math.max(0, effectiveWidth - totalOverhead)
+            : undefined;
 
-    const innerHeight = typeof effectiveHeight === 'number'
-        ? Math.max(0, effectiveHeight - totalOverhead)
-        : undefined;
+    const innerHeight =
+        typeof effectiveHeight === 'number'
+            ? Math.max(0, effectiveHeight - totalOverhead)
+            : undefined;
 
     // 3. Prepare Box props
     const boxProps: BoxProps = {
@@ -97,10 +99,13 @@ export const Panel: React.FC<PanelProps> = ({
 
     // 4. Update Context for children
     // We memoize the context value to prevent unnecessary re-renders
-    const childContext = React.useMemo(() => ({
-        ...(innerWidth !== undefined ? { width: innerWidth } : {}),
-        height: innerHeight
-    }), [innerWidth, innerHeight]);
+    const childContext = React.useMemo(
+        () => ({
+            ...(innerWidth !== undefined ? { width: innerWidth } : {}),
+            height: innerHeight,
+        }),
+        [innerWidth, innerHeight],
+    );
 
     // Note: If innerWidth is undefined (e.g. Panel width is '100%'), we might not be able to pass a number.
     // However, chartUtils useChartLayout falls back to defaultWidth if context width is missing.
@@ -119,8 +124,8 @@ export const Panel: React.FC<PanelProps> = ({
                             titleAlignment === 'center'
                                 ? 'center'
                                 : titleAlignment === 'right'
-                                    ? 'flex-end'
-                                    : 'flex-start'
+                                  ? 'flex-end'
+                                  : 'flex-start'
                         }
                     >
                         <Text bold color={borderColor || 'white'}>

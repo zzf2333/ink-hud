@@ -23,11 +23,16 @@ class MockRenderer extends Renderer {
 
     createCanvas(width: number, height: number): Pixel[][] {
         return Array.from({ length: height }, () =>
-            Array.from({ length: width }, () => ({ active: false }))
+            Array.from({ length: width }, () => ({ active: false })),
         );
     }
 
-    setPixel(canvas: Pixel[][], x: number, y: number, pixel: Partial<Pixel> = { active: true }): void {
+    setPixel(
+        canvas: Pixel[][],
+        x: number,
+        y: number,
+        pixel: Partial<Pixel> = { active: true },
+    ): void {
         const row = canvas[y];
         if (y >= 0 && y < canvas.length && row && x >= 0 && x < row.length) {
             const p = row[x];
@@ -37,7 +42,14 @@ class MockRenderer extends Renderer {
         }
     }
 
-    drawLine(canvas: Pixel[][], x0: number, y0: number, _x1: number, _y1: number, pixel?: Partial<Pixel>): void {
+    drawLine(
+        canvas: Pixel[][],
+        x0: number,
+        y0: number,
+        _x1: number,
+        _y1: number,
+        pixel?: Partial<Pixel>,
+    ): void {
         // simple implementation: only draw starting point
         this.setPixel(canvas, x0, y0, pixel);
     }

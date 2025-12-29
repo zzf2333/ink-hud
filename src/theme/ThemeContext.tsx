@@ -57,11 +57,11 @@ export const ONE_DARK_THEME: Theme = {
     palette: ONE_DARK_PALETTES.standard,
     semantic: {
         success: '#98c379', // green
-        error: '#e06c75',   // red
+        error: '#e06c75', // red
         warning: '#e5c07b', // yellow
-        info: '#61afef',    // blue
-        muted: '#5c6370',   // gray
-        text: '#abb2bf',    // light gray
+        info: '#61afef', // blue
+        muted: '#5c6370', // gray
+        text: '#abb2bf', // light gray
         textSecondary: '#5c6370', // dark gray
     },
     heatmapGradient: [
@@ -102,10 +102,7 @@ export interface ThemeProviderProps {
  * </ThemeProvider>
  * ```
  */
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({
-    theme: customTheme,
-    children,
-}) => {
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ theme: customTheme, children }) => {
     const mergedTheme = useMemo<Theme>(() => {
         if (!customTheme) {
             return ONE_DARK_THEME;
@@ -120,11 +117,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
         };
     }, [customTheme]);
 
-    return (
-        <ThemeContext.Provider value={mergedTheme}>
-            {children}
-        </ThemeContext.Provider>
-    );
+    return <ThemeContext.Provider value={mergedTheme}>{children}</ThemeContext.Provider>;
 };
 
 /**

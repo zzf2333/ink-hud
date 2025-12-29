@@ -63,12 +63,7 @@ const findMinMax = (data: number[][]) => {
     return { min: minVal, max: maxVal };
 };
 
-export const Heatmap: React.FC<HeatmapProps> = ({
-    data,
-    colors,
-    variant = 'unicode',
-    char,
-}) => {
+export const Heatmap: React.FC<HeatmapProps> = ({ data, colors, variant = 'unicode', char }) => {
     const theme = useTheme();
     const effectiveColors = colors ?? theme.heatmapGradient;
 
@@ -85,7 +80,10 @@ export const Heatmap: React.FC<HeatmapProps> = ({
     // 2. Create gradient function
     // We map 0..1 to gradient steps.
     const steps = effectiveColors.length;
-    const gradient = useMemo(() => createGradient(effectiveColors, steps), [effectiveColors, steps]);
+    const gradient = useMemo(
+        () => createGradient(effectiveColors, steps),
+        [effectiveColors, steps],
+    );
 
     // 3. Render
     return (

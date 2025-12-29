@@ -4,8 +4,8 @@
  * Unified base property interface for all chart components
  */
 
-import type { ColorPalette } from '../../utils/gradient';
 import type { RendererType } from '../../core/renderer';
+import type { ColorPalette } from '../../utils/gradient';
 
 /**
  * Basic chart dimensions and renderer configuration
@@ -117,4 +117,8 @@ export interface SeriesDataProps {
 /**
  * Complete time series chart properties (shared by LineChart/AreaChart)
  */
-export type TimeSeriesChartProps = BaseChartProps & LegendProps & ColorProps & AxisProps & SeriesDataProps;
+export type TimeSeriesChartProps = BaseChartProps &
+    LegendProps &
+    ColorProps &
+    AxisProps &
+    SeriesDataProps;

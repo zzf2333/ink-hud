@@ -1,6 +1,6 @@
-import type { Pixel, RenderedLine } from './types';
 import type { RendererMetadata } from './renderer';
 import { Renderer } from './renderer';
+import type { Pixel, RenderedLine } from './types';
 
 /**
  * ASCII renderer

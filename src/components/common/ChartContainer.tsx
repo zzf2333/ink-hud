@@ -7,8 +7,8 @@
 import { Box, Text } from 'ink';
 import React from 'react';
 import { Axis, type AxisProps } from './Axis';
-import type { ChartLayoutResult } from './chartUtils';
 import { Legend, type LegendItem } from './Legend';
+import type { ChartLayoutResult } from './chartUtils';
 
 /**
  * Axis configuration (excluding type and length fields, provided by ChartContainer)

@@ -38,10 +38,7 @@ export function useChartRenderer(
 ): Renderer {
     const { getRenderer, selectBest } = useInkHud();
 
-    const {
-        renderer: preferredRenderer,
-        rendererChain = defaultChain,
-    } = props;
+    const { renderer: preferredRenderer, rendererChain = defaultChain } = props;
 
     return useMemo(() => {
         if (preferredRenderer) {

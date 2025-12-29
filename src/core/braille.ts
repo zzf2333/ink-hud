@@ -1,6 +1,6 @@
-import type { Pixel, RenderedLine } from './types';
 import type { RendererMetadata } from './renderer';
 import { Renderer } from './renderer';
+import type { Pixel, RenderedLine } from './types';
 
 const BRAILLE_BASE = 0x2800;
 const DOT_WEIGHTS = [1, 2, 4, 8, 16, 32, 64, 128];

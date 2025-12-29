@@ -1,6 +1,6 @@
-import type { Pixel, RenderedLine } from './types';
 import type { RendererMetadata } from './renderer';
 import { Renderer } from './renderer';
+import type { Pixel, RenderedLine } from './types';
 
 /**
  * Block Elements renderer
@@ -42,8 +42,6 @@ export class BlockRenderer extends Renderer {
     // ============================================================
     // Block-specific private methods
     // ============================================================
-
-
 
     /**
      * Determine primary color
@@ -136,9 +134,10 @@ export class BlockRenderer extends Renderer {
 
                 // Mode A: Top-Heavy Inversion
                 // If BOTH columns are Top-Heavy (or one is Top and other empty), we use "Inverted Rendering".
-                // We calculate the empty space at the bottom (8 - count), lookup the char for that, 
+                // We calculate the empty space at the bottom (8 - count), lookup the char for that,
                 // and render it with FG=Black (Hole) and BG=Color (Fill).
-                const useInverse = (isLeftTop && (isRightTop || right.count === 0)) ||
+                const useInverse =
+                    (isLeftTop && (isRightTop || right.count === 0)) ||
                     (isRightTop && (isLeftTop || left.count === 0));
 
                 let char = ' ';

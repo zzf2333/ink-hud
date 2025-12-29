@@ -5,10 +5,7 @@
 import { Text } from 'ink';
 import React, { useMemo } from 'react';
 import { linearScale } from '../utils/scale';
-import {
-    ChartContainer,
-    type AxisConfig,
-} from './common/ChartContainer';
+import { type AxisConfig, ChartContainer } from './common/ChartContainer';
 import type { TimeSeriesChartProps } from './common/chartTypes';
 import {
     type ChartSeries,
@@ -24,6 +21,27 @@ import { DEFAULT_RENDERER_CHAIN, useChartRenderer } from './common/useChartRende
  * AreaChart component props
  */
 export type AreaChartProps = TimeSeriesChartProps;
+
+/**
+ * Fill area between two Y values at a given X position
+ */
+function fillVerticalLine(
+    renderer: ReturnType<typeof useChartRenderer>,
+    canvas: ReturnType<ReturnType<typeof useChartRenderer>['createCanvas']>,
+    x: number,
+    y1: number,
+    y2: number,
+    color?: string,
+): void {
+    const fillStart = Math.min(y1, y2);
+    const fillEnd = Math.max(y1, y2);
+    for (let fy = fillStart; fy <= fillEnd; fy++) {
+        renderer.setPixel(canvas, x, fy, {
+            active: true,
+            ...(color ? { color } : {}),
+        });
+    }
+}
 
 /**
  * Render area chart drawing logic
@@ -64,10 +82,12 @@ function renderAreaChartCanvas(params: {
         })
         .sort((a, b) => b.maxVal - a.maxVal);
 
-    sortedData.forEach(({ series: item, color }) => {
+    for (const { series: item, color } of sortedData) {
         let prevPoint: { x: number; y: number } | null = null;
 
-        item.data.forEach((value, idx) => {
+        for (let idx = 0; idx < item.data.length; idx++) {
+            const value = item.data[idx];
+            if (value === undefined) continue;
             const point = { x: Math.round(idx * xStep), y: scaleValue(value) };
 
             if (prevPoint) {
@@ -77,25 +97,18 @@ function renderAreaChartCanvas(params: {
                 for (let px = startX; px <= endX; px++) {
                     const t = endX === startX ? 0 : (px - prevPoint.x) / (point.x - prevPoint.x);
                     const py = Math.floor(prevPoint.y + (point.y - prevPoint.y) * t);
-
-                    const fillStart = Math.min(py, baselineY);
-                    const fillEnd = Math.max(py, baselineY);
-
-                    for (let fy = fillStart; fy <= fillEnd; fy++) {
-                        renderer.setPixel(canvas, px, fy, { active: true, ...(color ? { color } : {}) });
-                    }
+                    fillVerticalLine(renderer, canvas, px, py, baselineY, color);
                 }
-                renderer.drawLine(canvas, prevPoint.x, prevPoint.y, point.x, point.y, { active: true, ...(color ? { color } : {}) });
+                renderer.drawLine(canvas, prevPoint.x, prevPoint.y, point.x, point.y, {
+                    active: true,
+                    ...(color ? { color } : {}),
+                });
             } else {
-                const fillStart = Math.min(point.y, baselineY);
-                const fillEnd = Math.max(point.y, baselineY);
-                for (let fy = fillStart; fy <= fillEnd; fy++) {
-                    renderer.setPixel(canvas, point.x, fy, { active: true, ...(color ? { color } : {}) });
-                }
+                fillVerticalLine(renderer, canvas, point.x, point.y, baselineY, color);
             }
             prevPoint = point;
-        });
-    });
+        }
+    }
 
     return renderer.renderCanvas(canvas, pixelWidth, pixelHeight);
 }
@@ -132,16 +145,17 @@ export const AreaChart: React.FC<AreaChartProps> = (props) => {
 
     // 3. Draw area chart (component-specific logic)
     const coloredLines = useMemo(
-        () => renderAreaChartCanvas({
-            renderer,
-            series,
-            canvasWidth,
-            canvasHeight,
-            min,
-            max,
-            maxLength,
-            colors,
-        }),
+        () =>
+            renderAreaChartCanvas({
+                renderer,
+                series,
+                canvasWidth,
+                canvasHeight,
+                min,
+                max,
+                maxLength,
+                colors,
+            }),
         [renderer, series, canvasWidth, canvasHeight, min, max, maxLength, colors],
     );
 

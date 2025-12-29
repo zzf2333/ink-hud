@@ -1,6 +1,3 @@
-/** @jsxRuntime classic */
-/** @jsx React.createElement */
-import React from 'react';
 import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
 import { Legend } from '../../../src/components/common/Legend';
@@ -37,7 +34,7 @@ describe('Legend', () => {
                     { name: 'CPU', color: 'cyan' },
                     { name: 'Memory', color: 'green' },
                 ]}
-            />
+            />,
         );
         const output = stripAnsi(lastFrame() ?? '');
         expect(output).toContain('CPU');
@@ -47,11 +44,7 @@ describe('Legend', () => {
 
     it('should support custom symbols', () => {
         const { lastFrame } = render(
-            <Legend
-                items={[
-                    { name: 'Data', color: 'blue', symbol: '■' },
-                ]}
-            />
+            <Legend items={[{ name: 'Data', color: 'blue', symbol: '■' }]} />,
         );
         const output = stripAnsi(lastFrame() ?? '');
         expect(output).toContain('■');
@@ -66,10 +59,10 @@ describe('Legend', () => {
                     { name: 'B', color: 'blue' },
                 ]}
                 position="horizontal"
-            />
+            />,
         );
         const output = stripAnsi(lastFrame() ?? '');
-        const lines = output.split('\n').filter(l => l.trim());
+        const lines = output.split('\n').filter((l) => l.trim());
         expect(lines).toHaveLength(1);
     });
 
@@ -81,17 +74,15 @@ describe('Legend', () => {
                     { name: 'B', color: 'blue' },
                 ]}
                 position="vertical"
-            />
+            />,
         );
         const output = stripAnsi(lastFrame() ?? '');
-        const lines = output.split('\n').filter(l => l.trim());
+        const lines = output.split('\n').filter((l) => l.trim());
         expect(lines.length).toBeGreaterThanOrEqual(2);
     });
 
     it('should use default symbol ●', () => {
-        const { lastFrame } = render(
-            <Legend items={[{ name: 'Test', color: 'white' }]} />
-        );
+        const { lastFrame } = render(<Legend items={[{ name: 'Test', color: 'white' }]} />);
         const output = stripAnsi(lastFrame() ?? '');
         expect(output).toContain('●');
     });

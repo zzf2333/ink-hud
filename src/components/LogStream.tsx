@@ -104,12 +104,16 @@ const LogLine: React.FC<Omit<LogLineProps, 'index'>> = ({ parsed, semantic }) =>
     // Style configuration: based on semantic colors
     const getStyle = (lvl: LogLevel) => {
         switch (lvl) {
-            case 'error': return { color: semantic.error, badge: '✖  ERROR', icon: '✖' };
-            case 'warn': return { color: semantic.warning, badge: '⚠  WARN ', icon: '⚠' };
-            case 'success': return { color: semantic.success, badge: '✔ SUCCESS', icon: '✔' };
-            case 'debug': return { color: semantic.muted, badge: '⚙ DEBUG', icon: '⚙' };
-            case 'info':
-            default: return { color: semantic.info, badge: 'ℹ  INFO ', icon: 'ℹ' };
+            case 'error':
+                return { color: semantic.error, badge: '✖  ERROR', icon: '✖' };
+            case 'warn':
+                return { color: semantic.warning, badge: '⚠  WARN ', icon: '⚠' };
+            case 'success':
+                return { color: semantic.success, badge: '✔ SUCCESS', icon: '✔' };
+            case 'debug':
+                return { color: semantic.muted, badge: '⚙ DEBUG', icon: '⚙' };
+            default:
+                return { color: semantic.info, badge: 'ℹ  INFO ', icon: 'ℹ' };
         }
     };
 
@@ -145,7 +149,9 @@ const LogLine: React.FC<Omit<LogLineProps, 'index'>> = ({ parsed, semantic }) =>
                     <Text color={semantic.muted}>•</Text>
                 ) : (
                     <Text color={style.color} bold>
-                        {level === 'error' || level === 'warn' ? style.icon + ' ' + level.toUpperCase() : level.toUpperCase()}
+                        {level === 'error' || level === 'warn'
+                            ? `${style.icon} ${level.toUpperCase()}`
+                            : level.toUpperCase()}
                     </Text>
                 )}
             </Box>
@@ -175,17 +181,13 @@ const LogLine: React.FC<Omit<LogLineProps, 'index'>> = ({ parsed, semantic }) =>
  * - Use icons and colors to distinguish levels
  * - Support maximum line limit
  */
-export const LogStream: React.FC<LogStreamProps> = ({
-    logs,
-    maxLines = 100,
-    height,
-    width,
-}) => {
+export const LogStream: React.FC<LogStreamProps> = ({ logs, maxLines = 100, height, width }) => {
     const theme = useTheme();
 
     // Get dimensions from Grid context
     const gridContext = useContext(GridItemContext);
-    const effectiveHeight = height ?? (typeof gridContext?.height === 'number' ? gridContext.height : undefined);
+    const effectiveHeight =
+        height ?? (typeof gridContext?.height === 'number' ? gridContext.height : undefined);
     const effectiveWidth = width ?? gridContext?.width;
 
     // 1. Trim logs to maxLines
@@ -206,13 +208,7 @@ export const LogStream: React.FC<LogStreamProps> = ({
     // 3. Parse and render
     const items = displayLogs.map((line, index) => {
         const parsed = parseLogLine(line);
-        return (
-            <LogLine
-                key={index}
-                parsed={parsed}
-                semantic={theme.semantic}
-            />
-        );
+        return <LogLine key={index} parsed={parsed} semantic={theme.semantic} />;
     });
 
     return (

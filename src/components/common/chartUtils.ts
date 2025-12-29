@@ -140,11 +140,11 @@ export function useChartLayout(
     // 2. Calculate Component Dimensions
     const yAxisWidth = showYAxis
         ? getYAxisLabelWidth({
-            min,
-            max,
-            tickCount: yTickCount,
-            tickFormat: yTickFormat ?? defaultTickFormat,
-        })
+              min,
+              max,
+              tickCount: yTickCount,
+              tickFormat: yTickFormat ?? defaultTickFormat,
+          })
         : 0;
 
     const effectiveXAxisHeight = showXAxis ? 1 + (xAxisLabel ? 1 : 0) : 0;
@@ -251,7 +251,10 @@ export function useChartLayoutSimple(
     const renderYAxis = showYAxis ?? showAxis;
 
     return useChartLayout(
-        { ...(propsWidth !== undefined && { width: propsWidth }), ...(propsHeight !== undefined && { height: propsHeight }) },
+        {
+            ...(propsWidth !== undefined && { width: propsWidth }),
+            ...(propsHeight !== undefined && { height: propsHeight }),
+        },
         {
             widthOffset,
             heightOffset,
@@ -312,7 +315,6 @@ export function resolveSeriesInput(params: {
     }
     return [];
 }
-
 
 export function computeSeriesExtent(series: ChartSeries[]): {
     min: number;
@@ -423,4 +425,3 @@ export function computeBaselineY(params: {
     const baselineValue = min <= 0 && max >= 0 ? 0 : min > 0 ? min : max;
     return Math.round(linearScale(baselineValue, [min, max], [pixelHeight - 1, 0]));
 }
-

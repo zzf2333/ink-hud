@@ -80,8 +80,8 @@ export const Sparkline: React.FC<SparklineProps> = ({
             variant === 'braille'
                 ? SPARK_LEVELS_BRAILLE
                 : variant === 'ascii'
-                    ? SPARK_LEVELS_ASCII
-                    : SPARK_LEVELS_BLOCK;
+                  ? SPARK_LEVELS_ASCII
+                  : SPARK_LEVELS_BLOCK;
 
         return processedData
             .map((v) => {

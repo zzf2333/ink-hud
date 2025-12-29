@@ -5,16 +5,9 @@
 import { Text } from 'ink';
 import React, { useMemo } from 'react';
 import { linearScale } from '../utils/scale';
-import {
-    ChartContainer,
-    type AxisConfig,
-} from './common/ChartContainer';
+import { type AxisConfig, ChartContainer } from './common/ChartContainer';
 import type { TimeSeriesChartProps } from './common/chartTypes';
-import {
-    defaultTickFormat,
-    getPixelDimensions,
-    useChartLayoutSimple,
-} from './common/chartUtils';
+import { defaultTickFormat, getPixelDimensions, useChartLayoutSimple } from './common/chartUtils';
 import { useChartCore } from './common/useChartCore';
 import { DEFAULT_RENDERER_CHAIN, useChartRenderer } from './common/useChartRenderer';
 
@@ -55,15 +48,16 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
 
     // 3. Draw line chart (component-specific logic)
     const coloredLines = useMemo(
-        () => renderLineChartCanvas({
-            renderer,
-            series,
-            canvasWidth,
-            canvasHeight,
-            min,
-            max,
-            colors,
-        }),
+        () =>
+            renderLineChartCanvas({
+                renderer,
+                series,
+                canvasWidth,
+                canvasHeight,
+                min,
+                max,
+                colors,
+            }),
         [renderer, series, canvasWidth, canvasHeight, min, max, colors],
     );
 

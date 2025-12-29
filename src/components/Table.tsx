@@ -111,7 +111,7 @@ const SortableHeaderCell = <T,>({
             {...(isFocused ? { borderStyle: 'single' } : {})}
             borderColor={semantic.info}
             marginTop={isFocused ? -1 : 0} // visual adjustment for border
-        // Or better: use inverse color for focus
+            // Or better: use inverse color for focus
         >
             {/* 
                 Border adds size, might shift layout. 
@@ -194,7 +194,7 @@ export const Table = <T,>({
         // Both can be handled by the same scale factor logic
         const scale = availableWidth / totalContentWidth;
 
-        // If scale is close to 1 (within rounding error), just return contentWidths? 
+        // If scale is close to 1 (within rounding error), just return contentWidths?
         // No, we want to snap to availableWidth exactly if possible.
 
         let allocated = 0;
@@ -212,7 +212,10 @@ export const Table = <T,>({
     }, [availableWidth, totalContentWidth, contentWidths]);
 
     return (
-        <Box flexDirection="column" {...(availableWidth !== undefined && { width: availableWidth })}>
+        <Box
+            flexDirection="column"
+            {...(availableWidth !== undefined && { width: availableWidth })}
+        >
             {/* Header */}
             <Box
                 borderStyle="single"

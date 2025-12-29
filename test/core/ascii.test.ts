@@ -93,11 +93,18 @@ describe('AsciiRenderer', () => {
 
     describe('renderCanvas - smart character selection', () => {
         // helper: extract plain text from RenderedLine[]
-        const getText = (lines: Array<Array<{ text: string; color?: string }>>, lineIndex: number): string => {
+        const getText = (
+            lines: Array<Array<{ text: string; color?: string }>>,
+            lineIndex: number,
+        ): string => {
             return lines[lineIndex]?.map((seg) => seg.text).join('') ?? '';
         };
 
-        const getChar = (lines: Array<Array<{ text: string; color?: string }>>, lineIndex: number, charIndex: number): string => {
+        const getChar = (
+            lines: Array<Array<{ text: string; color?: string }>>,
+            lineIndex: number,
+            charIndex: number,
+        ): string => {
             const text = getText(lines, lineIndex);
             return text[charIndex] ?? '';
         };

@@ -126,7 +126,6 @@ export class RendererSelector {
     }
 }
 
-
 /**
  * Global RendererSelector instance
  */
