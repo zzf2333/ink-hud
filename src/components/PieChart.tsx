@@ -313,9 +313,9 @@ export const PieChart: React.FC<PieChartProps> = ({
     }
 
     return (
-        <Box flexDirection="column" width={totalWidth} alignItems="center">
-            <Box flexDirection="row">
-                <Box flexDirection="column">
+        <Box flexDirection="column" width={totalWidth} height={layout.totalHeight}>
+            <Box flexDirection="row" justifyContent="center">
+                <Box flexDirection="column" width={canvasWidth}>
                     {coloredLines.map((segments, i) => (
                         <Text key={`chart-line-${i}`}>
                             {segments.map((segment, j) => (

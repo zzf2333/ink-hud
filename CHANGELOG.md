@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-01-07
+
+### Fixed
+- **Grid Layout**: Fixed pixel rounding errors in column width calculation ensuring precise alignment. `Grid` now distributes remainder pixels across columns.
+- **Chart Sizing**: Fixed charts overflowing their container by enforcing strict height constraints in `ChartContainer`.
+- **PieChart Rendering**: Fixed `PieChart` not centering correctly and being truncated at boundaries. Added proper alignment and container sizing.
+- **Panel Height**: Fixed `Panel` not propagating height context to children when height is a string (e.g., "100%").
+- **Chart Defaults**: Improved default height handling in `chartUtils` to prevent hardcoded fallbacks.
+
 ## [Unreleased]
 
 ### Added

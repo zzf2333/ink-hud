@@ -7,6 +7,8 @@ interface GridContextValue {
     gap: number;
     totalWidth: number;
     rowHeight?: number | string | undefined;
+    /** Pre-calculated widths for each GridItem (by index) */
+    itemWidths?: number[];
 }
 
 const GridContext = createContext<GridContextValue>({
@@ -54,6 +56,77 @@ export interface GridProps {
 }
 
 /**
+ * Calculate precise widths for all GridItems
+ * Uses "distribute remainder" algorithm to eliminate rounding errors
+ */
+function calculateItemWidths(
+    children: React.ReactNode,
+    totalWidth: number,
+    columns: number,
+    gap: number,
+): number[] {
+    const childArray = React.Children.toArray(children);
+    const itemWidths: number[] = [];
+
+    // Calculate available width for columns (excluding all gaps between columns)
+    const totalGapWidth = Math.max(0, (columns - 1) * gap);
+    const availableWidth = Math.max(0, totalWidth - totalGapWidth);
+
+    // Base column width and remainder
+    const baseColWidth = Math.floor(availableWidth / columns);
+    const remainder = availableWidth % columns;
+
+    // Track current column position and remaining extra pixels
+    let currentCol = 0;
+    let remainingExtra = remainder;
+
+    for (const child of childArray) {
+        // Get span from child props (default: 1)
+        const span =
+            React.isValidElement(child) && typeof child.props.span === 'number'
+                ? Math.min(Math.max(1, child.props.span), columns)
+                : 1;
+
+        // Calculate how many extra pixels this item should get
+        // Distribute extras to columns from left to right
+        let itemExtra = 0;
+        const startCol = currentCol;
+        const endCol = Math.min(currentCol + span, columns);
+
+        for (let col = startCol; col < endCol && remainingExtra > 0; col++) {
+            if (col < remainder) {
+                itemExtra++;
+                remainingExtra--;
+            }
+        }
+
+        // Recalculate: we should use the actual distribution method
+        // For each column in the span, check if it should get +1
+        itemExtra = 0;
+        for (let col = currentCol; col < currentCol + span && col < columns; col++) {
+            if (col < remainder) {
+                itemExtra++;
+            }
+        }
+
+        // Item width = (base * span) + extra pixels + internal gaps
+        const itemGapWidth = Math.max(0, (span - 1) * gap);
+        const itemWidth = baseColWidth * span + itemExtra + itemGapWidth;
+
+        itemWidths.push(itemWidth);
+
+        // Move to next column position (wrap if needed)
+        currentCol += span;
+        if (currentCol >= columns) {
+            currentCol = 0;
+            remainingExtra = remainder; // Reset for next row
+        }
+    }
+
+    return itemWidths;
+}
+
+/**
  * Grid Container
  * Acts like a CSS Grid container, arranging items in columns.
  */
@@ -79,12 +152,28 @@ export const Grid: React.FC<GridProps> = ({
     }, [stdout]);
 
     // Use provided width or terminal width
-    // Subtract a safety margin (e.g., 2 chars) if using terminal width to prevent edge-case wrapping
-    const defaultWidth = terminalWidth > 2 ? terminalWidth - 2 : terminalWidth;
+    // When widthOffset is specified, user is manually managing margins, so don't apply default safety margin
+    // Otherwise, subtract a safety margin (2 chars) to prevent edge-case wrapping
+    const safetyMargin = widthOffset > 0 ? 0 : 2;
+    const defaultWidth =
+        terminalWidth > safetyMargin ? terminalWidth - safetyMargin : terminalWidth;
     const totalWidth = propsWidth ?? Math.max(0, defaultWidth - widthOffset);
 
+    // Pre-calculate precise widths for all items
+    const itemWidths = calculateItemWidths(children, totalWidth, columns, gap);
+
+    // Clone children with _gridIndex prop
+    const childrenWithIndex = React.Children.map(children, (child, index) => {
+        if (React.isValidElement(child)) {
+            return React.cloneElement(child as React.ReactElement<{ _gridIndex?: number }>, {
+                _gridIndex: index,
+            });
+        }
+        return child;
+    });
+
     return (
-        <GridContext.Provider value={{ columns, gap, totalWidth, rowHeight }}>
+        <GridContext.Provider value={{ columns, gap, totalWidth, rowHeight, itemWidths }}>
             <Box
                 flexDirection="row"
                 flexWrap="wrap"
@@ -92,7 +181,7 @@ export const Grid: React.FC<GridProps> = ({
                 rowGap={gap}
                 width={totalWidth}
             >
-                {children}
+                {childrenWithIndex}
             </Box>
         </GridContext.Provider>
     );
@@ -108,6 +197,8 @@ export interface GridItemProps {
     /** Overflow behavior */
     overflow?: 'visible' | 'hidden';
     children: React.ReactNode;
+    /** Internal: index assigned by Grid parent */
+    _gridIndex?: number;
 }
 
 /**
@@ -120,28 +211,38 @@ export const GridItem: React.FC<GridItemProps> = ({
     minHeight,
     overflow,
     children,
+    _gridIndex,
 }) => {
-    const { columns, gap, totalWidth, rowHeight: contextRowHeight } = useContext(GridContext);
+    const {
+        columns,
+        gap,
+        totalWidth,
+        rowHeight: contextRowHeight,
+        itemWidths,
+    } = useContext(GridContext);
 
-    // Calculate width accounting for gaps
-    // Available width for columns = Total - (Columns - 1) * Gap
-    const totalGapWidth = Math.max(0, (columns - 1) * gap);
-    const availableWidth = Math.max(0, totalWidth - totalGapWidth);
+    // Get precise width from pre-calculated widths if available
+    let basisWidth: number;
 
-    // Width for this item's span
-    // SpanWidth = (SingleColWidth * Span) + ((Span - 1) * Gap)
-    // We floor to ensure we don't overflow; flexGrow will fill remainder.
-    const colWidth = availableWidth / columns;
-    const itemGapWidth = Math.max(0, (span - 1) * gap);
-    const basisWidth = Math.floor(colWidth * span + itemGapWidth);
+    if (itemWidths !== undefined && _gridIndex !== undefined && _gridIndex < itemWidths.length) {
+        // Use pre-calculated precise width (non-null assertion safe due to bounds check)
+        basisWidth = itemWidths[_gridIndex] ?? 0;
+    } else {
+        // Fallback to original calculation (for standalone usage)
+        const totalGapWidth = Math.max(0, (columns - 1) * gap);
+        const availableWidth = Math.max(0, totalWidth - totalGapWidth);
+        const colWidth = availableWidth / columns;
+        const itemGapWidth = Math.max(0, (span - 1) * gap);
+        basisWidth = Math.floor(colWidth * span + itemGapWidth);
+    }
 
     const effectiveHeight = height ?? contextRowHeight;
 
     return (
         <GridItemContext.Provider value={{ width: basisWidth, height: effectiveHeight }}>
             <Box
-                flexGrow={1}
-                flexShrink={1}
+                flexGrow={0}
+                flexShrink={0}
                 flexBasis={basisWidth}
                 flexDirection="column"
                 {...(effectiveHeight !== undefined && { height: effectiveHeight })}

@@ -71,6 +71,8 @@ export interface ChartLayoutConfig {
     yTickFormat?: (value: number) => string;
     /** Default width if not in grid (default: 60) */
     defaultWidth?: number;
+    /** Default height if not in grid (default: 15) */
+    defaultHeight?: number;
     /** Data min value */
     min: number;
     /** Data max value */
@@ -118,6 +120,7 @@ export function useChartLayout(
         yTickCount = 5,
         yTickFormat,
         defaultWidth = 60,
+        defaultHeight = 15,
         min,
         max,
     } = config;
@@ -125,8 +128,10 @@ export function useChartLayout(
     const gridContext = useContext(GridItemContext);
 
     // 1. Calculate Total Dimensions
+    // Priority: props.height > gridContext.height (if number) > defaultHeight
     const totalHeight =
-        props.height ?? (typeof gridContext?.height === 'number' ? gridContext.height : 15);
+        props.height ??
+        (typeof gridContext?.height === 'number' ? gridContext.height : defaultHeight);
 
     let totalWidth = props.width;
     if (totalWidth === undefined) {

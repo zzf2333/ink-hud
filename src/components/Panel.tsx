@@ -99,12 +99,17 @@ export const Panel: React.FC<PanelProps> = ({
 
     // 4. Update Context for children
     // We memoize the context value to prevent unnecessary re-renders
+    // Note: If height is a string (like '100%'), we can't calculate innerHeight,
+    // but we should still pass meaningfully to children
     const childContext = React.useMemo(
         () => ({
             ...(innerWidth !== undefined ? { width: innerWidth } : {}),
-            height: innerHeight,
+            // Pass innerHeight if calculated, or pass the raw effectiveHeight for reference
+            // This allows children to know at least that a height constraint exists
+            height:
+                innerHeight ?? (typeof effectiveHeight === 'string' ? effectiveHeight : undefined),
         }),
-        [innerWidth, innerHeight],
+        [innerWidth, innerHeight, effectiveHeight],
     );
 
     // Note: If innerWidth is undefined (e.g. Panel width is '100%'), we might not be able to pass a number.

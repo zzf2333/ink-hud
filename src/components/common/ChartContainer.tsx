@@ -80,10 +80,10 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
     legendItems = [],
     children,
 }) => {
-    const { totalWidth, plotWidth, plotHeight, yAxisWidth } = layout;
+    const { totalWidth, totalHeight, plotWidth, plotHeight, yAxisWidth } = layout;
 
     return (
-        <Box flexDirection="column" width={totalWidth}>
+        <Box flexDirection="column" width={totalWidth} height={totalHeight}>
             {/* Top Legend */}
             {showLegend && legendPosition === 'top' && (
                 <Box marginBottom={1} marginLeft={showYAxis ? yAxisWidth + 1 : 0}>
