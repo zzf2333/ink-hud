@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.2] - 2026-01-13
+## [v0.1.2] - 2026-01-13
 
 ### Added
 - **PulseBar Component**: Heartbeat-style connection status visualization with unicode/ascii variants.
@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation**: Added PulseBar docs and screenshots to component guides and README.
 - **Release Workflow**: Generate GitHub releases from `CHANGELOG.md`.
 
-## [0.1.1] - 2026-01-07
+## [v0.1.1] - 2026-01-07
 
 ### Fixed
 - **Grid Layout**: Fixed pixel rounding errors in column width calculation ensuring precise alignment. `Grid` now distributes remainder pixels across columns.
@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Panel Height**: Fixed `Panel` not propagating height context to children when height is a string (e.g., "100%").
 - **Chart Defaults**: Improved default height handling in `chartUtils` to prevent hardcoded fallbacks.
 
-## [0.1.0] - TBD
+## [v0.1.0] - TBD
 
 ### Added
 - 🎨 Braille character rendering with 8x resolution
@@ -35,6 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 📦 npm package configuration with TypeScript support
 
 [unreleased]: https://github.com/zzf2333/ink-hud/compare/v0.1.2...HEAD
-[0.1.2]: https://github.com/zzf2333/ink-hud/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/zzf2333/ink-hud/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/zzf2333/ink-hud/releases/tag/v0.1.0
+[v0.1.2]: https://github.com/zzf2333/ink-hud/compare/v0.1.1...v0.1.2
+[v0.1.1]: https://github.com/zzf2333/ink-hud/compare/v0.1.0...v0.1.1
+[v0.1.0]: https://github.com/zzf2333/ink-hud/releases/tag/v0.1.0
