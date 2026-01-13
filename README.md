@@ -189,6 +189,23 @@ Real-time scrolling log display with syntax highlighting.
 />
 ```
 
+#### PulseBar
+Heartbeat-style connection status history.
+
+![PulseBar](./docs/images/pulsebar.png)
+
+```tsx
+<PulseBar 
+    records={[
+        { status: 'good' },
+        { status: 'unstable' },
+        { status: 'bad' },
+    ]}
+    maxBars={30}
+    variant="unicode"
+/>
+```
+
 ### Layout Components
 
 #### Panel
@@ -250,6 +267,7 @@ pnpm install
 npx tsx examples/dashboard.tsx
 
 # Run individual components
+npx tsx examples/basic/pulsebar.tsx
 npx tsx examples/basic/linechart.tsx
 npx tsx examples/basic/piechart.tsx
 npx tsx examples/basic/table.tsx

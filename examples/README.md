@@ -20,23 +20,16 @@ examples/
 │   ├── table.tsx           # Interactive data table
 │   ├── logstream.tsx       # Real-time log display
 │   ├── panel.tsx           # Container with borders
+│   ├── pulsebar.tsx        # Connection heartbeat status bar
 │   └── grid.tsx            # Grid layout system
 ├── _shared/                # Shared utilities
 │   ├── symbolSets.ts       # Symbol set definitions
 │   └── cli.ts              # CLI argument parsing
-└── run.sh                  # Interactive example runner
 ```
 
 ## 🚀 Running Examples
 
-### Method 1: Interactive Menu
-
-```bash
-cd examples
-./run.sh
-```
-
-### Method 2: Run Individual Components
+### Method 1: Run Individual Components
 
 From the repository root:
 
@@ -58,6 +51,9 @@ pnpm -C examples component:bignumber
 pnpm -C examples component:table
 pnpm -C examples component:logstream
 
+# Status components
+pnpm -C examples component:pulsebar
+
 # Layout components
 pnpm -C examples component:panel
 pnpm -C examples component:grid
@@ -66,7 +62,7 @@ pnpm -C examples component:grid
 pnpm -C examples component:dashboard
 ```
 
-### Method 3: Direct Execution
+### Method 2: Direct Execution
 
 ```bash
 npx tsx examples/dashboard.tsx
@@ -91,6 +87,11 @@ npx tsx examples/basic/linechart.tsx
 |---------|-------------|
 | `gauge.tsx` | Circular/linear progress indicator |
 | `bignumber.tsx` | Large KPI display with trend |
+
+### Status
+| Example | Description |
+|---------|-------------|
+| `pulsebar.tsx` | Heartbeat-style connection status history |
 
 ### Data
 | Example | Description |

@@ -210,3 +210,13 @@ export { LogStream, type LogStreamProps } from './components/LogStream';
  * Table - Table component
  */
 export { Table, type TableProps, type TableColumn } from './components/Table';
+
+/**
+ * PulseBar - network connection status component
+ */
+export {
+    PulseBar,
+    type PulseBarProps,
+    type PingStatus,
+    type PingRecord,
+} from './components/PulseBar';

@@ -18,6 +18,7 @@
         "component:heatmap": "node --import tsx basic/heatmap.tsx",
         "component:logstream": "node --import tsx basic/logstream.tsx",
         "component:table": "node --import tsx basic/table.tsx",
+        "component:pulsebar": "node --import tsx basic/pulsebar.tsx",
         "component:dashboard": "node --import tsx dashboard.tsx"
     },
     "dependencies": {

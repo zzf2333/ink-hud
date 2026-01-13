@@ -307,6 +307,39 @@ import { LogStream } from 'ink-hud';
 
 ---
 
+### PulseBar
+
+Heartbeat-style connection status history.
+
+![PulseBar](./images/pulsebar.png)
+
+#### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `records` | `PingRecord[]` | required | Ping history entries |
+| `maxBars` | `number` | `30` | Maximum number of bars to display |
+| `variant` | `'unicode' \| 'ascii'` | `'unicode'` | Character style |
+| `colors` | `{ good?: string; unstable?: string; bad?: string }` | - | Custom status colors |
+
+#### Example
+
+```tsx
+import { PulseBar } from 'ink-hud';
+
+<PulseBar
+    records={[
+        { status: 'good' },
+        { status: 'unstable' },
+        { status: 'bad' },
+    ]}
+    maxBars={30}
+    variant="unicode"
+/>
+```
+
+---
+
 ## Layout Components
 
 ### Panel
