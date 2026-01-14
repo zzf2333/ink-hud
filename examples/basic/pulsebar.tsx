@@ -3,7 +3,7 @@ import { render, Box, Text } from 'ink';
 import { PulseBar, PingRecord, ThemeProvider, Panel } from '../../src';
 
 const Demo = () => {
-    const [records, setRecords] = useState<PingRecord[]>([]);
+    const [records, setRecords] = useState<PingRecord[] | undefined>(undefined);
 
     useEffect(() => {
         // Simulate ping results
@@ -18,7 +18,10 @@ const Demo = () => {
                 status = 'bad';
             }
 
-            setRecords((prev) => [...prev.slice(-29), { status }]);
+            setRecords((prev) => {
+                const next = prev ?? [];
+                return [...next.slice(-29), { status }];
+            });
         }, 300);
 
         return () => clearInterval(timer);

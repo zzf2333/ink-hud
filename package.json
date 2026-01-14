@@ -1,6 +1,6 @@
 {
     "name": "ink-hud",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "description": "Retina-grade terminal data visualization dashboard - High-resolution chart library based on Braille characters",
     "type": "module",
     "sideEffects": false,

@@ -21,7 +21,7 @@ export interface PulseBarProps {
     /**
      * Ping history entries
      */
-    records: PingRecord[];
+    records?: PingRecord[];
 
     /**
      * Maximum number of bars to display
@@ -80,7 +80,7 @@ const CHAR_SETS = {
  * - Red: connection failed
  */
 export const PulseBar: React.FC<PulseBarProps> = ({
-    records,
+    records = [],
     maxBars = 30,
     variant = 'unicode',
     colors,

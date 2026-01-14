@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.1.3] - 2026-01-13
+
+### Fixed
+- **PulseBar**: Default to a fully muted bar when no records are provided; keep demo in sync.
+
 ## [v0.1.2] - 2026-01-13
 
 ### Added
@@ -34,7 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🧪 Comprehensive test suite with >90% coverage
 - 📦 npm package configuration with TypeScript support
 
-[unreleased]: https://github.com/zzf2333/ink-hud/compare/v0.1.2...HEAD
+[unreleased]: https://github.com/zzf2333/ink-hud/compare/v0.1.3...HEAD
+[v0.1.3]: https://github.com/zzf2333/ink-hud/compare/v0.1.2...v0.1.3
 [v0.1.2]: https://github.com/zzf2333/ink-hud/compare/v0.1.1...v0.1.2
 [v0.1.1]: https://github.com/zzf2333/ink-hud/compare/v0.1.0...v0.1.1
 [v0.1.0]: https://github.com/zzf2333/ink-hud/releases/tag/v0.1.0

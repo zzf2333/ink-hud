@@ -317,7 +317,7 @@ Heartbeat-style connection status history.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `records` | `PingRecord[]` | required | Ping history entries |
+| `records` | `PingRecord[]` | `[]` | Ping history entries |
 | `maxBars` | `number` | `30` | Maximum number of bars to display |
 | `variant` | `'unicode' \| 'ascii'` | `'unicode'` | Character style |
 | `colors` | `{ good?: string; unstable?: string; bad?: string }` | - | Custom status colors |
