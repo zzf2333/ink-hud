@@ -2,6 +2,12 @@ import React from 'react';
 import { render, Box, Text } from 'ink';
 import { Heatmap } from '../../src/components/Heatmap';
 import { Panel } from '../../src/components/Panel';
+import { detectImageProtocol } from '../../src/render/capabilities';
+
+const imageProtocol = detectImageProtocol();
+const imageNote = imageProtocol
+    ? `Image protocol: ${imageProtocol} (Heatmap will render as bitmap)`
+    : 'No image protocol detected — using character mode. Set INKHU_IMAGE_PROTOCOL=kitty|iterm2 to override.';
 
 // Generate simulated data (7 days x 24 hours)
 const generateData = () => {
@@ -27,8 +33,9 @@ const App = () => {
     return (
         <Box flexDirection="column" gap={1}>
             <Text bold>Heatmap Component Demo</Text>
+            <Text color="gray">{imageNote}</Text>
 
-            <Panel title="Server Activity (Last 7 Days)">
+            <Panel title="Server Activity (Last 7 Days) — auto mode">
                 <Box flexDirection="column">
                     <Box marginLeft={2} marginBottom={1}>
                         <Text color="gray">
@@ -41,19 +48,20 @@ const App = () => {
                                 <Text key={day} color="gray">{day}</Text>
                             ))}
                         </Box>
-                        <Heatmap data={data} />
+                        <Heatmap data={data} mode="auto" />
                     </Box>
                 </Box>
             </Panel>
 
-            <Panel title="GitHub Style">
+            <Panel title="GitHub Style — character mode">
                 <Heatmap
+                    mode="character"
                     data={[
                         [0, 2, 5, 8, 10],
                         [10, 8, 5, 2, 0],
                         [5, 5, 5, 5, 5]
                     ]}
-                    colors={['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39']} // GitHub Palette (Light)
+                    colors={['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39']}
                 />
             </Panel>
         </Box>

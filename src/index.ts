@@ -220,3 +220,27 @@ export {
     type PingStatus,
     type PingRecord,
 } from './components/PulseBar';
+
+// ============================================
+// Image Protocol (Render Layer)
+// ============================================
+
+/**
+ * Terminal image protocol detection
+ */
+export { detectImageProtocol, type ImageProtocol } from './render/capabilities';
+
+/**
+ * Minimal PNG encoder (no extra dependencies)
+ */
+export { createRgbPng, hexToRgb } from './render/image/png';
+
+/**
+ * Kitty Graphics Protocol encoder
+ */
+export { encodeKitty } from './render/image/kitty';
+
+/**
+ * iTerm2 Inline Images Protocol encoder
+ */
+export { encodeIterm2 } from './render/image/iterm2';

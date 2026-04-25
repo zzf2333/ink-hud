@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Image protocol rendering for Heatmap**: The `Heatmap` component now accepts a `mode` prop (`'auto' | 'image' | 'character'`). In `'auto'` mode it auto-detects the terminal's image protocol (Kitty Graphics / iTerm2 Inline Images) and renders the heatmap as a true bitmap, falling back to character mode when unsupported.
+- **`detectImageProtocol()`**: New function that detects whether the current terminal supports Kitty Graphics or iTerm2 Inline Images. Override with `INKHU_IMAGE_PROTOCOL=kitty|iterm2|none`.
+- **`createRgbPng()`** / **`hexToRgb()`**: Zero-dependency PNG encoder built on Node.js's built-in `zlib`. Used internally by image-mode components.
+- **`encodeKitty()`** / **`encodeIterm2()`**: Low-level encoders for Kitty Graphics Protocol (APC sequences) and iTerm2 Inline Images (OSC 1337). Available for custom rendering use cases.
+
 ### Breaking Changes
 - **ASCII variant removed** (`PulseBar`, `Gauge`, `Heatmap`, `BigNumber`, `Sparkline`): The `variant: 'ascii'` option has been removed from all components. `Sparkline` now accepts `'block' | 'braille'` only. The `fontStyle: 'ascii'` option has been removed from `BigNumber`.
   - **Migration**: If you need ASCII-style output, use the existing `fillChar` / `emptyChar` props on `Gauge`, or the `char` prop on `Heatmap`, to supply custom characters.
