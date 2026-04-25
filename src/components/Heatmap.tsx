@@ -126,7 +126,7 @@ export const Heatmap: React.FC<HeatmapProps> = ({
 
     // --- Image protocol: upload, effects, and placeholder data ---
     // charCols = dataCols Kitty cells, each 2 terminal cols wide (trailingSpace=true)
-    const { useImage, kittyLines, iterm2Cols } = useImageProtocol({
+    const { kittyLines, iterm2Cols } = useImageProtocol({
         mode,
         charCols: dataCols,
         charRows: dataRows,
@@ -155,9 +155,6 @@ export const Heatmap: React.FC<HeatmapProps> = ({
             </Box>
         );
     }
-
-    // Satisfy the linter — useImage is read via kittyLines/iterm2Cols checks above
-    void useImage;
 
     // --- Character mode ---
     const gradient = createGradient(effectiveColors, steps);

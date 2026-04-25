@@ -88,14 +88,72 @@ describe('useImageProtocol — zero dimensions', () => {
     });
 });
 
+describe('useImageProtocol — Kitty protocol (via env var)', () => {
+    it('returns kittyLines when KITTY_WINDOW_ID is set', () => {
+        const prev = process.env['KITTY_WINDOW_ID'];
+        process.env['KITTY_WINDOW_ID'] = '1';
+        try {
+            const { lastFrame } = render(
+                <Probe mode="auto" charCols={4} charRows={2} pngBuf={TINY_PNG} />,
+            );
+            const result = parse(lastFrame());
+            expect(result.useImage).toBe(true);
+            expect(result.hasKitty).toBe(true);
+            expect(result.hasIterm2).toBe(false);
+            expect(result.kittyLineCount).toBe(2);
+        } finally {
+            if (prev === undefined) delete process.env['KITTY_WINDOW_ID'];
+            else process.env['KITTY_WINDOW_ID'] = prev;
+        }
+    });
+
+    it('trailingSpace=true doubles kittyLine count of placeholder chars', () => {
+        const prev = process.env['KITTY_WINDOW_ID'];
+        process.env['KITTY_WINDOW_ID'] = '1';
+        try {
+            const { lastFrame } = render(
+                <Probe mode="auto" charCols={3} charRows={1} pngBuf={TINY_PNG} trailingSpace={true} />,
+            );
+            const result = parse(lastFrame());
+            expect(result.hasKitty).toBe(true);
+            expect(result.kittyLineCount).toBe(1);
+        } finally {
+            if (prev === undefined) delete process.env['KITTY_WINDOW_ID'];
+            else process.env['KITTY_WINDOW_ID'] = prev;
+        }
+    });
+});
+
 describe('useImageProtocol — iTerm2 iterm2Cols calculation', () => {
     it('trailingSpace=true (default) → iterm2Cols = charCols * 2', () => {
-        // We cannot easily inject a real iTerm2 env in tests, so we verify
-        // the formula via a unit-level check on the hook's pure logic path.
-        // The hook returns iterm2Cols=null when no protocol is detected;
-        // we verify the formula holds for the expected values mathematically.
-        const charCols = 5;
-        expect(charCols * 2).toBe(10); // trailingSpace=true
-        expect(charCols * 1).toBe(5);  // trailingSpace=false
+        const prev = process.env['TERM_PROGRAM'];
+        process.env['TERM_PROGRAM'] = 'iTerm.app';
+        try {
+            const { lastFrame } = render(
+                <Probe mode="auto" charCols={5} charRows={2} pngBuf={TINY_PNG} trailingSpace={true} />,
+            );
+            const result = parse(lastFrame());
+            expect(result.useImage).toBe(true);
+            expect(result.hasIterm2).toBe(true);
+            expect(result.iterm2Cols).toBe(10); // 5 * 2
+        } finally {
+            if (prev === undefined) delete process.env['TERM_PROGRAM'];
+            else process.env['TERM_PROGRAM'] = prev;
+        }
+    });
+
+    it('trailingSpace=false → iterm2Cols = charCols * 1', () => {
+        const prev = process.env['TERM_PROGRAM'];
+        process.env['TERM_PROGRAM'] = 'iTerm.app';
+        try {
+            const { lastFrame } = render(
+                <Probe mode="auto" charCols={5} charRows={2} pngBuf={TINY_PNG} trailingSpace={false} />,
+            );
+            const result = parse(lastFrame());
+            expect(result.iterm2Cols).toBe(5); // 5 * 1
+        } finally {
+            if (prev === undefined) delete process.env['TERM_PROGRAM'];
+            else process.env['TERM_PROGRAM'] = prev;
+        }
     });
 });

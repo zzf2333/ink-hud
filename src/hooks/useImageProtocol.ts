@@ -73,9 +73,9 @@ export function useImageProtocol({
     const { stdout } = useStdout();
 
     // Stable image ID for this component instance.
-    // Initialized once; survives re-renders; freed on unmount via Kitty delete.
-    const imageIdRef = useRef<number>(0);
-    if (imageIdRef.current === 0) {
+    // null sentinel is unambiguous (0 could theoretically be a valid ID).
+    const imageIdRef = useRef<number | null>(null);
+    if (imageIdRef.current === null) {
         imageIdRef.current = nextImageId++;
     }
     const imageId = imageIdRef.current;
@@ -93,21 +93,23 @@ export function useImageProtocol({
         charRows > 0;
 
     // Kitty: upload new PNG when pngBuf changes; delete stored image on unmount.
+    // useImage is intentionally excluded from deps — its constituent values
+    // (protocol, pngBuf, charCols, charRows, mode) are already listed individually.
     useEffect(() => {
-        if (!useImage || protocol !== 'kitty' || !pngBuf) return;
+        if (protocol !== 'kitty' || !pngBuf || charCols <= 0 || charRows <= 0 || mode === 'character') return;
         stdout.write(encodeKittyUpload(pngBuf, charCols, charRows, imageId));
         return () => {
             stdout.write(encodeKittyDelete(imageId));
         };
-    }, [useImage, protocol, pngBuf, charCols, charRows, imageId, stdout]);
+    }, [mode, protocol, pngBuf, charCols, charRows, imageId, stdout]);
 
     // iTerm2: overwrite the placeholder region on each pngBuf change.
     useEffect(() => {
-        if (!useImage || protocol !== 'iterm2' || !pngBuf) return;
+        if (protocol !== 'iterm2' || !pngBuf || charCols <= 0 || charRows <= 0 || mode === 'character') return;
         const terminalCols = charCols * (trailingSpace ? 2 : 1);
         const seq = encodeIterm2(pngBuf, terminalCols);
         stdout.write(`\x1b[${charRows}A\x1b[0G${seq}\x1b[${charRows}B`);
-    }, [useImage, protocol, pngBuf, charCols, charRows, trailingSpace, stdout]);
+    }, [mode, protocol, pngBuf, charCols, charRows, trailingSpace, stdout]);
 
     if (!useImage) {
         return { useImage: false, kittyLines: null, iterm2Cols: null };

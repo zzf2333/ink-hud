@@ -72,6 +72,24 @@ describe('encodeKittyPlaceholders', () => {
     });
 });
 
+describe('encodeKittyPlaceholders — bounds checking', () => {
+    it('accepts rows and cols up to 256', () => {
+        expect(() => encodeKittyPlaceholders(256, 256, 1)).not.toThrow();
+    });
+
+    it('throws RangeError when rows > 256', () => {
+        expect(() => encodeKittyPlaceholders(1, 257, 1)).toThrow(RangeError);
+    });
+
+    it('throws RangeError when cols > 256', () => {
+        expect(() => encodeKittyPlaceholders(257, 1, 1)).toThrow(RangeError);
+    });
+
+    it('error message mentions the offending dimension', () => {
+        expect(() => encodeKittyPlaceholders(300, 1, 1)).toThrow(/300/);
+    });
+});
+
 describe('encodeKittyPlaceholders — trailingSpace option', () => {
     it('default (trailingSpace=true) adds a space after each placeholder', () => {
         const result = encodeKittyPlaceholders(2, 1, 1);
