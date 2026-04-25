@@ -10,7 +10,7 @@ ink-hud 基于 [ink](https://github.com/vadimdemedes/ink)（CLI 的 React）渲�
 │                                                                     │
 │  LineChart  AreaChart  BarChart  PieChart  │  Heatmap   Sparkline   │
 │                                            │                        │
-│      ↓ rendererChain prop                  │    ↓ mode prop         │
+│      ↓ useChartRenderer(kind)              │    ↓ mode prop         │
 │  ┌─────────────────────────┐               │  ┌─────────────────┐   │
 │  │  系统一：字符渲染链        │               │  │  系统二：         │   │
 │  │  Character Renderer     │               │  │  图像协议管道    │   │
@@ -32,17 +32,17 @@ ink-hud 基于 [ink](https://github.com/vadimdemedes/ink)（CLI 的 React）渲�
 ```
 组件 props
     ↓
-useChartRenderer(props, rendererChain)
+useChartRenderer(kind)   ← kind = 'line' | 'area' | 'bar' | 'pie'
     ↓
-InkHudContext.selectBest(chain)   ← 由 <InkHudProvider> 提供
+InkHudContext.getRendererFor(kind)   ← 由 <InkHudProvider> 提供
     ↓
-RendererSelector.selectBest()
+合并用户 renderers 配置与 DEFAULT_CHART_RENDERERS
     ↓
 TerminalDetector.detect()  →  TerminalCapabilities { score: 0-100, ... }
     ↓
-遍历 preferredChain，选出第一个 minScore ≤ score 的渲染器
+若目标 renderer 不支持 → 静默兜底至 BlockRenderer
     ↓
-renderer: BrailleRenderer | BlockRenderer | AsciiRenderer
+renderer: BrailleRenderer | BlockRenderer
     ↓
 renderer.createCanvas(pixelW, pixelH)   →   Pixel[][]
     ↓
@@ -77,16 +77,32 @@ Braille 白名单：`iterm`、`warp`、`alacritty`、`kitty`、`wezterm`、`hype
 
 BlockRenderer 是最终兜底（minScore=30，任何 UTF-8 终端均可达到）。
 
-### 渲染链配置
+### 渲染器配置（`DEFAULT_CHART_RENDERERS`）
 
-每个图表组件有默认链，可通过 `rendererChain` prop 覆盖：
+每个图表类型预设了视觉最优的 renderer，无需任何配置：
+
+| 图表类型 | 默认渲染器 | 原因 |
+|---|---|---|
+| `line` | braille | 2×4 子像素网格使斜线更平滑 |
+| `area` | braille | 曲线下方填充分辨率更细腻 |
+| `bar` | block | 2×2 格渲染矩形边更整齐 |
+| `pie` | braille | 径向像素受益于更高分辨率 |
+
+通过 `InkHudProvider` 的 `renderers` prop 可按图表类型覆盖：
 
 ```tsx
-// LineChart / AreaChart 默认：['braille', 'block', 'ascii']
-<LineChart rendererChain={['block', 'ascii']} ... />
+// 标准用法（自动检测，每图最优渲染器）
+<InkHudProvider>
+  <Dashboard />
+</InkHudProvider>
 
-// 通过 InkHudProvider 全局强制指定渲染器
-<InkHudProvider forceRenderer="ascii">
+// 覆盖特定图表类型
+<InkHudProvider renderers={{ line: 'block', bar: 'braille' }}>
+  <Dashboard />
+</InkHudProvider>
+
+// 注入 mock 检测器（测试环境）
+<InkHudProvider detector={mockDetector}>
   <Dashboard />
 </InkHudProvider>
 ```
@@ -96,7 +112,7 @@ BlockRenderer 是最终兜底（minScore=30，任何 UTF-8 终端均可达到）
 `<InkHudProvider>` 包裹应用，向子树提供 `InkHudContext`。不使用时，组件回退到模块级默认 `RendererSelector`。以下场景必须使用 Provider：
 
 - 注入自定义 `TerminalDetector`（如测试环境）
-- 通过 `forceRenderer` 强制指定渲染器
+- 通过 `renderers` prop 覆盖特定图表类型的渲染器
 
 ---
 
@@ -212,10 +228,10 @@ iTerm2 模式下：`iterm2Cols = charCols * (trailingSpace ? 2 : 1)`，即占位
 
 | 组件 | 使用系统 | 渲染器/协议 | 关键 Props |
 |---|---|---|---|
-| `LineChart` | 字符渲染链 | braille → block → ascii | `rendererChain` |
-| `AreaChart` | 字符渲染链 | braille → block → ascii | `rendererChain` |
-| `BarChart` | 字符渲染链 | block → ascii | `rendererChain` |
-| `PieChart` | 字符渲染链 | braille → block → ascii | `rendererChain` |
+| `LineChart` | 字符渲染链 | braille（默认），可覆盖 | `InkHudProvider renderers={{ line: ... }}` |
+| `AreaChart` | 字符渲染链 | braille（默认），可覆盖 | `InkHudProvider renderers={{ area: ... }}` |
+| `BarChart` | 字符渲染链 | block（默认），可覆盖 | `InkHudProvider renderers={{ bar: ... }}` |
+| `PieChart` | 字符渲染链 | braille（默认），可覆盖 | `InkHudProvider renderers={{ pie: ... }}` |
 | `Sparkline` | **双系统** | 字符：braille/block；图像：Kitty/iTerm2 | `mode`, `variant`, `height`, `colors`, `cellPx` |
 | `Heatmap` | **双系统** | 字符：unicode block；图像：Kitty/iTerm2 | `mode`, `colors`, `cellPx` |
 | `Gauge` | 字符（内联） | 仅 unicode block 字符 | — |
@@ -240,7 +256,7 @@ iTerm2 模式下：`iterm2Cols = charCols * (trailingSpace ? 2 : 1)`，即占位
 
 5. **字符模式像素 canvas**：`Pixel` 对象可变；`createCanvas` 预分配所有格。`setPixel` 和 `drawLine` 原地修改。禁止跨渲染共享 canvas 实例。
 
-6. **两套系统完全隔离**：组件不能同时使用 `rendererChain` 和 `useImageProtocol`，两者服务于不同类型的组件。
+6. **两套系统完全隔离**：组件不能同时使用 `useChartRenderer` 和 `useImageProtocol`，两者服务于不同类型的组件。
 
 ---
 
@@ -258,7 +274,7 @@ src/
 ├── symbols.ts               # 集中装饰字符常量（按用途分组：trend/legend/bar/border…）
 ├── detect/                  # 系统一：终端能力检测
 │   ├── terminal.ts          # TerminalDetector（环境变量评分）
-│   ├── selector.ts          # RendererSelector（遍历链，选最优）
+│   ├── selector.ts          # RendererSelector（isRendererTypeSupported 供 Provider 使用）
 │   └── types.ts             # TerminalCapabilities、EnvironmentInfo
 ├── render/                  # 系统二：图像协议层
 │   ├── capabilities.ts      # detectImageProtocol()

@@ -7,8 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking Changes
+- **Renderer selection centralised in `InkHudProvider`**: The `renderer` and `rendererChain` props have been removed from `LineChart`, `AreaChart`, `BarChart`, and `PieChart`. The `forceRenderer` prop has been removed from `InkHudProvider`.
+  - **Migration**: Use `<InkHudProvider renderers={{ line: 'block', bar: 'braille' }}>` to override the renderer for specific chart kinds. Unspecified kinds keep their pre-tuned defaults (line/area/pie → braille; bar → block).
+- **`selectBest` removed from `InkHudContextValue`**: No longer part of the public context interface.
+
 ### Added
+- **`ChartKind`** type (`'line' | 'area' | 'bar' | 'pie'`) and **`ChartRenderers`** (`Record<ChartKind, RendererType>`) exported from the package.
+- **`DEFAULT_CHART_RENDERERS`** exported constant with pre-tuned per-chart defaults.
+- **`getRendererFor(kind: ChartKind): Renderer`** added to `InkHudContextValue`.
+- **`renderers?: Partial<ChartRenderers>`** prop on `InkHudProvider` for per-kind override.
+
+### Added (previous)
 - **Image protocol rendering for Heatmap**: The `Heatmap` component now accepts a `mode` prop (`'auto' | 'image' | 'character'`). In `'auto'` mode it auto-detects the terminal's image protocol (Kitty Graphics / iTerm2 Inline Images) and renders the heatmap as a true bitmap, falling back to character mode when unsupported.
+
 - **Image protocol rendering for Sparkline**: `Sparkline` now accepts `mode`, `height`, `colors`, and `cellPx` props for image mode rendering. In `'auto'` or `'image'` mode the sparkline renders as a smooth area chart bitmap with configurable height and gradient colors.
 - **`detectImageProtocol()`**: New function that detects whether the current terminal supports Kitty Graphics or iTerm2 Inline Images. Override with `INKHU_IMAGE_PROTOCOL=kitty|iterm2|none`.
 - **`createRgbPng()`** / **`hexToRgb()`**: Zero-dependency PNG encoder built on Node.js's built-in `zlib`. Used internally by image-mode components.

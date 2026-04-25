@@ -233,20 +233,28 @@ Responsive grid layout system for dashboard construction.
 
 ## 🎨 Renderer System
 
-ink-hud auto-detects terminal capabilities and selects the best renderer:
+ink-hud auto-detects terminal capabilities and selects the best renderer per chart kind:
 
-| Renderer | Resolution | Characters | Best For |
-|----------|------------|------------|----------|
-| **Braille** | 2×4 dots, 8x vertical | `⠀⠁⠂...⣿` | Modern terminals |
-| **Block** | 2×8 dots, 8x vertical | `▁▂▃▄▅▆▇█` | UTF-8 terminals |
-| **ASCII** | 1×3, max compat | `_.-'"` | Legacy terminals |
+| Renderer | Resolution | Characters | Default For |
+|----------|------------|------------|-------------|
+| **Braille** | 2×4 dots, 8x vertical | `⠀⠁⠂...⣿` | LineChart, AreaChart, PieChart |
+| **Block** | 2×8 dots, 8x vertical | `▁▂▃▄▅▆▇█` | BarChart |
+
+Each chart ships with a pre-tuned default — no configuration required. To override:
 
 ```tsx
-// Force specific renderer
-<LineChart series={data} renderer="braille" />
-<LineChart series={data} renderer="block" />
-<LineChart series={data} renderer="ascii" />
+// Override per chart kind via InkHudProvider
+<InkHudProvider renderers={{ line: 'block', bar: 'braille' }}>
+    <MyApp />
+</InkHudProvider>
+
+// Inject mock detector for testing
+<InkHudProvider detector={mockDetector}>
+    <MyApp />
+</InkHudProvider>
 ```
+
+If the configured renderer is not supported by the terminal (e.g. braille on a legacy console), BlockRenderer is used as a silent fallback.
 
 ## 🖥 Terminal Compatibility
 
@@ -254,7 +262,6 @@ ink-hud auto-detects terminal capabilities and selects the best renderer:
 |---------------|-----------|
 | ✅ **Full (Braille)** | iTerm2, Warp, Alacritty, Kitty, Windows Terminal, VS Code |
 | ⚠️ **Partial (Block)** | macOS Terminal.app, some SSH sessions |
-| 📝 **Minimum (ASCII)** | Legacy terminals, plain text environments |
 
 ## 📚 Examples
 
