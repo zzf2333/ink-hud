@@ -54,6 +54,9 @@ export {
     InkHudProvider,
     useInkHud,
     useRendererSelector,
+    DEFAULT_CHART_RENDERERS,
+    type ChartKind,
+    type ChartRenderers,
     type InkHudProviderProps,
     type InkHudContextValue,
 } from './components/InkHudProvider';
@@ -251,7 +254,12 @@ export { createRgbPng, hexToRgb } from './render/image/png';
 /**
  * Kitty Graphics Protocol encoder
  */
-export { encodeKitty, encodeKittyUpload, encodeKittyPlaceholders, encodeKittyDelete } from './render/image/kitty';
+export {
+    encodeKitty,
+    encodeKittyUpload,
+    encodeKittyPlaceholders,
+    encodeKittyDelete,
+} from './render/image/kitty';
 
 /**
  * iTerm2 Inline Images Protocol encoder

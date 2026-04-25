@@ -31,8 +31,7 @@ export const SYMBOL_SETS: Array<{
 
 export function symbolSetForRenderer(renderer: RendererType): SymbolSetId {
     if (renderer === 'braille') return 'braille';
-    if (renderer === 'block') return 'unicode-blocks';
-    return 'ascii';
+    return 'unicode-blocks';
 }
 
 export function getSymbolSet(id: SymbolSetId): (typeof SYMBOL_SETS)[number] {

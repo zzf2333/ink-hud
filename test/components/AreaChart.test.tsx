@@ -1,6 +1,7 @@
 import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
 import { AreaChart } from '../../src/components/AreaChart';
+import { InkHudProvider } from '../../src/components/InkHudProvider';
 
 function stripAnsi(input: string): string {
     let output = '';
@@ -30,14 +31,15 @@ describe('AreaChart', () => {
     it('should output fixed height canvas content with Block renderer', () => {
         const height = 8;
         const { lastFrame } = render(
-            <AreaChart
-                series={[{ name: 'S1', data: [1, 3, 2, 4, 3, 5] }]}
-                renderer="block"
-                showLegend={false}
-                showAxis={false}
-                width={24}
-                height={height}
-            />,
+            <InkHudProvider renderers={{ area: 'block' }}>
+                <AreaChart
+                    series={[{ name: 'S1', data: [1, 3, 2, 4, 3, 5] }]}
+                    showLegend={false}
+                    showAxis={false}
+                    width={24}
+                    height={height}
+                />
+            </InkHudProvider>,
         );
 
         const output = stripAnsi(lastFrame() ?? '');

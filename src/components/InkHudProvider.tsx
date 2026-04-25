@@ -10,6 +10,41 @@ import { RendererSelector } from '../detect/selector';
 import { TerminalDetector } from '../detect/terminal';
 import type { TerminalCapabilities } from '../detect/types';
 
+// ============================================
+// Chart renderer configuration
+// ============================================
+
+/**
+ * Chart types that use the pixel-canvas rendering system
+ */
+export type ChartKind = 'line' | 'area' | 'bar' | 'pie';
+
+/**
+ * Per-chart-kind renderer assignment
+ */
+export type ChartRenderers = Record<ChartKind, RendererType>;
+
+/**
+ * Default renderer per chart kind — pre-tuned for best visual output
+ *
+ * | Chart | Renderer | Reason |
+ * |-------|----------|--------|
+ * | line  | braille  | 2×4 sub-pixel grid renders smooth diagonals |
+ * | area  | braille  | Fine-grained fill under curves |
+ * | bar   | block    | 2×2 cells produce clean rectangular bar edges |
+ * | pie   | braille  | Radial pixels benefit from higher resolution |
+ */
+export const DEFAULT_CHART_RENDERERS: ChartRenderers = {
+    line: 'braille',
+    area: 'braille',
+    bar: 'block',
+    pie: 'braille',
+};
+
+// ============================================
+// Context
+// ============================================
+
 /**
  * InkHud Context value
  */
@@ -23,8 +58,12 @@ export interface InkHudContextValue {
     /** Get renderer of specified type */
     getRenderer: (type: RendererType) => Renderer;
 
-    /** Select best renderer */
-    selectBest: (chain?: RendererType[]) => Renderer;
+    /**
+     * Get the renderer configured for a specific chart kind.
+     * Falls back silently to BlockRenderer if the configured renderer is
+     * not supported by the current terminal (e.g. braille on a legacy console).
+     */
+    getRendererFor: (kind: ChartKind) => Renderer;
 }
 
 /**
@@ -35,7 +74,13 @@ const defaultContext: InkHudContextValue = {
     selector: defaultSelector,
     getCapabilities: () => defaultSelector.getTerminalCapabilities(),
     getRenderer: (type) => defaultSelector.getRenderer(type),
-    selectBest: (chain) => defaultSelector.selectBest(chain),
+    getRendererFor: (kind) => {
+        const target = DEFAULT_CHART_RENDERERS[kind];
+        if (defaultSelector.isRendererTypeSupported(target)) {
+            return defaultSelector.getRenderer(target);
+        }
+        return defaultSelector.getRenderer('block');
+    },
 };
 
 const InkHudContext = createContext<InkHudContextValue>(defaultContext);
@@ -51,10 +96,18 @@ export interface InkHudProviderProps {
     detector?: TerminalDetector;
 
     /**
-     * Force use of specified renderer
-     * Override automatic detection for testing or specific scenarios
+     * Override the renderer used for specific chart kinds.
+     * Unspecified kinds keep their default (see DEFAULT_CHART_RENDERERS).
+     *
+     * @example
+     * ```tsx
+     * // Force all line charts to use block renderer
+     * <InkHudProvider renderers={{ line: 'block' }}>
+     *     <MyApp />
+     * </InkHudProvider>
+     * ```
      */
-    forceRenderer?: RendererType;
+    renderers?: Partial<ChartRenderers>;
 
     children: React.ReactNode;
 }
@@ -62,11 +115,13 @@ export interface InkHudProviderProps {
 /**
  * InkHud Context Provider
  *
- * Encapsulate renderer selection logic, supports dependency injection
+ * Encapsulate renderer selection logic, supports dependency injection.
+ * Each chart kind ships with a pre-tuned default renderer — no per-component
+ * configuration required.
  *
  * @example
  * ```tsx
- * // Standard usage (automatic detection)
+ * // Standard usage (automatic detection, best renderer per chart)
  * <InkHudProvider>
  *     <MyApp />
  * </InkHudProvider>
@@ -76,32 +131,40 @@ export interface InkHudProviderProps {
  *     <MyApp />
  * </InkHudProvider>
  *
- * // Force block renderer
- * <InkHudProvider forceRenderer="block">
+ * // Override renderer for specific charts
+ * <InkHudProvider renderers={{ line: 'block', bar: 'braille' }}>
  *     <MyApp />
  * </InkHudProvider>
  * ```
  */
 export const InkHudProvider: React.FC<InkHudProviderProps> = ({
     detector,
-    forceRenderer,
+    renderers,
     children,
 }) => {
     const value = useMemo<InkHudContextValue>(() => {
         const selector = detector ? new RendererSelector(detector) : defaultSelector;
 
+        const mergedRenderers: ChartRenderers = {
+            ...DEFAULT_CHART_RENDERERS,
+            ...renderers,
+        };
+
+        const getRendererFor = (kind: ChartKind): Renderer => {
+            const target = mergedRenderers[kind];
+            if (selector.isRendererTypeSupported(target)) {
+                return selector.getRenderer(target);
+            }
+            return selector.getRenderer('block');
+        };
+
         return {
             selector,
             getCapabilities: () => selector.getTerminalCapabilities(),
             getRenderer: (type) => selector.getRenderer(type),
-            selectBest: (chain) => {
-                if (forceRenderer) {
-                    return selector.getRenderer(forceRenderer);
-                }
-                return selector.selectBest(chain);
-            },
+            getRendererFor,
         };
-    }, [detector, forceRenderer]);
+    }, [detector, renderers]);
 
     return <InkHudContext.Provider value={value}>{children}</InkHudContext.Provider>;
 };

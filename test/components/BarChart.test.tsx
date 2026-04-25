@@ -1,6 +1,7 @@
 import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
 import { BarChart } from '../../src/components/BarChart';
+import { InkHudProvider } from '../../src/components/InkHudProvider';
 
 function stripAnsi(input: string): string {
     let output = '';
@@ -30,17 +31,18 @@ describe('BarChart', () => {
     it('should output fixed height canvas content with Block renderer', () => {
         const height = 8;
         const { lastFrame } = render(
-            <BarChart
-                series={[
-                    { name: 'A', data: [1, 2, 3] },
-                    { name: 'B', data: [3, 2, 1] },
-                ]}
-                renderer="block"
-                showLegend={false}
-                showAxis={false}
-                width={30}
-                height={height}
-            />,
+            <InkHudProvider renderers={{ bar: 'block' }}>
+                <BarChart
+                    series={[
+                        { name: 'A', data: [1, 2, 3] },
+                        { name: 'B', data: [3, 2, 1] },
+                    ]}
+                    showLegend={false}
+                    showAxis={false}
+                    width={30}
+                    height={height}
+                />
+            </InkHudProvider>,
         );
 
         const output = stripAnsi(lastFrame() ?? '');
@@ -51,18 +53,19 @@ describe('BarChart', () => {
     it('should output fixed height canvas content in horizontal mode', () => {
         const height = 10;
         const { lastFrame } = render(
-            <BarChart
-                series={[
-                    { name: 'A', data: [1, 2, 3] },
-                    { name: 'B', data: [3, 2, 1] },
-                ]}
-                renderer="block"
-                showLegend={false}
-                showAxis={false}
-                orientation="horizontal"
-                width={24}
-                height={height}
-            />,
+            <InkHudProvider renderers={{ bar: 'block' }}>
+                <BarChart
+                    series={[
+                        { name: 'A', data: [1, 2, 3] },
+                        { name: 'B', data: [3, 2, 1] },
+                    ]}
+                    showLegend={false}
+                    showAxis={false}
+                    orientation="horizontal"
+                    width={24}
+                    height={height}
+                />
+            </InkHudProvider>,
         );
 
         const output = stripAnsi(lastFrame() ?? '');

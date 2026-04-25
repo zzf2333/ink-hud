@@ -48,6 +48,18 @@ export class RendererSelector {
     }
 
     /**
+     * Check if a renderer type is supported by the current terminal
+     * Used internally by InkHudProvider to determine the per-chart renderer
+     * @param type - Renderer type
+     * @returns Whether the renderer type is supported
+     */
+    isRendererTypeSupported(type: RendererType): boolean {
+        const capabilities = this.detector.detect();
+        const renderer = this.createRenderer(type);
+        return this.isRendererSupported(renderer, capabilities);
+    }
+
+    /**
      * Check if the renderer meets terminal capability requirements
      * @param renderer - Renderer instance
      * @param capabilities - Terminal capabilities

@@ -1,5 +1,6 @@
 import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
+import { InkHudProvider } from '../../src/components/InkHudProvider';
 import { PieChart } from '../../src/components/PieChart';
 
 function stripAnsi(input: string): string {
@@ -38,16 +39,17 @@ describe('PieChart', () => {
         const height = 8;
         const width = 20;
         const { lastFrame } = render(
-            <PieChart
-                data={[
-                    { name: 'A', value: 30 },
-                    { name: 'B', value: 70 },
-                ]}
-                renderer="block"
-                showLegend={false}
-                width={width}
-                height={height}
-            />,
+            <InkHudProvider renderers={{ pie: 'block' }}>
+                <PieChart
+                    data={[
+                        { name: 'A', value: 30 },
+                        { name: 'B', value: 70 },
+                    ]}
+                    showLegend={false}
+                    width={width}
+                    height={height}
+                />
+            </InkHudProvider>,
         );
 
         const output = stripAnsi(lastFrame() ?? '');

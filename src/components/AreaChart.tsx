@@ -15,7 +15,7 @@ import {
     useChartLayoutSimple,
 } from './common/chartUtils';
 import { useChartCore } from './common/useChartCore';
-import { DEFAULT_RENDERER_CHAIN, useChartRenderer } from './common/useChartRenderer';
+import { useChartRenderer } from './common/useChartRenderer';
 
 /**
  * AreaChart component props
@@ -126,7 +126,6 @@ export const AreaChart: React.FC<AreaChartProps> = (props) => {
         yTickCount = 5,
         xTickFormat,
         yTickFormat,
-        rendererChain = DEFAULT_RENDERER_CHAIN,
         xIntegerScale = true,
         yIntegerScale = false,
     } = props;
@@ -136,7 +135,7 @@ export const AreaChart: React.FC<AreaChartProps> = (props) => {
 
     // 1. Use common Hooks
     const { series, min, max, maxLength, colors, legendItems } = useChartCore(props);
-    const renderer = useChartRenderer(props, rendererChain);
+    const renderer = useChartRenderer('area');
 
     // 2. Layout calculation (use simplified API)
     const layout = useChartLayoutSimple(props, min, max);

@@ -16,6 +16,6 @@ export function parseCharsetMode(argv: string[]): CharsetMode {
         return 'auto';
     }
 
-    const valid: RendererType[] = ['braille', 'block', 'ascii'];
+    const valid: RendererType[] = ['braille', 'block'];
     return valid.includes(raw as RendererType) ? (raw as RendererType) : 'compare';
 }

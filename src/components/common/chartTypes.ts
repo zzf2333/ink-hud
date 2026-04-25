@@ -4,11 +4,10 @@
  * Unified base property interface for all chart components
  */
 
-import type { RendererType } from '../../core/renderer';
 import type { ColorPalette } from '../../utils/gradient';
 
 /**
- * Basic chart dimensions and renderer configuration
+ * Basic chart dimensions
  */
 export interface BaseChartProps {
     /** Chart width (character count) */
@@ -16,12 +15,6 @@ export interface BaseChartProps {
 
     /** Chart height (character rows) */
     height?: number;
-
-    /** Manually specify Renderer type */
-    renderer?: RendererType;
-
-    /** Custom renderer fallback chain */
-    rendererChain?: RendererType[];
 
     /**
      * Width offset

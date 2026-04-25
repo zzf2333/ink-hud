@@ -9,7 +9,7 @@ import { type AxisConfig, ChartContainer } from './common/ChartContainer';
 import type { TimeSeriesChartProps } from './common/chartTypes';
 import { defaultTickFormat, getPixelDimensions, useChartLayoutSimple } from './common/chartUtils';
 import { useChartCore } from './common/useChartCore';
-import { DEFAULT_RENDERER_CHAIN, useChartRenderer } from './common/useChartRenderer';
+import { useChartRenderer } from './common/useChartRenderer';
 
 /**
  * LineChart component props
@@ -29,7 +29,6 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
         yTickCount = 5,
         xTickFormat,
         yTickFormat,
-        rendererChain = DEFAULT_RENDERER_CHAIN,
         xIntegerScale = true,
         yIntegerScale = false,
     } = props;
@@ -39,7 +38,7 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
 
     // 1. Use common Hooks
     const { series, min, max, maxLength, colors, legendItems } = useChartCore(props);
-    const renderer = useChartRenderer(props, rendererChain);
+    const renderer = useChartRenderer('line');
 
     // 2. Layout calculation (use simplified API)
     const layout = useChartLayoutSimple(props, min, max);

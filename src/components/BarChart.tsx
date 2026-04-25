@@ -16,7 +16,7 @@ import {
     useChartLayoutSimple,
 } from './common/chartUtils';
 import { useChartCore } from './common/useChartCore';
-import { BAR_CHART_RENDERER_CHAIN, useChartRenderer } from './common/useChartRenderer';
+import { useChartRenderer } from './common/useChartRenderer';
 
 // ============================================================================
 // Layout Helpers (Pure Functions)
@@ -322,7 +322,6 @@ export const BarChart: React.FC<BarChartProps> = (props) => {
         yTickCount = 5,
         xTickFormat,
         yTickFormat,
-        rendererChain = BAR_CHART_RENDERER_CHAIN,
         xIntegerScale,
         yIntegerScale,
     } = props;
@@ -332,7 +331,7 @@ export const BarChart: React.FC<BarChartProps> = (props) => {
 
     // 1. Core Data
     const { series, min, max, maxLength, colors, legendItems } = useChartCore(props);
-    const renderer = useChartRenderer(props, rendererChain);
+    const renderer = useChartRenderer('bar');
 
     // 2. Layout
     const layout = useChartLayoutSimple(props, min, max);

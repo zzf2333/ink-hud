@@ -6,12 +6,11 @@
 
 import { Box, Text } from 'ink';
 import React, { useMemo } from 'react';
-import type { RendererType } from '../core/renderer';
 import { LEGEND } from '../symbols';
 import { type ColorPalette, assignColors } from '../utils/gradient';
-import { useInkHud } from './InkHudProvider';
 import { Legend } from './common/Legend';
 import { getPixelDimensions, useChartLayoutSimple } from './common/chartUtils';
+import { useChartRenderer } from './common/useChartRenderer';
 
 /**
  * PieChart data item
@@ -71,12 +70,6 @@ export interface PieChartProps {
 
     /** Palette name or custom color array */
     colorPalette?: ColorPalette;
-
-    /** Manually specify renderer type (optional) */
-    renderer?: RendererType;
-
-    /** Custom renderer fallback chain (default: ['braille', 'block']) */
-    rendererChain?: RendererType[];
 
     /**
      * Height offset
@@ -186,8 +179,6 @@ export const PieChart: React.FC<PieChartProps> = ({
     legendPosition = 'right',
     colors,
     colorPalette,
-    renderer: preferredRenderer,
-    rendererChain = ['braille', 'block'],
     heightOffset = 0,
     widthOffset = 0,
 }) => {
@@ -211,14 +202,7 @@ export const PieChart: React.FC<PieChartProps> = ({
 
     const { totalWidth, plotWidth: canvasWidth, plotHeight: canvasHeight } = layout;
 
-    const { getRenderer, selectBest } = useInkHud();
-
-    const renderer = useMemo(() => {
-        if (preferredRenderer) {
-            return getRenderer(preferredRenderer);
-        }
-        return selectBest(rendererChain);
-    }, [preferredRenderer, rendererChain, getRenderer, selectBest]);
+    const renderer = useChartRenderer('pie');
 
     // Calculate aspect ratio dynamically if not provided
     const ratio = useMemo(() => {
