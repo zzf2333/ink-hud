@@ -1,5 +1,6 @@
 import { Box, Text } from 'ink';
 import React, { useMemo } from 'react';
+import { HEATMAP } from '../symbols';
 import tinygradient from 'tinygradient';
 import { createRgbPng, hexToRgb } from '../render/image/png';
 import { useTheme } from '../theme/ThemeContext';
@@ -82,7 +83,7 @@ export const Heatmap: React.FC<HeatmapProps> = ({
 }) => {
     const theme = useTheme();
     const effectiveColors = colors ?? theme.heatmapGradient;
-    const effectiveChar = char ?? '■';
+    const effectiveChar = char ?? HEATMAP.default;
 
     const dataRows = data.length;
     const dataCols = data[0]?.length ?? 0;

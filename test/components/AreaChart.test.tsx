@@ -27,12 +27,12 @@ describe('AreaChart', () => {
         expect(lastFrame()).toBe('');
     });
 
-    it('should output fixed height canvas content with ASCII renderer', () => {
+    it('should output fixed height canvas content with Block renderer', () => {
         const height = 8;
         const { lastFrame } = render(
             <AreaChart
                 series={[{ name: 'S1', data: [1, 3, 2, 4, 3, 5] }]}
-                renderer="ascii"
+                renderer="block"
                 showLegend={false}
                 showAxis={false}
                 width={24}

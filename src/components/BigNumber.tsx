@@ -1,9 +1,8 @@
 import { Box, Text } from 'ink';
 import React, { useMemo } from 'react';
+import { TREND } from '../symbols';
 import { useTheme } from '../theme/ThemeContext';
 import { type FontStyle, renderBigString } from './BigNumber/font';
-
-const TREND_ARROWS = { up: '▲', down: '▼', neutral: '─' } as const;
 
 export interface BigNumberProps {
     /**
@@ -70,12 +69,12 @@ export const BigNumber: React.FC<BigNumberProps> = ({
 
     if (trendDirection === 'up') {
         trendColor = theme.semantic.success;
-        trendArrow = TREND_ARROWS.up;
+        trendArrow = TREND.up;
     } else if (trendDirection === 'down') {
         trendColor = theme.semantic.error;
-        trendArrow = TREND_ARROWS.down;
+        trendArrow = TREND.down;
     } else if (trendDirection === 'neutral') {
-        trendArrow = TREND_ARROWS.neutral;
+        trendArrow = TREND.neutral;
     }
 
     const alignItems =

@@ -34,7 +34,7 @@ describe('PieChart', () => {
         expect(lastFrame()).toBe('');
     });
 
-    it('should output fixed height canvas content with ASCII renderer', () => {
+    it('should output fixed height canvas content with Block renderer', () => {
         const height = 8;
         const width = 20;
         const { lastFrame } = render(
@@ -43,7 +43,7 @@ describe('PieChart', () => {
                     { name: 'A', value: 30 },
                     { name: 'B', value: 70 },
                 ]}
-                renderer="ascii"
+                renderer="block"
                 showLegend={false}
                 width={width}
                 height={height}

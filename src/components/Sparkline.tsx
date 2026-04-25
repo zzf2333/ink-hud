@@ -7,12 +7,10 @@ import React, { useContext, useMemo } from 'react';
 import { lttb } from '../utils/downsampling';
 import { gradientColorFn, buildSparklinePixelGrid } from '../render/image/drawing';
 import { createRgbPng } from '../render/image/png';
+import { SPARK_LEVELS } from '../symbols';
 import { useTheme } from '../theme/ThemeContext';
 import { useImageProtocol } from '../hooks/useImageProtocol';
 import { GridItemContext } from './Grid';
-
-const SPARK_LEVELS_BLOCK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
-const SPARK_LEVELS_BRAILLE = ['⠀', '⡀', '⣀', '⣄', '⣤', '⣦', '⣶', '⣷', '⣿'];
 
 export interface SparklineProps {
     /** Array of data points */
@@ -158,7 +156,7 @@ export const Sparkline: React.FC<SparklineProps> = ({
         return <Text>{''}</Text>;
     }
 
-    const levels = variant === 'braille' ? SPARK_LEVELS_BRAILLE : SPARK_LEVELS_BLOCK;
+    const levels = SPARK_LEVELS[variant];
     const text = processedData
         .map((v) => {
             const value = Math.max(min, Math.min(max, v));

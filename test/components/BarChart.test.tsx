@@ -27,7 +27,7 @@ describe('BarChart', () => {
         expect(lastFrame()).toBe('');
     });
 
-    it('should output fixed height canvas content with ASCII renderer', () => {
+    it('should output fixed height canvas content with Block renderer', () => {
         const height = 8;
         const { lastFrame } = render(
             <BarChart
@@ -35,7 +35,7 @@ describe('BarChart', () => {
                     { name: 'A', data: [1, 2, 3] },
                     { name: 'B', data: [3, 2, 1] },
                 ]}
-                renderer="ascii"
+                renderer="block"
                 showLegend={false}
                 showAxis={false}
                 width={30}
@@ -56,7 +56,7 @@ describe('BarChart', () => {
                     { name: 'A', data: [1, 2, 3] },
                     { name: 'B', data: [3, 2, 1] },
                 ]}
-                renderer="ascii"
+                renderer="block"
                 showLegend={false}
                 showAxis={false}
                 orientation="horizontal"

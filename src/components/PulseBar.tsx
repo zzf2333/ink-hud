@@ -1,5 +1,6 @@
 import { Box, Text } from 'ink';
 import React from 'react';
+import { BORDER_ROUNDED } from '../symbols';
 import { useTheme } from '../theme/ThemeContext';
 
 /**
@@ -39,15 +40,6 @@ export interface PulseBarProps {
     };
 }
 
-const CHARS = {
-    bar: '▌',
-    left: '╭',
-    right: '╮',
-    leftBottom: '╰',
-    rightBottom: '╯',
-    horizontal: '─',
-    vertical: '│',
-} as const;
 
 /**
  * PulseBar - network connection status component
@@ -78,23 +70,23 @@ export const PulseBar: React.FC<PulseBarProps> = ({
     const displayRecords = records.slice(-maxBars);
     const paddingCount = maxBars - displayRecords.length;
     const borderColor = theme.semantic.muted;
-    const topBorder = CHARS.left + CHARS.horizontal.repeat(maxBars) + CHARS.right;
-    const bottomBorder = CHARS.leftBottom + CHARS.horizontal.repeat(maxBars) + CHARS.rightBottom;
+    const topBorder = BORDER_ROUNDED.topLeft + BORDER_ROUNDED.horizontal.repeat(maxBars) + BORDER_ROUNDED.topRight;
+    const bottomBorder = BORDER_ROUNDED.bottomLeft + BORDER_ROUNDED.horizontal.repeat(maxBars) + BORDER_ROUNDED.bottomRight;
 
     return (
         <Box flexDirection="column">
             <Text color={borderColor}>{topBorder}</Text>
             <Box flexDirection="row">
-                <Text color={borderColor}>{CHARS.vertical}</Text>
+                <Text color={borderColor}>{BORDER_ROUNDED.vertical}</Text>
                 {paddingCount > 0 && (
-                    <Text color={borderColor}>{CHARS.bar.repeat(paddingCount)}</Text>
+                    <Text color={borderColor}>{BORDER_ROUNDED.bar.repeat(paddingCount)}</Text>
                 )}
                 {displayRecords.map((record, index) => (
                     <Text key={index} color={getColor(record.status)}>
-                        {CHARS.bar}
+                        {BORDER_ROUNDED.bar}
                     </Text>
                 ))}
-                <Text color={borderColor}>{CHARS.vertical}</Text>
+                <Text color={borderColor}>{BORDER_ROUNDED.vertical}</Text>
             </Box>
             <Text color={borderColor}>{bottomBorder}</Text>
         </Box>

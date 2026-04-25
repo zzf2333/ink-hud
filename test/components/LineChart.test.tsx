@@ -27,12 +27,12 @@ describe('LineChart', () => {
         expect(lastFrame()).toBe('');
     });
 
-    it('should output fixed height canvas content with ASCII renderer', () => {
+    it('should output fixed height canvas content with Block renderer', () => {
         const height = 8;
         const { lastFrame } = render(
             <LineChart
                 series={[{ name: 'S1', data: [0, 10, 5, 12, 3, 8] }]}
-                renderer="ascii"
+                renderer="block"
                 showLegend={false}
                 showAxis={false}
                 width={24}

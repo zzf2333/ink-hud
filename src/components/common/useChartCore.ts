@@ -5,6 +5,7 @@
  */
 
 import { useMemo } from 'react';
+import { LEGEND } from '../../symbols';
 import { type ColorPalette } from '../../utils/gradient';
 import type { LegendItem } from './Legend';
 import {
@@ -82,7 +83,7 @@ export function useChartCore(props: ChartCoreProps): ChartCoreResult {
             series.map((item, i) => ({
                 name: item.name,
                 color: item.color ?? colors[i] ?? 'cyan',
-                symbol: '●',
+                symbol: LEGEND.dot,
             })),
         [series, colors],
     );

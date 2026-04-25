@@ -1,8 +1,7 @@
 import { Box, Text } from 'ink';
 import React from 'react';
+import { BAR } from '../symbols';
 import { useTheme } from '../theme/ThemeContext';
-
-const CHARS = { fill: '█', empty: '░' } as const;
 
 export interface GaugeProps {
     /**
@@ -84,8 +83,8 @@ export const Gauge: React.FC<GaugeProps> = ({
     const effectiveColor = color ?? theme.semantic.success;
     const effectiveEmptyColor = emptyColor ?? theme.semantic.muted;
 
-    const effectiveFillChar = fillChar ?? CHARS.fill;
-    const effectiveEmptyChar = emptyChar ?? CHARS.empty;
+    const effectiveFillChar = fillChar ?? BAR.fill;
+    const effectiveEmptyChar = emptyChar ?? BAR.empty;
 
     const clampedValue = Math.min(Math.max(value, min), max);
     const range = max - min;

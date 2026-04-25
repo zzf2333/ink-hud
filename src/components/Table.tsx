@@ -1,5 +1,6 @@
 import { Box, Text, useFocus, useInput } from 'ink';
 import React, { useMemo, useContext } from 'react';
+import { TREND } from '../symbols';
 import { useTheme } from '../theme/ThemeContext';
 import { GridItemContext } from './Grid';
 
@@ -99,7 +100,7 @@ const SortableHeaderCell = <T,>({
 
     let indicator = '';
     if (isSorted) {
-        indicator = sortDirection === 'asc' ? ' ▲' : ' ▼';
+        indicator = sortDirection === 'asc' ? ` ${TREND.up}` : ` ${TREND.down}`;
     }
 
     return (
