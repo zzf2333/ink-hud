@@ -1,9 +1,9 @@
 import { Box, Text, useStdout } from 'ink';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import tinygradient from 'tinygradient';
 import { detectImageProtocol, type ImageProtocol } from '../render/capabilities';
 import { createRgbPng, hexToRgb } from '../render/image/png';
-import { encodeKitty } from '../render/image/kitty';
+import { encodeKittyUpload, encodeKittyPlaceholders, encodeKittyDelete } from '../render/image/kitty';
 import { encodeIterm2 } from '../render/image/iterm2';
 import { useTheme } from '../theme/ThemeContext';
 import { createGradient } from '../utils/gradient';
@@ -14,14 +14,13 @@ import { createGradient } from '../utils/gradient';
 
 export interface HeatmapProps {
     /**
-     * Data matrix (2D array)
-     * e.g. rows x cols
+     * Data matrix (2D array), rows × cols
      */
     data: number[][];
 
     /**
-     * Color gradient (from low to high)
-     * Defaults to theme's heatmapGradient
+     * Color gradient (from low to high).
+     * Defaults to theme's heatmapGradient.
      */
     colors?: string[];
 
@@ -41,7 +40,6 @@ export interface HeatmapProps {
 
     /**
      * Pixel size of each data cell in image mode.
-     * Higher values produce sharper images at the cost of more data.
      * @default 8
      */
     cellPx?: number;
@@ -63,10 +61,6 @@ function findMinMax(data: number[][]): { min: number; max: number } {
     return { min: minVal, max: maxVal };
 }
 
-/**
- * Build an array of RGB triples spanning the gradient.
- * Uses tinygradient (already a dependency) for accurate colour interpolation.
- */
 function gradientRgbPalette(
     colors: string[],
     steps: number,
@@ -80,6 +74,9 @@ function gradientRgbPalette(
     const g = tinygradient(colors);
     return g.rgb(steps).map((c) => hexToRgb('#' + c.toHex()));
 }
+
+/** Stable counter for generating unique image IDs across component instances. */
+let nextImageId = 1;
 
 // ---------------------------------------------------------------------------
 // Component
@@ -97,7 +94,14 @@ export const Heatmap: React.FC<HeatmapProps> = ({
     const effectiveChar = char ?? '■';
     const { stdout } = useStdout();
 
-    // --- Shared min/max/steps ---
+    // Stable image ID for this component instance (Kitty placeholder mode)
+    const imageIdRef = useRef<number>(0);
+    if (imageIdRef.current === 0) {
+        imageIdRef.current = nextImageId++;
+    }
+    const imageId = imageIdRef.current;
+
+    // --- Shared min/max ---
     const { min, max } = useMemo(() => {
         const { min: minVal, max: maxVal } = findMinMax(data);
         if (minVal === Number.POSITIVE_INFINITY) return { min: 0, max: 0 };
@@ -114,21 +118,17 @@ export const Heatmap: React.FC<HeatmapProps> = ({
 
     const useImage = protocol !== null && mode !== 'character';
 
-    // --- Image rendering via terminal image protocol ---
-    useEffect(() => {
-        if (!useImage || !protocol) return;
+    // --- Build pixel grid (shared between kitty and iterm2 paths) ---
+    const pngBuf = useMemo(() => {
+        if (!useImage) return null;
 
         const dataRows = data.length;
         const dataCols = data[0]?.length ?? 0;
-        if (!dataRows || !dataCols) return;
+        if (!dataRows || !dataCols) return null;
 
-        // Build an RGB colour palette for the gradient
         const palette = gradientRgbPalette(effectiveColors, steps);
-
-        // Build a pixel grid: each data cell → cellPx × cellPx pixels
-        // Adjacent cells share a cellPx-wide gap painted in near-black for visual separation.
         const pixelGrid: [number, number, number][][] = [];
-        const GAP: [number, number, number] = [16, 16, 16]; // dark separator
+        const GAP: [number, number, number] = [16, 16, 16];
 
         for (let row = 0; row < dataRows; row++) {
             for (let py = 0; py < cellPx; py++) {
@@ -140,32 +140,67 @@ export const Heatmap: React.FC<HeatmapProps> = ({
                     if (si >= steps) si = steps - 1;
                     const rgb = palette[si] ?? GAP;
                     for (let px = 0; px < cellPx; px++) pixelRow.push(rgb);
-                    // Gap column (mirrors the trailing space in character mode)
                     for (let px = 0; px < cellPx; px++) pixelRow.push(GAP);
                 }
                 pixelGrid.push(pixelRow);
             }
         }
 
-        const pngBuf = createRgbPng(pixelGrid);
-        // Each data column occupies 2 character cells (char + space)
+        return createRgbPng(pixelGrid);
+    }, [data, min, max, steps, effectiveColors, cellPx, useImage]);
+
+    // --- Kitty: upload image on data change, clean up on unmount ---
+    useEffect(() => {
+        if (protocol !== 'kitty' || !pngBuf) return;
+
+        const dataRows = data.length;
+        const dataCols = data[0]?.length ?? 0;
+        if (!dataRows || !dataCols) return;
+
         const charCols = dataCols * 2;
+        const uploadSeq = encodeKittyUpload(pngBuf, charCols, dataRows, imageId);
+        stdout.write(uploadSeq);
 
-        const seq =
-            protocol === 'kitty'
-                ? encodeKitty(pngBuf, charCols, dataRows)
-                : encodeIterm2(pngBuf, charCols);
+        return () => {
+            stdout.write(encodeKittyDelete(imageId));
+        };
+    }, [pngBuf, protocol, imageId, data, stdout]);
 
-        // PoC positioning: cursor up by dataRows lines, write image, cursor down.
-        // Assumes Heatmap placeholder is at the bottom of the current ink frame.
-        // Precise sub-component positioning will be addressed in a future iteration.
+    // --- iTerm2: cursor-up write on data change ---
+    useEffect(() => {
+        if (protocol !== 'iterm2' || !pngBuf) return;
+
+        const dataRows = data.length;
+        const dataCols = data[0]?.length ?? 0;
+        if (!dataRows || !dataCols) return;
+
+        const charCols = dataCols * 2;
+        const seq = encodeIterm2(pngBuf, charCols);
         stdout.write(`\x1b[${dataRows}A\x1b[0G${seq}\x1b[${dataRows}B`);
-    }, [data, min, max, steps, effectiveColors, protocol, useImage, cellPx, stdout]);
+    }, [pngBuf, protocol, data, stdout]);
 
-    // --- Character rendering (or placeholder for image mode) ---
+    // --- Kitty placeholder rendering ---
+    if (protocol === 'kitty' && useImage) {
+        const dataRows = data.length;
+        const dataCols = data[0]?.length ?? 0;
+        if (!dataRows || !dataCols) return null;
 
-    if (useImage) {
-        // Render blank placeholder rows so ink reserves the correct space.
+        const charCols = dataCols * 2;
+        const placeholderText = encodeKittyPlaceholders(charCols, dataRows, imageId);
+
+        // Split into lines so ink can measure height correctly
+        const lines = placeholderText.split('\n');
+        return (
+            <Box flexDirection="column">
+                {lines.map((line, i) => (
+                    <Text key={i}>{line}</Text>
+                ))}
+            </Box>
+        );
+    }
+
+    // --- iTerm2 placeholder (blank rows; image written via cursor-up in useEffect) ---
+    if (protocol === 'iterm2' && useImage) {
         const placeholderWidth = (data[0]?.length ?? 0) * 2;
         return (
             <Box flexDirection="column">
@@ -176,7 +211,7 @@ export const Heatmap: React.FC<HeatmapProps> = ({
         );
     }
 
-    // Character mode — original implementation
+    // --- Character mode ---
     const gradient = createGradient(effectiveColors, steps);
 
     return (
