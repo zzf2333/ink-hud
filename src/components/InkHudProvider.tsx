@@ -76,8 +76,8 @@ export interface InkHudProviderProps {
  *     <MyApp />
  * </InkHudProvider>
  *
- * // Force ASCII renderer
- * <InkHudProvider forceRenderer="ascii">
+ * // Force block renderer
+ * <InkHudProvider forceRenderer="block">
  *     <MyApp />
  * </InkHudProvider>
  * ```

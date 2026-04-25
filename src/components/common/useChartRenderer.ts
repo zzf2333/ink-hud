@@ -19,12 +19,12 @@ export interface ChartRendererProps {
 /**
  * Default renderer fallback chain
  */
-export const DEFAULT_RENDERER_CHAIN: RendererType[] = ['braille', 'block', 'ascii'];
+export const DEFAULT_RENDERER_CHAIN: RendererType[] = ['braille', 'block'];
 
 /**
  * BarChart default renderer fallback chain (prefer block)
  */
-export const BAR_CHART_RENDERER_CHAIN: RendererType[] = ['block', 'braille', 'ascii'];
+export const BAR_CHART_RENDERER_CHAIN: RendererType[] = ['block', 'braille'];
 
 /**
  * Chart renderer selection Hook

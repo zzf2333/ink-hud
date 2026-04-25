@@ -28,11 +28,6 @@ export { BrailleRenderer } from './core/braille';
  */
 export { BlockRenderer } from './core/block';
 
-/**
- * ASCII Renderer (1x3 resolution, maximum compatibility)
- */
-export { AsciiRenderer } from './core/ascii';
-
 // ============================================
 // Terminal Detection and Renderer Selection
 // ============================================
@@ -229,6 +224,15 @@ export {
     type PingStatus,
     type PingRecord,
 } from './components/PulseBar';
+
+// ============================================
+// Visual Symbol Constants
+// ============================================
+
+/**
+ * Centralised character constants grouped by purpose (trend/legend/bar/border/heatmap/sparkLevels)
+ */
+export { TREND, LEGEND, BAR, HEATMAP, BORDER_ROUNDED, SPARK_LEVELS } from './symbols';
 
 // ============================================
 // Image Protocol (Render Layer)

@@ -103,7 +103,7 @@ function computeHorizontalLayout(params: {
     pixelHeight: number;
     categoryCount: number;
     seriesCount: number;
-    alignment: number; // Vertical resolution (usually 8 for Block, 3 for Ascii, 4 for Braille)
+    alignment: number; // Vertical resolution (8 for Block, 4 for Braille)
 }): { groupHeight: number; barHeight: number; barGap: number; groupPadding: number } {
     const { pixelHeight, categoryCount, seriesCount, alignment } = params;
 
@@ -135,7 +135,7 @@ function computeHorizontalLayout(params: {
         };
     }
 
-    // 3. Standard Logic (Low Alignment, e.g. Ascii/Braille or purely pixel-based)
+    // 3. Standard Logic (Low Alignment, e.g. Braille or purely pixel-based)
     // Similar to vertical logic: try to add padding/gaps if space allows.
     const padding = alignment;
 

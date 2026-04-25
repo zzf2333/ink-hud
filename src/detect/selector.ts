@@ -4,7 +4,6 @@
  * Automatically selects the optimal renderer based on terminal capabilities to achieve intelligent fallback
  */
 
-import { AsciiRenderer } from '../core/ascii';
 import { BlockRenderer } from '../core/block';
 import { BrailleRenderer } from '../core/braille';
 import type { Renderer, RendererType } from '../core/renderer';
@@ -36,8 +35,6 @@ export class RendererSelector {
                 return new BrailleRenderer();
             case 'block':
                 return new BlockRenderer();
-            case 'ascii':
-                return new AsciiRenderer();
         }
     }
 
@@ -94,12 +91,12 @@ export class RendererSelector {
      * Automatically select the best renderer
      *
      * Try in the order of the priority chain, returning the first renderer that meets terminal capability requirements
-     * If none are satisfied, fallback to ASCII
+     * If none are satisfied, fallback to Block (UTF-8 terminals all qualify at minScore=30)
      *
-     * @param preferredChain - Priority chain (default: ['braille', 'block', 'ascii'])
+     * @param preferredChain - Priority chain (default: ['braille', 'block'])
      * @returns Selected renderer instance
      */
-    selectBest(preferredChain: RendererType[] = ['braille', 'block', 'ascii']): Renderer {
+    selectBest(preferredChain: RendererType[] = ['braille', 'block']): Renderer {
         // Detect terminal capabilities
         const capabilities = this.detector.detect();
 
@@ -113,8 +110,8 @@ export class RendererSelector {
             }
         }
 
-        // Fallback to ASCII (no requirements, supported by any terminal)
-        return this.getRenderer('ascii');
+        // Fallback to Block (requires UTF-8, minScore=30 — met by any modern terminal)
+        return this.getRenderer('block');
     }
 
     /**

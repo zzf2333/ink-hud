@@ -74,7 +74,8 @@ Braille 白名单：`iterm`、`warp`、`alacritty`、`kitty`、`wezterm`、`hype
 |---|---|---|---|---|
 | BrailleRenderer | 80 | 2×4 | ✓ | ✓ |
 | BlockRenderer | 30 | 2×8 | ✓ | ✓ |
-| AsciiRenderer | 0 | 1×1 | ✗ | ✗ |
+
+BlockRenderer 是最终兜底（minScore=30，任何 UTF-8 终端均可达到）。
 
 ### 渲染链配置
 
@@ -253,8 +254,8 @@ src/
 ├── core/                    # 系统一：渲染器基类
 │   ├── renderer.ts          # 抽象 Renderer + 绘图原语
 │   ├── braille.ts           # BrailleRenderer（2×4 像素/字符）
-│   ├── block.ts             # BlockRenderer（2×8 像素/字符）
-│   └── ascii.ts             # AsciiRenderer（1×1 像素/字符，无需求兜底）
+│   └── block.ts             # BlockRenderer（2×8 像素/字符，最终兜底）
+├── symbols.ts               # 集中装饰字符常量（按用途分组：trend/legend/bar/border…）
 ├── detect/                  # 系统一：终端能力检测
 │   ├── terminal.ts          # TerminalDetector（环境变量评分）
 │   ├── selector.ts          # RendererSelector（遍历链，选最优）

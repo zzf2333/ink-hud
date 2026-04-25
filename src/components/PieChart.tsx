@@ -7,6 +7,7 @@
 import { Box, Text } from 'ink';
 import React, { useMemo } from 'react';
 import type { RendererType } from '../core/renderer';
+import { LEGEND } from '../symbols';
 import { type ColorPalette, assignColors } from '../utils/gradient';
 import { useInkHud } from './InkHudProvider';
 import { Legend } from './common/Legend';
@@ -74,7 +75,7 @@ export interface PieChartProps {
     /** Manually specify renderer type (optional) */
     renderer?: RendererType;
 
-    /** Custom renderer fallback chain (default: ['braille', 'block', 'ascii']) */
+    /** Custom renderer fallback chain (default: ['braille', 'block']) */
     rendererChain?: RendererType[];
 
     /**
@@ -186,7 +187,7 @@ export const PieChart: React.FC<PieChartProps> = ({
     colors,
     colorPalette,
     renderer: preferredRenderer,
-    rendererChain = ['braille', 'block', 'ascii'],
+    rendererChain = ['braille', 'block'],
     heightOffset = 0,
     widthOffset = 0,
 }) => {
@@ -304,7 +305,7 @@ export const PieChart: React.FC<PieChartProps> = ({
         return data.map((item, i) => ({
             name: showLabels ? `${item.name} (${percentages[i]?.toFixed(1)}%)` : item.name,
             color: item.color ?? itemColors[i] ?? 'cyan',
-            symbol: '●',
+            symbol: LEGEND.dot,
         }));
     }, [data, itemColors, showLabels, percentages]);
 

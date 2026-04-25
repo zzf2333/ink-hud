@@ -7,7 +7,7 @@ import type { Pixel, RenderedLine } from './types';
 /**
  * Renderer type
  */
-export type RendererType = 'braille' | 'block' | 'ascii';
+export type RendererType = 'braille' | 'block';
 
 /**
  * Renderer resolution information
