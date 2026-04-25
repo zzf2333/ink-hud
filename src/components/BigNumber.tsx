@@ -3,13 +3,7 @@ import React, { useMemo } from 'react';
 import { useTheme } from '../theme/ThemeContext';
 import { type FontStyle, renderBigString } from './BigNumber/font';
 
-/**
- * Trend arrow character set
- */
-const TREND_ARROWS = {
-    unicode: { up: '▲', down: '▼', neutral: '─' },
-    ascii: { up: '^', down: 'v', neutral: '-' },
-} as const;
+const TREND_ARROWS = { up: '▲', down: '▼', neutral: '─' } as const;
 
 export interface BigNumberProps {
     /**
@@ -39,18 +33,9 @@ export interface BigNumberProps {
     trendLabel?: string;
 
     /**
-     * Trend arrow style
-     * - 'unicode': Use Unicode arrows
-     * - 'ascii': Use ASCII characters
-     * @default 'unicode'
-     */
-    variant?: 'unicode' | 'ascii';
-
-    /**
      * Large font style
      * - 'block': Block Elements characters (default)
      * - 'braille': Braille Dot Matrix characters
-     * - 'ascii': Pure ASCII characters
      * @default 'block'
      */
     fontStyle?: FontStyle;
@@ -73,7 +58,6 @@ export const BigNumber: React.FC<BigNumberProps> = ({
     color = 'white',
     trendDirection,
     trendLabel,
-    variant = 'unicode',
     fontStyle = 'block',
     align = 'center',
 }) => {
@@ -81,20 +65,17 @@ export const BigNumber: React.FC<BigNumberProps> = ({
 
     const theme = useTheme();
 
-    // Select arrow character based on variant
-    const arrows = TREND_ARROWS[variant];
-
     let trendColor = theme.semantic.muted;
     let trendArrow = '';
 
     if (trendDirection === 'up') {
         trendColor = theme.semantic.success;
-        trendArrow = arrows.up;
+        trendArrow = TREND_ARROWS.up;
     } else if (trendDirection === 'down') {
         trendColor = theme.semantic.error;
-        trendArrow = arrows.down;
+        trendArrow = TREND_ARROWS.down;
     } else if (trendDirection === 'neutral') {
-        trendArrow = arrows.neutral;
+        trendArrow = TREND_ARROWS.neutral;
     }
 
     const alignItems =

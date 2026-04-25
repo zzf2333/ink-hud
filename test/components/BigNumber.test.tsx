@@ -47,11 +47,4 @@ describe('BigNumber', () => {
         expect(output).toContain('⡆');
     });
 
-    it('should support ascii font style', () => {
-        const { lastFrame } = render(<BigNumber value={1} fontStyle="ascii" />);
-        const output = stripAnsi(lastFrame() ?? '');
-        // ASCII font uses pipe character for "1"
-        expect(output).toContain('|');
-        expect(output).not.toContain('█');
-    });
 });

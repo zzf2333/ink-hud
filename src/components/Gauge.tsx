@@ -2,13 +2,7 @@ import { Box, Text } from 'ink';
 import React from 'react';
 import { useTheme } from '../theme/ThemeContext';
 
-/**
- * Character set configuration
- */
-const CHAR_SETS = {
-    unicode: { fill: '█', empty: '░' },
-    ascii: { fill: '#', empty: '-' },
-} as const;
+const CHARS = { fill: '█', empty: '░' } as const;
 
 export interface GaugeProps {
     /**
@@ -53,20 +47,12 @@ export interface GaugeProps {
     showPercent?: boolean;
 
     /**
-     * Rendering style
-     * - 'unicode': Use Unicode block characters (█░)
-     * - 'ascii': Use ASCII characters (#-)
-     * @default 'unicode'
-     */
-    variant?: 'unicode' | 'ascii';
-
-    /**
-     * Custom fill character (overrides variant setting)
+     * Custom fill character
      */
     fillChar?: string;
 
     /**
-     * Custom unfilled character (overrides variant setting)
+     * Custom unfilled character
      */
     emptyChar?: string;
 
@@ -80,9 +66,7 @@ export interface GaugeProps {
  * Gauge - Gauge/progress bar component
  *
  * Display progress or load of a single metric.
- * Style examples:
- * - unicode: [██████░░░░] 60%
- * - ascii:   [######----] 60%
+ * Example: [██████░░░░] 60%
  */
 export const Gauge: React.FC<GaugeProps> = ({
     value,
@@ -92,7 +76,6 @@ export const Gauge: React.FC<GaugeProps> = ({
     color,
     emptyColor,
     showPercent = true,
-    variant = 'unicode',
     fillChar,
     emptyChar,
     label,
@@ -101,10 +84,8 @@ export const Gauge: React.FC<GaugeProps> = ({
     const effectiveColor = color ?? theme.semantic.success;
     const effectiveEmptyColor = emptyColor ?? theme.semantic.muted;
 
-    // Select character set based on variant
-    const charSet = CHAR_SETS[variant];
-    const effectiveFillChar = fillChar ?? charSet.fill;
-    const effectiveEmptyChar = emptyChar ?? charSet.empty;
+    const effectiveFillChar = fillChar ?? CHARS.fill;
+    const effectiveEmptyChar = emptyChar ?? CHARS.empty;
 
     const clampedValue = Math.min(Math.max(value, min), max);
     const range = max - min;

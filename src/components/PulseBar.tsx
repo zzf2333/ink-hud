@@ -30,14 +30,6 @@ export interface PulseBarProps {
     maxBars?: number;
 
     /**
-     * Render style
-     * - 'unicode': use Unicode characters
-     * - 'ascii': use ASCII characters
-     * @default 'unicode'
-     */
-    variant?: 'unicode' | 'ascii';
-
-    /**
      * Custom colors
      */
     colors?: {
@@ -47,28 +39,14 @@ export interface PulseBarProps {
     };
 }
 
-/**
- * Character set configuration
- */
-const CHAR_SETS = {
-    unicode: {
-        bar: '▌',
-        left: '╭',
-        right: '╮',
-        leftBottom: '╰',
-        rightBottom: '╯',
-        horizontal: '─',
-        vertical: '│',
-    },
-    ascii: {
-        bar: '|',
-        left: '/',
-        right: '\\',
-        leftBottom: '\\',
-        rightBottom: '/',
-        horizontal: '-',
-        vertical: '|',
-    },
+const CHARS = {
+    bar: '▌',
+    left: '╭',
+    right: '╮',
+    leftBottom: '╰',
+    rightBottom: '╯',
+    horizontal: '─',
+    vertical: '│',
 } as const;
 
 /**
@@ -82,13 +60,10 @@ const CHAR_SETS = {
 export const PulseBar: React.FC<PulseBarProps> = ({
     records = [],
     maxBars = 30,
-    variant = 'unicode',
     colors,
 }) => {
     const theme = useTheme();
-    const chars = CHAR_SETS[variant];
 
-    // Resolve the color for each status
     const getColor = (status: PingStatus): string => {
         switch (status) {
             case 'good':
@@ -100,35 +75,26 @@ export const PulseBar: React.FC<PulseBarProps> = ({
         }
     };
 
-    // Keep the most recent maxBars entries
     const displayRecords = records.slice(-maxBars);
-    // Fill remaining slots with empty bars
     const paddingCount = maxBars - displayRecords.length;
-
-    // Border color
     const borderColor = theme.semantic.muted;
-
-    // Top border
-    const topBorder = chars.left + chars.horizontal.repeat(maxBars) + chars.right;
-    // Bottom border
-    const bottomBorder = chars.leftBottom + chars.horizontal.repeat(maxBars) + chars.rightBottom;
+    const topBorder = CHARS.left + CHARS.horizontal.repeat(maxBars) + CHARS.right;
+    const bottomBorder = CHARS.leftBottom + CHARS.horizontal.repeat(maxBars) + CHARS.rightBottom;
 
     return (
         <Box flexDirection="column">
             <Text color={borderColor}>{topBorder}</Text>
             <Box flexDirection="row">
-                <Text color={borderColor}>{chars.vertical}</Text>
-                {/* Fill empty slots with muted bars */}
+                <Text color={borderColor}>{CHARS.vertical}</Text>
                 {paddingCount > 0 && (
-                    <Text color={borderColor}>{chars.bar.repeat(paddingCount)}</Text>
+                    <Text color={borderColor}>{CHARS.bar.repeat(paddingCount)}</Text>
                 )}
-                {/* Render each ping record */}
                 {displayRecords.map((record, index) => (
                     <Text key={index} color={getColor(record.status)}>
-                        {chars.bar}
+                        {CHARS.bar}
                     </Text>
                 ))}
-                <Text color={borderColor}>{chars.vertical}</Text>
+                <Text color={borderColor}>{CHARS.vertical}</Text>
             </Box>
             <Text color={borderColor}>{bottomBorder}</Text>
         </Box>

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking Changes
+- **ASCII variant removed** (`PulseBar`, `Gauge`, `Heatmap`, `BigNumber`, `Sparkline`): The `variant: 'ascii'` option has been removed from all components. `Sparkline` now accepts `'block' | 'braille'` only. The `fontStyle: 'ascii'` option has been removed from `BigNumber`.
+  - **Migration**: If you need ASCII-style output, use the existing `fillChar` / `emptyChar` props on `Gauge`, or the `char` prop on `Heatmap`, to supply custom characters.
+
+### Removed
+- `BigNumber` `variant` prop (trend arrow style) — Unicode arrows are now always used (▲ ▼ ─).
+- `BigNumber` `fontStyle: 'ascii'` — BigNumber large-font now supports `'block'` and `'braille'` only.
+
 ## [v0.1.3] - 2026-01-13
 
 ### Fixed

@@ -34,13 +34,6 @@ const App = () => {
                         <Sparkline data={memData} min={0} max={100} color="blue" variant="braille" />
                     </Text>
                 </Box>
-                <Box>
-                    <Text bold>ASCII:</Text>
-                    <Text>
-                        Load: <Text color="red">{Math.round(cpuData[cpuData.length - 1] / 10)}</Text>{' '}
-                        <Sparkline data={cpuData} min={0} max={100} color="magenta" variant="ascii" />
-                    </Text>
-                </Box>
             </Box>
             <Box marginTop={1}>
                 <Text dimColor>

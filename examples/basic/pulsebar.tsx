@@ -6,7 +6,6 @@ const Demo = () => {
     const [records, setRecords] = useState<PingRecord[] | undefined>(undefined);
 
     useEffect(() => {
-        // Simulate ping results
         const timer = setInterval(() => {
             const rand = Math.random();
             let status: PingRecord['status'];
@@ -33,15 +32,9 @@ const Demo = () => {
                 <Text bold>PulseBar demo</Text>
                 <Text color="gray">Press Ctrl+C to exit</Text>
 
-                <Box marginTop={1} flexDirection="column" gap={1}>
-                    {/* Unicode style */}
-                    <Panel title="Unicode style (variant='unicode')">
-                        <PulseBar records={records} variant="unicode" maxBars={40} />
-                    </Panel>
-
-                    {/* ASCII style */}
-                    <Panel title="ASCII style (variant='ascii')">
-                        <PulseBar records={records} variant="ascii" maxBars={40} />
+                <Box marginTop={1}>
+                    <Panel title="Network Status">
+                        <PulseBar records={records} maxBars={40} />
                     </Panel>
                 </Box>
 
