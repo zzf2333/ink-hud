@@ -157,8 +157,8 @@ export const Heatmap: React.FC<HeatmapProps> = ({
         const dataCols = data[0]?.length ?? 0;
         if (!dataRows || !dataCols) return;
 
-        const charCols = dataCols * 2;
-        const uploadSeq = encodeKittyUpload(pngBuf, charCols, dataRows, imageId);
+        // Kitty: cols = number of placeholder cells (each cell = 2 terminal cols via U+10EEEE + space)
+        const uploadSeq = encodeKittyUpload(pngBuf, dataCols, dataRows, imageId);
         stdout.write(uploadSeq);
 
         return () => {
@@ -174,8 +174,8 @@ export const Heatmap: React.FC<HeatmapProps> = ({
         const dataCols = data[0]?.length ?? 0;
         if (!dataRows || !dataCols) return;
 
-        const charCols = dataCols * 2;
-        const seq = encodeIterm2(pngBuf, charCols);
+        // iTerm2: cols = terminal column count (dataCols * 2 because each cell = char + space)
+        const seq = encodeIterm2(pngBuf, dataCols * 2);
         stdout.write(`\x1b[${dataRows}A\x1b[0G${seq}\x1b[${dataRows}B`);
     }, [pngBuf, protocol, data, stdout]);
 
@@ -185,8 +185,8 @@ export const Heatmap: React.FC<HeatmapProps> = ({
         const dataCols = data[0]?.length ?? 0;
         if (!dataRows || !dataCols) return null;
 
-        const charCols = dataCols * 2;
-        const placeholderText = encodeKittyPlaceholders(charCols, dataRows, imageId);
+        // dataCols placeholder cells, each 2 terminal cols wide (U+10EEEE + space)
+        const placeholderText = encodeKittyPlaceholders(dataCols, dataRows, imageId);
 
         // Split into lines so ink can measure height correctly
         const lines = placeholderText.split('\n');

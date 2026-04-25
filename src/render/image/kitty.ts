@@ -73,22 +73,25 @@ export function encodeKittyUpload(
 /**
  * Build placeholder character rows for a previously-uploaded Kitty image.
  *
- * Each "cell" in the grid is represented by:
- *   - fg color set to encode the image ID: ESC[38;2;R;G;Bm
- *     where R=(id>>16)&0xFF, G=(id>>8)&0xFF, B=id&0xFF
+ * Each cell is represented by:
+ *   - fg color encoding the image ID: ESC[38;2;R;G;Bm
  *   - U+10EEEE  (Kitty placeholder, string-width=1)
- *   - DIACRITICS[row]  (zero-width combining mark, encodes row index)
- *   - DIACRITICS[col]  (zero-width combining mark, encodes col index)
- *   - U+0020  (space, makes each cell 2 chars wide to match character-mode layout)
+ *   - DIACRITICS[row]  (zero-width combining mark)
+ *   - DIACRITICS[col]  (zero-width combining mark)
+ *   - U+0020 (trailing space) — only when trailingSpace=true (default)
+ *
+ * trailingSpace=true  → each cell = 2 terminal columns (Heatmap, 1 char + 1 space layout)
+ * trailingSpace=false → each cell = 1 terminal column  (Sparkline, 1 char per column layout)
  *
  * Returns a string with `rows` lines separated by '\n' (no trailing newline).
- * The caller is responsible for resetting color after writing this string.
  */
 export function encodeKittyPlaceholders(
     cols: number,
     rows: number,
     imageId: number,
+    options: { trailingSpace?: boolean } = {},
 ): string {
+    const { trailingSpace = true } = options;
     const r = (imageId >> 16) & 0xff;
     const g = (imageId >> 8) & 0xff;
     const b = imageId & 0xff;
@@ -105,7 +108,7 @@ export function encodeKittyPlaceholders(
         for (let col = 0; col < cols; col++) {
             const colMark = String.fromCodePoint(DIACRITICS[col] ?? DIACRITICS[0]!);
             // placeholder char + row diacritic + col diacritic + trailing space
-            line += placeholder + rowMark + colMark + ' ';
+            line += placeholder + rowMark + colMark + (trailingSpace ? ' ' : '');
         }
         line += resetSeq;
         lines.push(line);

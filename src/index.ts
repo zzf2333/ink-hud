@@ -244,3 +244,8 @@ export { encodeKitty, encodeKittyUpload, encodeKittyPlaceholders, encodeKittyDel
  * iTerm2 Inline Images Protocol encoder
  */
 export { encodeIterm2 } from './render/image/iterm2';
+
+/**
+ * Shared image-mode drawing utilities
+ */
+export { gradientColorFn, buildSparklinePixelGrid } from './render/image/drawing';

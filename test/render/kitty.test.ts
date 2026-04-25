@@ -72,6 +72,29 @@ describe('encodeKittyPlaceholders', () => {
     });
 });
 
+describe('encodeKittyPlaceholders — trailingSpace option', () => {
+    it('default (trailingSpace=true) adds a space after each placeholder', () => {
+        const result = encodeKittyPlaceholders(2, 1, 1);
+        // Each cell: U+10EEEE + rowMark + colMark + ' ' — count spaces between placeholders
+        const line = result.split('\n')[0]!.replace(/\x1b\[[^m]*m/g, '');
+        expect(line).toContain(' ');
+    });
+
+    it('trailingSpace=false omits the trailing space', () => {
+        const withSpace = encodeKittyPlaceholders(2, 1, 1);
+        const withoutSpace = encodeKittyPlaceholders(2, 1, 1, { trailingSpace: false });
+        // Strip ANSI codes for comparison
+        const strip = (s: string) => s.replace(/\x1b\[[^m]*m/g, '');
+        expect(strip(withoutSpace).length).toBeLessThan(strip(withSpace).length);
+    });
+
+    it('trailingSpace=false still contains U+10EEEE placeholders', () => {
+        const result = encodeKittyPlaceholders(3, 2, 1, { trailingSpace: false });
+        const count = [...result].filter(ch => ch === '\u{10EEEE}').length;
+        expect(count).toBe(6); // 3 cols × 2 rows
+    });
+});
+
 describe('encodeKittyDelete', () => {
     it('produces correct delete sequence', () => {
         expect(encodeKittyDelete(7)).toBe('\x1b_Ga=d,d=I,i=7\x1b\\');

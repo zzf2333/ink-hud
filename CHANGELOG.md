@@ -9,9 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Image protocol rendering for Heatmap**: The `Heatmap` component now accepts a `mode` prop (`'auto' | 'image' | 'character'`). In `'auto'` mode it auto-detects the terminal's image protocol (Kitty Graphics / iTerm2 Inline Images) and renders the heatmap as a true bitmap, falling back to character mode when unsupported.
+- **Image protocol rendering for Sparkline**: `Sparkline` now accepts `mode`, `height`, `colors`, and `cellPx` props for image mode rendering. In `'auto'` or `'image'` mode the sparkline renders as a smooth area chart bitmap with configurable height and gradient colors.
 - **`detectImageProtocol()`**: New function that detects whether the current terminal supports Kitty Graphics or iTerm2 Inline Images. Override with `INKHU_IMAGE_PROTOCOL=kitty|iterm2|none`.
 - **`createRgbPng()`** / **`hexToRgb()`**: Zero-dependency PNG encoder built on Node.js's built-in `zlib`. Used internally by image-mode components.
 - **`encodeKitty()`** / **`encodeIterm2()`**: Low-level encoders for Kitty Graphics Protocol (APC sequences) and iTerm2 Inline Images (OSC 1337). Available for custom rendering use cases.
+- **`encodeKittyUpload()`** / **`encodeKittyPlaceholders()`** / **`encodeKittyDelete()`**: Kitty Unicode Placeholder API (`U=1`). Images are stored by ID and referenced by U+10EEEE placeholder characters, making image rendering compatible with ink's React reconciler (re-renders no longer overwrite the image).
+- **`gradientColorFn()`** / **`buildSparklinePixelGrid()`**: Shared image-mode drawing utilities for building RGB pixel grids from data series.
 
 ### Breaking Changes
 - **ASCII variant removed** (`PulseBar`, `Gauge`, `Heatmap`, `BigNumber`, `Sparkline`): The `variant: 'ascii'` option has been removed from all components. `Sparkline` now accepts `'block' | 'braille'` only. The `fontStyle: 'ascii'` option has been removed from `BigNumber`.
