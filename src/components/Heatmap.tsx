@@ -1,21 +1,17 @@
-import { Box, Text, useStdout } from 'ink';
-import React, { useEffect, useMemo, useRef } from 'react';
+import { Box, Text } from 'ink';
+import React, { useMemo } from 'react';
 import tinygradient from 'tinygradient';
-import { detectImageProtocol, type ImageProtocol } from '../render/capabilities';
 import { createRgbPng, hexToRgb } from '../render/image/png';
-import { encodeKittyUpload, encodeKittyPlaceholders, encodeKittyDelete } from '../render/image/kitty';
-import { encodeIterm2 } from '../render/image/iterm2';
 import { useTheme } from '../theme/ThemeContext';
 import { createGradient } from '../utils/gradient';
+import { useImageProtocol } from '../hooks/useImageProtocol';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 export interface HeatmapProps {
-    /**
-     * Data matrix (2D array), rows × cols
-     */
+    /** Data matrix (2D array), rows × cols */
     data: number[][];
 
     /**
@@ -24,14 +20,12 @@ export interface HeatmapProps {
      */
     colors?: string[];
 
-    /**
-     * Custom character for character mode (defaults to Unicode block ■)
-     */
+    /** Custom character for character mode (defaults to Unicode block ■) */
     char?: string;
 
     /**
      * Rendering mode.
-     * - 'auto': use image protocol if the terminal supports it, otherwise character mode
+     * - 'auto': use image protocol if supported, otherwise character mode
      * - 'image': force image protocol (no-op if unsupported)
      * - 'character': always use unicode block characters
      * @default 'auto'
@@ -75,9 +69,6 @@ function gradientRgbPalette(
     return g.rgb(steps).map((c) => hexToRgb('#' + c.toHex()));
 }
 
-/** Stable counter for generating unique image IDs across component instances. */
-let nextImageId = 1;
-
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -92,14 +83,9 @@ export const Heatmap: React.FC<HeatmapProps> = ({
     const theme = useTheme();
     const effectiveColors = colors ?? theme.heatmapGradient;
     const effectiveChar = char ?? '■';
-    const { stdout } = useStdout();
 
-    // Stable image ID for this component instance (Kitty placeholder mode)
-    const imageIdRef = useRef<number>(0);
-    if (imageIdRef.current === 0) {
-        imageIdRef.current = nextImageId++;
-    }
-    const imageId = imageIdRef.current;
+    const dataRows = data.length;
+    const dataCols = data[0]?.length ?? 0;
 
     // --- Shared min/max ---
     const { min, max } = useMemo(() => {
@@ -110,21 +96,9 @@ export const Heatmap: React.FC<HeatmapProps> = ({
 
     const steps = effectiveColors.length;
 
-    // --- Detect image protocol ---
-    const protocol: ImageProtocol | null = useMemo(() => {
-        if (mode === 'character') return null;
-        return detectImageProtocol();
-    }, [mode]);
-
-    const useImage = protocol !== null && mode !== 'character';
-
-    // --- Build pixel grid (shared between kitty and iterm2 paths) ---
+    // --- Build PNG (skipped in character mode or when data is empty) ---
     const pngBuf = useMemo(() => {
-        if (!useImage) return null;
-
-        const dataRows = data.length;
-        const dataCols = data[0]?.length ?? 0;
-        if (!dataRows || !dataCols) return null;
+        if (mode === 'character' || !dataRows || !dataCols) return null;
 
         const palette = gradientRgbPalette(effectiveColors, steps);
         const pixelGrid: [number, number, number][][] = [];
@@ -140,6 +114,7 @@ export const Heatmap: React.FC<HeatmapProps> = ({
                     if (si >= steps) si = steps - 1;
                     const rgb = palette[si] ?? GAP;
                     for (let px = 0; px < cellPx; px++) pixelRow.push(rgb);
+                    // Gap column mirrors the trailing space in character mode
                     for (let px = 0; px < cellPx; px++) pixelRow.push(GAP);
                 }
                 pixelGrid.push(pixelRow);
@@ -147,69 +122,42 @@ export const Heatmap: React.FC<HeatmapProps> = ({
         }
 
         return createRgbPng(pixelGrid);
-    }, [data, min, max, steps, effectiveColors, cellPx, useImage]);
+    }, [data, min, max, steps, effectiveColors, cellPx, mode, dataRows, dataCols]);
 
-    // --- Kitty: upload image on data change, clean up on unmount ---
-    useEffect(() => {
-        if (protocol !== 'kitty' || !pngBuf) return;
+    // --- Image protocol: upload, effects, and placeholder data ---
+    // charCols = dataCols Kitty cells, each 2 terminal cols wide (trailingSpace=true)
+    const { useImage, kittyLines, iterm2Cols } = useImageProtocol({
+        mode,
+        charCols: dataCols,
+        charRows: dataRows,
+        pngBuf,
+        trailingSpace: true,
+    });
 
-        const dataRows = data.length;
-        const dataCols = data[0]?.length ?? 0;
-        if (!dataRows || !dataCols) return;
-
-        // Kitty: cols = number of placeholder cells (each cell = 2 terminal cols via U+10EEEE + space)
-        const uploadSeq = encodeKittyUpload(pngBuf, dataCols, dataRows, imageId);
-        stdout.write(uploadSeq);
-
-        return () => {
-            stdout.write(encodeKittyDelete(imageId));
-        };
-    }, [pngBuf, protocol, imageId, data, stdout]);
-
-    // --- iTerm2: cursor-up write on data change ---
-    useEffect(() => {
-        if (protocol !== 'iterm2' || !pngBuf) return;
-
-        const dataRows = data.length;
-        const dataCols = data[0]?.length ?? 0;
-        if (!dataRows || !dataCols) return;
-
-        // iTerm2: cols = terminal column count (dataCols * 2 because each cell = char + space)
-        const seq = encodeIterm2(pngBuf, dataCols * 2);
-        stdout.write(`\x1b[${dataRows}A\x1b[0G${seq}\x1b[${dataRows}B`);
-    }, [pngBuf, protocol, data, stdout]);
-
-    // --- Kitty placeholder rendering ---
-    if (protocol === 'kitty' && useImage) {
-        const dataRows = data.length;
-        const dataCols = data[0]?.length ?? 0;
-        if (!dataRows || !dataCols) return null;
-
-        // dataCols placeholder cells, each 2 terminal cols wide (U+10EEEE + space)
-        const placeholderText = encodeKittyPlaceholders(dataCols, dataRows, imageId);
-
-        // Split into lines so ink can measure height correctly
-        const lines = placeholderText.split('\n');
+    // --- Kitty placeholder ---
+    if (kittyLines !== null) {
         return (
             <Box flexDirection="column">
-                {lines.map((line, i) => (
+                {kittyLines.map((line, i) => (
                     <Text key={i}>{line}</Text>
                 ))}
             </Box>
         );
     }
 
-    // --- iTerm2 placeholder (blank rows; image written via cursor-up in useEffect) ---
-    if (protocol === 'iterm2' && useImage) {
-        const placeholderWidth = (data[0]?.length ?? 0) * 2;
+    // --- iTerm2 placeholder (blank rows; image written via cursor-up in hook) ---
+    if (iterm2Cols !== null) {
         return (
             <Box flexDirection="column">
                 {data.map((_, i) => (
-                    <Text key={i}>{' '.repeat(placeholderWidth)}</Text>
+                    <Text key={i}>{' '.repeat(iterm2Cols)}</Text>
                 ))}
             </Box>
         );
     }
+
+    // Satisfy the linter — useImage is read via kittyLines/iterm2Cols checks above
+    void useImage;
 
     // --- Character mode ---
     const gradient = createGradient(effectiveColors, steps);

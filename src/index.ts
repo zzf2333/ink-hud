@@ -129,6 +129,15 @@ export {
     type EasingFunction,
 } from './hooks/useSmooth';
 
+/**
+ * Image protocol hook — shared by all image-mode components (Heatmap, Sparkline, …)
+ */
+export {
+    useImageProtocol,
+    type UseImageProtocolOptions,
+    type UseImageProtocolResult,
+} from './hooks/useImageProtocol';
+
 // ============================================
 // React Components
 // ============================================
