@@ -1,91 +1,90 @@
-# ink-hud Architecture
+# ink-hud 架构文档
 
-## Overview
+## 概述
 
-ink-hud renders interactive terminal dashboard widgets using [ink](https://github.com/vadimdemedes/ink) (React for CLIs). The library contains **two independent rendering systems** that operate in parallel: a character renderer chain for line/area/bar/pie charts, and an image protocol pipeline for bitmap-capable components (Heatmap, Sparkline). The two systems share no code and make independent terminal capability decisions.
+ink-hud 基于 [ink](https://github.com/vadimdemedes/ink)（CLI 的 React）渲染交互式终端仪表盘组件。库内包含**两套完全独立的渲染系统**并行运行：字符渲染链负责折线图/面积图/柱状图/饼图，图像协议管道负责位图渲染能力的组件（Heatmap、Sparkline）。两套系统不共享任何代码，各自独立判断终端能力。
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                         ink-hud Components                          │
+│                         ink-hud 组件层                               │
 │                                                                     │
 │  LineChart  AreaChart  BarChart  PieChart  │  Heatmap   Sparkline   │
 │                                            │                        │
 │      ↓ rendererChain prop                  │    ↓ mode prop         │
 │  ┌─────────────────────────┐               │  ┌─────────────────┐   │
-│  │  System 1: Character    │               │  │  System 2:      │   │
-│  │  Renderer Chain         │               │  │  Image Protocol │   │
+│  │  系统一：字符渲染链        │               │  │  系统二：         │   │
+│  │  Character Renderer     │               │  │  图像协议管道    │   │
 │  └─────────────────────────┘               │  └─────────────────┘   │
 └────────────────────────────────────────────┼────────────────────────┘
                                              │
-            Rendered via ink React tree      │  Rendered via stdout
-            (pure ANSI text output)          │  escape sequences +
-                                             │  ink placeholder chars
+         通过 ink React 树输出               │  通过 stdout 转义序列输出
+         （纯 ANSI 文本）                    │  + ink 占位符字符
 ```
 
 ---
 
-## System 1: Character Renderer Chain
+## 系统一：字符渲染链
 
-Used by `LineChart`, `AreaChart`, `BarChart`, `PieChart`, and `Sparkline` (character mode).
+用于 `LineChart`、`AreaChart`、`BarChart`、`PieChart` 以及 `Sparkline`（字符模式）。
 
-### Data Flow
+### 数据流
 
 ```
-Component props
+组件 props
     ↓
 useChartRenderer(props, rendererChain)
     ↓
-InkHudContext.selectBest(chain)   ← provided by <InkHudProvider>
+InkHudContext.selectBest(chain)   ← 由 <InkHudProvider> 提供
     ↓
 RendererSelector.selectBest()
     ↓
 TerminalDetector.detect()  →  TerminalCapabilities { score: 0-100, ... }
     ↓
-Walk preferredChain, pick first renderer whose minScore ≤ score
+遍历 preferredChain，选出第一个 minScore ≤ score 的渲染器
     ↓
 renderer: BrailleRenderer | BlockRenderer | AsciiRenderer
     ↓
 renderer.createCanvas(pixelW, pixelH)   →   Pixel[][]
     ↓
-draw onto canvas  (drawLine / setPixel / drawArc …)
+在 canvas 上绘制  (drawLine / setPixel / drawArc …)
     ↓
 renderer.renderCanvas(canvas, w, h)   →   RenderedLine[]
     ↓
-<Box> + <Text> via ink React tree
+通过 ink React 树输出 <Box> + <Text>
 ```
 
-### Terminal Scoring (`src/detect/terminal.ts`)
+### 终端评分算法（`src/detect/terminal.ts`）
 
-`TerminalDetector` reads `LANG`, `TERM`, `COLORTERM`, `TERM_PROGRAM` and produces a 0–100 score:
+`TerminalDetector` 读取 `LANG`、`TERM`、`COLORTERM`、`TERM_PROGRAM` 并计算 0–100 分：
 
-| Feature | Points |
+| 特性 | 加分 |
 |---|---|
-| UTF-8 (`LANG` contains `UTF-8`) | +20 |
-| Unicode (same as UTF-8) | +10 |
-| Braille (TERM_PROGRAM in whitelist) | +30 |
-| Block Elements (same as Unicode) | +10 |
-| Color (`TERM` has `color`/`256color` or `COLORTERM` set) | +15 |
-| True color (`COLORTERM=truecolor` or `24bit`) | +15 |
+| UTF-8（`LANG` 包含 `UTF-8`） | +20 |
+| Unicode（与 UTF-8 相同） | +10 |
+| Braille（`TERM_PROGRAM` 在白名单中） | +30 |
+| Block Elements（与 Unicode 相同） | +10 |
+| 颜色（`TERM` 含 `color`/`256color` 或 `COLORTERM` 已设置） | +15 |
+| True color（`COLORTERM=truecolor` 或 `24bit`） | +15 |
 
-Braille whitelist: `iterm`, `warp`, `alacritty`, `kitty`, `wezterm`, `hyper`, `tabby`, `rio`.
+Braille 白名单：`iterm`、`warp`、`alacritty`、`kitty`、`wezterm`、`hyper`、`tabby`、`rio`。
 
-### Renderer Properties
+### 渲染器参数对比
 
-| Renderer | minScore | Resolution (H×V px/char) | UTF-8 | Unicode |
+| 渲染器 | minScore | 分辨率（H×V 像素/字符） | 需要 UTF-8 | 需要 Unicode |
 |---|---|---|---|---|
 | BrailleRenderer | 80 | 2×4 | ✓ | ✓ |
 | BlockRenderer | 30 | 2×8 | ✓ | ✓ |
 | AsciiRenderer | 0 | 1×1 | ✗ | ✗ |
 
-### Renderer Chain Configuration
+### 渲染链配置
 
-Each chart component has a default chain. Charts accept a `rendererChain` prop to override:
+每个图表组件有默认链，可通过 `rendererChain` prop 覆盖：
 
 ```tsx
-// Default for LineChart / AreaChart: ['braille', 'block', 'ascii']
+// LineChart / AreaChart 默认：['braille', 'block', 'ascii']
 <LineChart rendererChain={['block', 'ascii']} ... />
 
-// Force ascii globally via InkHudProvider
+// 通过 InkHudProvider 全局强制指定渲染器
 <InkHudProvider forceRenderer="ascii">
   <Dashboard />
 </InkHudProvider>
@@ -93,187 +92,189 @@ Each chart component has a default chain. Charts accept a `rendererChain` prop t
 
 ### InkHudProvider
 
-`<InkHudProvider>` wraps the app to provide `InkHudContext`. Without it, components use a module-level default `RendererSelector`. The provider is optional for basic usage but required for:
-- Injecting a custom `TerminalDetector` (e.g., in tests)
-- Forcing a specific renderer via `forceRenderer`
+`<InkHudProvider>` 包裹应用，向子树提供 `InkHudContext`。不使用时，组件回退到模块级默认 `RendererSelector`。以下场景必须使用 Provider：
+
+- 注入自定义 `TerminalDetector`（如测试环境）
+- 通过 `forceRenderer` 强制指定渲染器
 
 ---
 
-## System 2: Image Protocol Pipeline
+## 系统二：图像协议管道
 
-Used by `Heatmap` and `Sparkline` (image mode).
+用于 `Heatmap` 和 `Sparkline`（图像模式）。
 
-### Data Flow
+### 数据流
 
 ```
-Component props (data, mode, cellPx, colors, …)
+组件 props（data、mode、cellPx、colors …）
     ↓
 detectImageProtocol()   →   'kitty' | 'iterm2' | null
     ↓
-Build PNG buffer in useMemo:
-  • Heatmap:   gradientRgbPalette → pixel grid → createRgbPng()
-  • Sparkline: gradientColorFn → buildSparklinePixelGrid → createRgbPng()
+在 useMemo 中构建 PNG buffer：
+  • Heatmap：   gradientRgbPalette → 像素网格 → createRgbPng()
+  • Sparkline： gradientColorFn → buildSparklinePixelGrid → createRgbPng()
     ↓
 useImageProtocol({ mode, charCols, charRows, pngBuf, trailingSpace })
     │
     ├── protocol='kitty'
     │     useEffect: stdout.write(encodeKittyUpload(pngBuf, cols, rows, imageId))
-    │     return:    kittyLines = encodeKittyPlaceholders(…).split('\n')
-    │     cleanup:   stdout.write(encodeKittyDelete(imageId))
+    │     返回：    kittyLines = encodeKittyPlaceholders(…).split('\n')
+    │     清理：    stdout.write(encodeKittyDelete(imageId))
     │
     └── protocol='iterm2'
           useEffect: stdout.write(`\x1b[${rows}A\x1b[0G${encodeIterm2(pngBuf, termCols)}\x1b[${rows}B`)
-          return:    iterm2Cols = charCols * (trailingSpace ? 2 : 1)
+          返回：    iterm2Cols = charCols * (trailingSpace ? 2 : 1)
     ↓
-Component renders ink React tree:
-  • Kitty:   kittyLines.map(line => <Text>{line}</Text>)
-  • iTerm2:  data.map(_ => <Text>{' '.repeat(iterm2Cols)}</Text>)
-  • Fallback: character mode rendering
+组件渲染 ink React 树：
+  • Kitty：   kittyLines.map(line => <Text>{line}</Text>)
+  • iTerm2：  data.map(_ => <Text>{' '.repeat(iterm2Cols)}</Text>)
+  • 兜底：    字符模式渲染
 ```
 
-### Protocol Detection (`src/render/capabilities.ts`)
+### 协议检测（`src/render/capabilities.ts`）
 
-Priority order (first match wins):
+按优先级顺序，第一个匹配项生效：
 
-1. `INKHU_IMAGE_PROTOCOL=kitty|iterm2|none` — user override
-2. `KITTY_WINDOW_ID` set → `'kitty'`
-3. `TERM_PROGRAM=wezterm` or `TERM_PROGRAM=ghostty` → `'kitty'`
+1. `INKHU_IMAGE_PROTOCOL=kitty|iterm2|none` — 用户手动覆盖
+2. `KITTY_WINDOW_ID` 已设置 → `'kitty'`
+3. `TERM_PROGRAM=wezterm` 或 `TERM_PROGRAM=ghostty` → `'kitty'`
 4. `TERM_PROGRAM=iterm.app` → `'iterm2'`
-5. Otherwise → `null` (character fallback)
+5. 否则 → `null`（回退到字符模式）
 
-VS Code (≥1.110) supports Kitty Graphics but requires `terminal.integrated.enableImages=true`. Users must set `INKHU_IMAGE_PROTOCOL=kitty` to enable.
+VS Code（≥1.110）支持 Kitty Graphics，但需要开启 `terminal.integrated.enableImages=true`，同时手动设置 `INKHU_IMAGE_PROTOCOL=kitty`。
 
-### Kitty Unicode Placeholder Mode
+### Kitty Unicode Placeholder 模式
 
-ink re-renders overwrite raw `\x1b[nA` cursor-positioned images. The solution is Kitty's Unicode Placeholder mode (`U=1`):
+ink 重渲染会覆盖通过 `\x1b[nA` 光标定位写入的图像。解决方案是 Kitty 的 Unicode Placeholder 模式（`U=1`）：
 
-1. Image is **uploaded once** with `a=T,U=1,i=<id>` (stored in terminal memory, not displayed)
-2. Component renders **U+10EEEE placeholder characters** with diacritical marks encoding row/col indices and the image ID encoded as the foreground RGB color
-3. The terminal replaces each placeholder char with the corresponding image cell automatically
-4. ink re-renders only update the placeholder chars — the image stays in terminal memory
+1. 图像以 `a=T,U=1,i=<id>` **上传一次**（存入终端内存，不直接显示）
+2. 组件渲染 **U+10EEEE 占位符字符**，通过附加组合附标记编码行列索引，图像 ID 编码在前景 RGB 颜色中
+3. 终端自动将每个占位符替换为对应的图像格
+4. ink 重渲染只更新占位符字符——图像始终保留在终端内存中
 
-Each placeholder cell encodes:
+每个占位符格的编码结构：
+
 ```
-ESC[38;2;R;G;Bm   ← image ID as RGB foreground
-U+10EEEE           ← Kitty placeholder codepoint (string-width=1)
-DIACRITICS[row]    ← zero-width combining mark for row index
-DIACRITICS[col]    ← zero-width combining mark for col index
-U+0020             ← trailing space (when trailingSpace=true)
+ESC[38;2;R;G;Bm   ← 图像 ID 编码为 RGB 前景色
+U+10EEEE           ← Kitty 占位符码点（字符宽度=1）
+DIACRITICS[row]    ← 零宽附标记，编码行索引
+DIACRITICS[col]    ← 零宽附标记，编码列索引
+U+0020             ← 尾随空格（trailingSpace=true 时）
 ```
 
-The `DIACRITICS` array has 256 entries covering the full set from the Kitty spec. Grids larger than 256×256 throw a `RangeError`.
+`DIACRITICS` 数组共 256 项，覆盖 Kitty 规范的完整集合。超过 256×256 的网格会抛出 `RangeError`。
 
-### `useImageProtocol` Hook (`src/hooks/useImageProtocol.ts`)
+### `useImageProtocol` Hook（`src/hooks/useImageProtocol.ts`）
 
-Shared hook eliminating duplicate protocol logic between Heatmap and Sparkline.
+提取自 Heatmap 和 Sparkline 的共享 Hook，消除约 60 行重复的协议逻辑。
 
 ```typescript
 interface UseImageProtocolOptions {
     mode: 'auto' | 'image' | 'character';
-    charCols: number;   // number of placeholder cells (not terminal columns)
+    charCols: number;   // 占位符格数量（非终端列数）
     charRows: number;
     pngBuf: Buffer | null;
-    trailingSpace?: boolean;  // default true
+    trailingSpace?: boolean;  // 默认 true
 }
 
 interface UseImageProtocolResult {
     useImage: boolean;
-    kittyLines: string[] | null;   // non-null when Kitty is active
-    iterm2Cols: number | null;     // non-null when iTerm2 is active
+    kittyLines: string[] | null;   // Kitty 激活时非 null
+    iterm2Cols: number | null;     // iTerm2 激活时非 null
 }
 ```
 
-**Image ID management**: A module-level counter `nextImageId = 1` allocates unique Kitty image IDs across all component instances. Each component instance gets one stable ID via `useRef<number | null>(null)` — initialized once and never changed.
+**图像 ID 管理**：模块级计数器 `nextImageId = 1` 跨所有组件实例分配唯一的 Kitty 图像 ID。每个组件实例通过 `useRef<number | null>(null)` 获得一个稳定 ID，初始化后永不改变。
 
-### `trailingSpace` Semantics
+### `trailingSpace` 语义
 
-Controls how many terminal columns each Kitty placeholder cell occupies:
+控制每个 Kitty 占位符格占用的终端列数：
 
-| `trailingSpace` | Terminal cols/cell | Use case |
+| `trailingSpace` | 终端列数/格 | 适用场景 |
 |---|---|---|
-| `true` (default) | 2 (U+10EEEE + space) | Heatmap — matches character mode "■ " (char + space) |
-| `false` | 1 (U+10EEEE only) | Sparkline — matches character mode "█" (1 char/column) |
+| `true`（默认） | 2（U+10EEEE + 空格） | Heatmap — 匹配字符模式 "■ "（字符 + 空格）的宽度 |
+| `false` | 1（仅 U+10EEEE） | Sparkline — 匹配字符模式 "█"（每列一个字符）的宽度 |
 
-For iTerm2, `iterm2Cols = charCols * (trailingSpace ? 2 : 1)` gives the total terminal column width of the placeholder region.
+iTerm2 模式下：`iterm2Cols = charCols * (trailingSpace ? 2 : 1)`，即占位区域的总终端列宽。
 
-### PNG Generation
+### PNG 生成
 
-**`src/render/image/png.ts`** — Zero-dependency PNG encoder using Node.js built-in `zlib.deflateSync`. Accepts `pixels: [r,g,b][][]` (row-major RGB grid), outputs a valid PNG `Buffer`.
+**`src/render/image/png.ts`** — 零依赖 PNG 编码器，使用 Node.js 内置 `zlib.deflateSync`。接受 `pixels: [r,g,b][][]`（行优先 RGB 网格），输出合法的 PNG `Buffer`。
 
-**`src/render/image/drawing.ts`** — Shared pixel-grid drawing utilities:
-- `gradientColorFn(colors)` — builds a 256-step tinygradient palette, returns `(normalized: 0-1) => [r,g,b]`
-- `buildSparklinePixelGrid(data, widthPx, heightPx, min, max, colorFn, bgColor)` — linear interpolation + 2px bright line + darkened area fill
+**`src/render/image/drawing.ts`** — 共享像素网格绘制工具：
+- `gradientColorFn(colors)` — 基于 tinygradient 构建 256 步调色板，返回 `(normalized: 0-1) => [r,g,b]`
+- `buildSparklinePixelGrid(data, widthPx, heightPx, min, max, colorFn, bgColor)` — 线性插值 + 2px 亮线 + 暗色填充区域
 
 ---
 
-## Component Matrix
+## 组件渲染矩阵
 
-| Component | System | Renderer/Protocol | Key Props |
+| 组件 | 使用系统 | 渲染器/协议 | 关键 Props |
 |---|---|---|---|
-| `LineChart` | Character | braille → block → ascii | `rendererChain` |
-| `AreaChart` | Character | braille → block → ascii | `rendererChain` |
-| `BarChart` | Character | block → ascii | `rendererChain` |
-| `PieChart` | Character | braille → block → ascii | `rendererChain` |
-| `Sparkline` | **Both** | character: braille/block; image: Kitty/iTerm2 | `mode`, `variant`, `height`, `colors`, `cellPx` |
-| `Heatmap` | **Both** | character: unicode block; image: Kitty/iTerm2 | `mode`, `colors`, `cellPx` |
-| `Gauge` | Character (inline) | unicode block chars only | — |
-| `PulseBar` | Character (inline) | unicode block chars only | — |
-| `BigNumber` | Character (inline) | unicode box-drawing only | — |
-| `Table` | Layout | ink Box/Text only | — |
-| `Panel` | Layout | ink Box/Text only | — |
-| `LogStream` | Layout | ink Box/Text only | — |
-| `Grid` | Layout | ink Flexbox only | — |
+| `LineChart` | 字符渲染链 | braille → block → ascii | `rendererChain` |
+| `AreaChart` | 字符渲染链 | braille → block → ascii | `rendererChain` |
+| `BarChart` | 字符渲染链 | block → ascii | `rendererChain` |
+| `PieChart` | 字符渲染链 | braille → block → ascii | `rendererChain` |
+| `Sparkline` | **双系统** | 字符：braille/block；图像：Kitty/iTerm2 | `mode`, `variant`, `height`, `colors`, `cellPx` |
+| `Heatmap` | **双系统** | 字符：unicode block；图像：Kitty/iTerm2 | `mode`, `colors`, `cellPx` |
+| `Gauge` | 字符（内联） | 仅 unicode block 字符 | — |
+| `PulseBar` | 字符（内联） | 仅 unicode block 字符 | — |
+| `BigNumber` | 字符（内联） | 仅 unicode 盒绘制字符 | — |
+| `Table` | 布局 | 仅 ink Box/Text | — |
+| `Panel` | 布局 | 仅 ink Box/Text | — |
+| `LogStream` | 布局 | 仅 ink Box/Text | — |
+| `Grid` | 布局 | 仅 ink Flexbox | — |
 
 ---
 
-## Key Invariants
+## 关键不变式
 
-1. **DIACRITICS ≤ 256**: `encodeKittyPlaceholders` throws `RangeError` for rows or cols > 256. This is a hard protocol limit from the Kitty spec.
+1. **DIACRITICS ≤ 256**：`encodeKittyPlaceholders` 对 rows 或 cols > 256 抛出 `RangeError`。这是 Kitty 协议规范的硬限制。
 
-2. **charCols ≠ terminal cols**: `charCols` passed to `useImageProtocol` is always the number of data cells (placeholder grid cells), not terminal column count. Terminal width = `charCols * (trailingSpace ? 2 : 1)`.
+2. **charCols ≠ 终端列数**：传入 `useImageProtocol` 的 `charCols` 始终是数据格数（占位符网格格数），不是终端列数。终端列宽 = `charCols * (trailingSpace ? 2 : 1)`。
 
-3. **Image ID uniqueness**: All components that use `useImageProtocol` share a single module-level `nextImageId` counter. Never instantiate separate counters in components.
+3. **图像 ID 唯一性**：所有使用 `useImageProtocol` 的组件共享同一个模块级 `nextImageId` 计数器，禁止在组件内单独维护计数器。
 
-4. **pngBuf immutability**: `pngBuf` is produced by `useMemo` and only changes when data changes. The Kitty effect runs only when `pngBuf` changes (by reference), triggering a new upload. The previous image is not explicitly deleted between data updates — Kitty reuses the same image ID.
+4. **pngBuf 不可变性**：`pngBuf` 由 `useMemo` 生成，只在数据变化时更新。Kitty effect 仅在 `pngBuf` 引用变化时触发新上传，相同 imageId 重复使用，无需显式删除旧图像。
 
-5. **Character mode pixel canvas**: `Pixel` objects are mutable; `createCanvas` pre-allocates all cells. `setPixel` and `drawLine` mutate in place. Do not share canvas instances across renders.
+5. **字符模式像素 canvas**：`Pixel` 对象可变；`createCanvas` 预分配所有格。`setPixel` 和 `drawLine` 原地修改。禁止跨渲染共享 canvas 实例。
 
-6. **No System 1/System 2 interop**: The two systems are completely independent. A component cannot use both `rendererChain` and `useImageProtocol` simultaneously — they serve different component archetypes.
+6. **两套系统完全隔离**：组件不能同时使用 `rendererChain` 和 `useImageProtocol`，两者服务于不同类型的组件。
 
 ---
 
-## Directory Structure
+## 目录结构
 
 ```
 src/
-├── components/          # React components (both systems)
-│   ├── InkHudProvider.tsx   # Context for System 1 (RendererSelector injection)
-│   └── useImageProtocol.ts  # Shared hook for System 2
-├── core/                # System 1: renderer base classes
-│   ├── renderer.ts          # Abstract Renderer + drawing primitives
-│   ├── braille.ts           # BrailleRenderer (2×4 px/char)
-│   ├── block.ts             # BlockRenderer (2×8 px/char)
-│   └── ascii.ts             # AsciiRenderer (1×1 px/char, no-op fallback)
-├── detect/              # System 1: terminal capability detection
-│   ├── terminal.ts          # TerminalDetector (env var scoring)
-│   ├── selector.ts          # RendererSelector (walk chain, pick best)
-│   └── types.ts             # TerminalCapabilities, EnvironmentInfo
-├── render/              # System 2: image protocol layer
+├── components/              # React 组件（两套系统均在此）
+│   ├── InkHudProvider.tsx   # 系统一的 Context（RendererSelector 注入）
+│   └── useImageProtocol.ts  # 系统二的共享 Hook
+├── core/                    # 系统一：渲染器基类
+│   ├── renderer.ts          # 抽象 Renderer + 绘图原语
+│   ├── braille.ts           # BrailleRenderer（2×4 像素/字符）
+│   ├── block.ts             # BlockRenderer（2×8 像素/字符）
+│   └── ascii.ts             # AsciiRenderer（1×1 像素/字符，无需求兜底）
+├── detect/                  # 系统一：终端能力检测
+│   ├── terminal.ts          # TerminalDetector（环境变量评分）
+│   ├── selector.ts          # RendererSelector（遍历链，选最优）
+│   └── types.ts             # TerminalCapabilities、EnvironmentInfo
+├── render/                  # 系统二：图像协议层
 │   ├── capabilities.ts      # detectImageProtocol()
 │   └── image/
 │       ├── kitty.ts         # encodeKittyUpload / Placeholders / Delete
-│       ├── iterm2.ts        # encodeIterm2 (OSC 1337)
-│       ├── png.ts           # createRgbPng (zero-dependency)
-│       └── drawing.ts       # gradientColorFn, buildSparklinePixelGrid
-├── theme/               # ThemeContext + default theme
-└── utils/               # gradient helpers, LTTB downsampling
+│       ├── iterm2.ts        # encodeIterm2（OSC 1337）
+│       ├── png.ts           # createRgbPng（零依赖）
+│       └── drawing.ts       # gradientColorFn、buildSparklinePixelGrid
+├── theme/                   # ThemeContext + 默认主题
+└── utils/                   # 渐变工具、LTTB 降采样等
 ```
 
 ---
 
-## Testing Conventions
+## 测试约定
 
-- **Character renderer tests** (`test/components/*.test.tsx`): Render with `ink-testing-library`, inspect `lastFrame()` for ANSI sequences or character patterns.
-- **Image protocol tests** (`test/render/kitty.test.ts`, `test/hooks/useImageProtocol.test.tsx`): Unit-test encoding functions directly; use env var injection (`KITTY_WINDOW_ID`, `TERM_PROGRAM`) with `try/finally` cleanup to test protocol paths.
-- **TerminalDetector tests**: Construct with a custom `env` object — never read from `process.env` directly in tests.
-- **InkHudProvider injection**: Pass a `detector={mockDetector}` to force a specific renderer in component tests.
+- **字符渲染器测试**（`test/components/*.test.tsx`）：使用 `ink-testing-library` 渲染，通过 `lastFrame()` 检查 ANSI 序列或字符模式。
+- **图像协议测试**（`test/render/kitty.test.ts`、`test/hooks/useImageProtocol.test.tsx`）：直接对编码函数做单元测试；通过环境变量注入（`KITTY_WINDOW_ID`、`TERM_PROGRAM`）配合 `try/finally` 清理来测试各协议路径。
+- **TerminalDetector 测试**：构造时传入自定义 `env` 对象，禁止在测试中直接读取 `process.env`。
+- **InkHudProvider 注入**：在组件测试中传入 `detector={mockDetector}` 强制指定渲染器。
