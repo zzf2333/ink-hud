@@ -77,6 +77,8 @@ export interface ChartLayoutConfig {
     min: number;
     /** Data max value */
     max: number;
+    /** Legend item names, used to dynamically compute right legend width */
+    legendNames?: string[];
 }
 
 /**
@@ -123,6 +125,7 @@ export function useChartLayout(
         defaultHeight = 15,
         min,
         max,
+        legendNames,
     } = config;
 
     const gridContext = useContext(GridItemContext);
@@ -159,7 +162,10 @@ export function useChartLayout(
 
     if (showLegend) {
         if (legendPosition === 'right') {
-            legendWidth = 20; // Fixed width for right legend
+            legendWidth =
+                legendNames && legendNames.length > 0
+                    ? Math.max(...legendNames.map((n) => n.length)) + 2
+                    : 20;
         } else {
             // Top or Bottom
             legendHeight = 2; // 1 line content + 1 line margin
@@ -234,6 +240,7 @@ export function useChartLayoutSimple(
     props: ChartLayoutProps,
     min: number,
     max: number,
+    legendNames?: string[],
 ): ChartLayoutResult {
     const {
         width: propsWidth,
@@ -273,6 +280,7 @@ export function useChartLayoutSimple(
             ...(yTickFormat && { yTickFormat }),
             min,
             max,
+            ...(legendNames && { legendNames }),
         },
     );
 }

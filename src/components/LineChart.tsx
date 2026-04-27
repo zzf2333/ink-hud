@@ -41,7 +41,12 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
     const renderer = useChartRenderer('line');
 
     // 2. Layout calculation (use simplified API)
-    const layout = useChartLayoutSimple(props, min, max);
+    const layout = useChartLayoutSimple(
+        props,
+        min,
+        max,
+        legendItems.map((it) => it.name),
+    );
 
     const { plotWidth: canvasWidth, plotHeight: canvasHeight } = layout;
 
