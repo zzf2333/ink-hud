@@ -1,7 +1,7 @@
 /**
  * Demo smoke test
  *
- * Spawns `tsx examples/dashboard.tsx` and verifies that it boots without
+ * Spawns `tsx examples/demo.tsx` and verifies that it boots without
  * a JavaScript crash (TypeError, ReferenceError, SyntaxError).
  * Visual output correctness is covered separately by dashboard.test.tsx.
  */
@@ -40,7 +40,7 @@ describe('demo smoke', () => {
         async () => {
             let stderr = '';
 
-            child = spawn('node_modules/.bin/tsx', ['examples/dashboard.tsx'], {
+            child = spawn('node_modules/.bin/tsx', ['examples/demo.tsx'], {
                 cwd: ROOT_DIR,
                 env: { ...process.env, FORCE_COLOR: '0' },
                 stdio: ['ignore', 'ignore', 'pipe'],
