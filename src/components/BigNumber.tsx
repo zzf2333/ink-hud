@@ -6,9 +6,19 @@ import { type FontStyle, renderBigString } from './BigNumber/font';
 
 export interface BigNumberProps {
     /**
-     * Main value
+     * Main value — should contain only supported characters: 0-9 . , % + -
      */
     value: string | number;
+
+    /**
+     * Small text rendered to the left of the big value (e.g. "$")
+     */
+    prefix?: string;
+
+    /**
+     * Small text rendered to the right of the big value (e.g. "ms", "k", "%")
+     */
+    suffix?: string;
 
     /**
      * Subtitle/label
@@ -53,6 +63,8 @@ export interface BigNumberProps {
  */
 export const BigNumber: React.FC<BigNumberProps> = ({
     value,
+    prefix,
+    suffix,
     label,
     color = 'white',
     trendDirection,
@@ -82,12 +94,24 @@ export const BigNumber: React.FC<BigNumberProps> = ({
 
     return (
         <Box flexDirection="column" alignItems={alignItems}>
-            <Box flexDirection="column" marginBottom={1}>
-                {bigLines.map((line, i) => (
-                    <Text key={i} color={color}>
-                        {line}
-                    </Text>
-                ))}
+            <Box flexDirection="row" alignItems="flex-end" marginBottom={1}>
+                {prefix && (
+                    <Box marginRight={1}>
+                        <Text color={color}>{prefix}</Text>
+                    </Box>
+                )}
+                <Box flexDirection="column">
+                    {bigLines.map((line, i) => (
+                        <Text key={i} color={color}>
+                            {line}
+                        </Text>
+                    ))}
+                </Box>
+                {suffix && (
+                    <Box marginLeft={1}>
+                        <Text color={color}>{suffix}</Text>
+                    </Box>
+                )}
             </Box>
 
             <Box flexDirection="row" gap={1}>

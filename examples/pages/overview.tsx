@@ -8,30 +8,43 @@ import {
     LineChart,
     Panel,
     Sparkline,
+    useTheme,
 } from 'ink-hud';
 import { useSystemMetrics } from '../shared/data';
 
 export const OverviewPage = () => {
     const m = useSystemMetrics();
+    const theme = useTheme();
+
+    // ONE_DARK_PALETTES.standard: [blue, green, yellow, purple, red, cyan, orange, gray]
+    const C = {
+        accent:  theme.palette[5], // cyan  #56b6c2
+        warn:    theme.palette[2], // yellow #e5c07b
+        purple:  theme.palette[3], // purple #c678dd
+        success: theme.semantic.success,
+        error:   theme.semantic.error,
+    };
+
+    const errorColor = m.errorRate > 1 ? C.error : C.success;
 
     return (
         <Box flexDirection="column" paddingX={1}>
             {/* Header */}
             <Box
                 borderStyle="round"
-                borderColor="cyan"
+                borderColor={C.accent}
                 paddingX={2}
                 marginBottom={1}
                 justifyContent="space-between"
             >
                 <Box flexDirection="column">
-                    <Text bold color="cyanBright">
+                    <Text bold color={C.accent}>
                         ink-hud showcase
                     </Text>
                     <Text dimColor>system monitor · live metrics</Text>
                 </Box>
                 <Box flexDirection="column" alignItems="flex-end">
-                    <Text color="green">● ONLINE</Text>
+                    <Text color={C.success}>● ONLINE</Text>
                     <Text dimColor>{new Date().toLocaleTimeString()}</Text>
                 </Box>
             </Box>
@@ -39,11 +52,11 @@ export const OverviewPage = () => {
             {/* KPI row — BigNumber with trendDirection + trendLabel */}
             <Grid columns={4} rowHeight={7}>
                 <GridItem>
-                    <Panel title="Requests/s" borderColor="cyan">
+                    <Panel title="Requests/s" borderColor={C.accent}>
                         <BigNumber
-                            value={m.reqs.toLocaleString()}
+                            value={m.reqs.toLocaleString('en-US')}
                             label="req/s"
-                            color="cyan"
+                            color={C.accent}
                             trendDirection={m.reqsTrend >= 0 ? 'up' : 'down'}
                             trendLabel={`${m.reqsTrend >= 0 ? '+' : ''}${m.reqsTrend}%`}
                             align="center"
@@ -51,11 +64,12 @@ export const OverviewPage = () => {
                     </Panel>
                 </GridItem>
                 <GridItem>
-                    <Panel title="p99 Latency" borderColor="yellow">
+                    <Panel title="p99 Latency" borderColor={C.warn}>
                         <BigNumber
-                            value={`${m.latency}ms`}
+                            value={m.latency}
+                            suffix="ms"
                             label="p99"
-                            color="yellow"
+                            color={C.warn}
                             trendDirection={m.latencyTrend <= 0 ? 'up' : 'down'}
                             trendLabel={`${m.latencyTrend >= 0 ? '+' : ''}${m.latencyTrend}%`}
                             align="center"
@@ -63,11 +77,12 @@ export const OverviewPage = () => {
                     </Panel>
                 </GridItem>
                 <GridItem>
-                    <Panel title="Error Rate" borderColor={m.errorRate > 1 ? 'red' : 'green'}>
+                    <Panel title="Error Rate" borderColor={errorColor}>
                         <BigNumber
-                            value={`${m.errorRate}%`}
+                            value={m.errorRate}
+                            suffix="%"
                             label="errors"
-                            color={m.errorRate > 1 ? 'red' : 'green'}
+                            color={errorColor}
                             trendDirection={m.errorTrend <= 0 ? 'up' : 'down'}
                             trendLabel={`${m.errorTrend >= 0 ? '+' : ''}${m.errorTrend}`}
                             align="center"
@@ -75,11 +90,11 @@ export const OverviewPage = () => {
                     </Panel>
                 </GridItem>
                 <GridItem>
-                    <Panel title="Active Users" borderColor="magenta">
+                    <Panel title="Active Users" borderColor={C.purple}>
                         <BigNumber
-                            value={m.activeUsers.toLocaleString()}
+                            value={m.activeUsers.toLocaleString('en-US')}
                             label="users"
-                            color="magenta"
+                            color={C.purple}
                             trendDirection={m.usersTrend >= 0 ? 'up' : 'down'}
                             trendLabel={`${m.usersTrend >= 0 ? '+' : ''}${m.usersTrend}%`}
                             align="center"
@@ -109,7 +124,7 @@ export const OverviewPage = () => {
                                         value={m.cpu}
                                         min={0}
                                         max={100}
-                                        color={m.cpu > 80 ? 'red' : m.cpu > 60 ? 'yellow' : 'green'}
+                                        color={m.cpu > 80 ? C.error : m.cpu > 60 ? C.warn : C.success}
                                     />
                                     <Text dimColor>{Math.round(m.cpu)}%</Text>
                                 </Box>
@@ -122,7 +137,7 @@ export const OverviewPage = () => {
                                         value={m.memory}
                                         min={0}
                                         max={100}
-                                        color={m.memory > 85 ? 'red' : 'cyan'}
+                                        color={m.memory > 85 ? C.error : C.accent}
                                     />
                                     <Text dimColor>{Math.round(m.memory)}%</Text>
                                 </Box>

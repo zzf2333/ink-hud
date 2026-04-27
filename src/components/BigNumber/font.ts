@@ -67,11 +67,32 @@ const UNKNOWN: Record<FontStyle, string[]> = {
 };
 
 // ============================================================
+// Dev-mode warn for unsupported characters
+// ============================================================
+
+const warnedChars = new Set<string>();
+
+function warnUnsupportedChar(char: string, style: FontStyle): void {
+    if (process.env.NODE_ENV === 'production') return;
+    const key = `${style}:${char}`;
+    if (warnedChars.has(key)) return;
+    warnedChars.add(key);
+    console.warn(
+        `[ink-hud] BigNumber: unsupported char "${char}" (style="${style}") rendered as "?". Use the prefix/suffix props for units or symbols (e.g. <BigNumber value="49" suffix="ms" />).`,
+    );
+}
+
+// ============================================================
 // Public API
 // ============================================================
 
 export function getBigChar(char: string, style: FontStyle = 'block'): string[] {
-    return FONTS[style][char] || UNKNOWN[style];
+    const glyphs = FONTS[style][char];
+    if (!glyphs) {
+        warnUnsupportedChar(char, style);
+        return UNKNOWN[style];
+    }
+    return glyphs;
 }
 
 export function renderBigString(text: string, style: FontStyle = 'block'): string[] {
