@@ -67,14 +67,21 @@ export interface InkHudContextValue {
     getRendererFor: (kind: ChartKind) => Renderer;
 }
 
-// Module-level dedup set — one warning per (kind, target) pair per process
-const warnedFallbacks = new Set<string>();
+// Per-selector dedup map — one warning per (kind, target) pair per RendererSelector instance.
+// Using WeakMap ensures test isolation: each new RendererSelector gets a fresh Set so
+// module-level state does not bleed across test cases.
+const selectorFallbackWarnings = new WeakMap<RendererSelector, Set<string>>();
 
-function warnFallback(kind: ChartKind, target: RendererType): void {
+function warnFallback(selector: RendererSelector, kind: ChartKind, target: RendererType): void {
     if (process.env.NODE_ENV === 'production') return;
+    let warned = selectorFallbackWarnings.get(selector);
+    if (!warned) {
+        warned = new Set<string>();
+        selectorFallbackWarnings.set(selector, warned);
+    }
     const key = `${kind}:${target}`;
-    if (warnedFallbacks.has(key)) return;
-    warnedFallbacks.add(key);
+    if (warned.has(key)) return;
+    warned.add(key);
     console.warn(
         `[ink-hud] Renderer '${target}' is not supported by the current terminal; ` +
             `falling back to 'block' for chart kind '${kind}'. ` +
@@ -95,7 +102,7 @@ const defaultContext: InkHudContextValue = {
         if (defaultSelector.isRendererTypeSupported(target)) {
             return defaultSelector.getRenderer(target);
         }
-        warnFallback(kind, target);
+        warnFallback(defaultSelector, kind, target);
         return defaultSelector.getRenderer('block');
     },
 };
@@ -172,7 +179,7 @@ export const InkHudProvider: React.FC<InkHudProviderProps> = ({
             if (selector.isRendererTypeSupported(target)) {
                 return selector.getRenderer(target);
             }
-            warnFallback(kind, target);
+            warnFallback(selector, kind, target);
             return selector.getRenderer('block');
         };
 
