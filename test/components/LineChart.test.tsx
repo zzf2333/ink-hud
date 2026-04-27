@@ -2,25 +2,18 @@ import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
 import { InkHudProvider } from '../../src/components/InkHudProvider';
 import { LineChart } from '../../src/components/LineChart';
+import { TerminalDetector } from '../../src/detect/terminal';
+import { LINE_FIXTURE_SERIES } from '../fixtures/chartFixtures';
+import { stripAnsi } from '../helpers/stripAnsi';
 
-function stripAnsi(input: string): string {
-    let output = '';
-    let i = 0;
-    while (i < input.length) {
-        const char = input[i];
-        if (char === '\u001b' && input[i + 1] === '[') {
-            i += 2;
-            while (i < input.length && input[i] !== 'm') {
-                i++;
-            }
-            i++;
-            continue;
-        }
-        output += char ?? '';
-        i++;
-    }
-    return output;
-}
+const brailleDetector = new TerminalDetector({
+    LANG: 'en_US.UTF-8',
+    TERM_PROGRAM: 'iTerm.app',
+    COLORTERM: 'truecolor',
+});
+
+const CHART_WIDTH = 24;
+const CHART_HEIGHT = 8;
 
 describe('LineChart', () => {
     it('should output empty content when data is empty and axes/legends are disabled', () => {
@@ -28,22 +21,94 @@ describe('LineChart', () => {
         expect(lastFrame()).toBe('');
     });
 
-    it('should output fixed height canvas content with Block renderer', () => {
-        const height = 8;
+    it('renders with block renderer — height matches prop', () => {
         const { lastFrame } = render(
             <InkHudProvider renderers={{ line: 'block' }}>
                 <LineChart
-                    series={[{ name: 'S1', data: [0, 10, 5, 12, 3, 8] }]}
+                    series={LINE_FIXTURE_SERIES}
                     showLegend={false}
                     showAxis={false}
-                    width={24}
-                    height={height}
+                    width={CHART_WIDTH}
+                    height={CHART_HEIGHT}
                 />
             </InkHudProvider>,
         );
-
         const output = stripAnsi(lastFrame() ?? '');
-        expect(output.split('\n')).toHaveLength(height);
+        expect(output.split('\n')).toHaveLength(CHART_HEIGHT);
         expect(output.trim()).not.toBe('');
+    });
+
+    it('renders block path inline snapshot', () => {
+        const { lastFrame } = render(
+            <InkHudProvider renderers={{ line: 'block' }}>
+                <LineChart
+                    series={LINE_FIXTURE_SERIES}
+                    showLegend={false}
+                    showAxis={false}
+                    width={CHART_WIDTH}
+                    height={CHART_HEIGHT}
+                />
+            </InkHudProvider>,
+        );
+        expect(stripAnsi(lastFrame() ?? '')).toMatchInlineSnapshot(`
+          "                ▗▄▖    ▗
+                    ▃    ▗▅ ▄▖▃ ▃▇
+                   ▄▇▃▗▂▖▅   ▇▄▄▖
+               ▂▂▇▅▂▗▃▄ ▄▖  ▗▇▇ ▆▃
+            ▗▅▅▖ ▄█ █ █▄▆▆▃▗▅    █
+           ▂▅█ ▇▆▇        ▇▆
+          ▇▄
+          ▄█"
+        `);
+    });
+
+    it('renders braille path inline snapshot', () => {
+        const { lastFrame } = render(
+            <InkHudProvider detector={brailleDetector}>
+                <LineChart
+                    series={LINE_FIXTURE_SERIES}
+                    showLegend={false}
+                    showAxis={false}
+                    width={CHART_WIDTH}
+                    height={CHART_HEIGHT}
+                />
+            </InkHudProvider>,
+        );
+        expect(stripAnsi(lastFrame() ?? '')).toMatchInlineSnapshot(`
+          "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⢣⠀⠀⠀⠀⠀⢀
+          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⠀⠀⠀⠀⢀⠎⠀⢣⠀⣄⠀⡰⠁
+          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⡜⠈⢆⢀⠔⡄⡜⠀⠀⠀⣿⢈⢮⠀⠀
+          ⠀⠀⠀⠀⠀⡠⠊⠒⡼⣀⢀⠜⢇⠀⡸⡅⠀⠀⢰⠁⠁⠀⠑⡄
+          ⠀⠀⠀⣜⠶⡁⠀⡰⠁⠀⠁⠀⠈⢦⠃⠘⡄⢠⠃⠀⠀⠀⠀⠈
+          ⠀⡠⡜⠁⠀⠈⠲⠁⠀⠀⠀⠀⠀⠀⠀⠀⠘⠎⠀⠀⠀⠀⠀⠀
+          ⠊⡜⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+          ⡜⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+        `);
+    });
+
+    it('renders with axis and legend inline snapshot', () => {
+        const { lastFrame } = render(
+            <InkHudProvider renderers={{ line: 'block' }}>
+                <LineChart
+                    series={LINE_FIXTURE_SERIES}
+                    showLegend={true}
+                    showAxis={true}
+                    width={40}
+                    height={10}
+                />
+            </InkHudProvider>,
+        );
+        expect(stripAnsi(lastFrame() ?? '')).toMatchInlineSnapshot(`
+          "10           ▄▖  ▗  ● S1
+                   ▖   ▌▄▗▗▄
+           8      ▗▅▖▃▐█▇▅▇
+                ▗▂▄ ▇▇▆ ▗▄▅▖  ● S2
+           5   ▃▃▗▅▃▇▄▇ ▄  ▆
+              ▐▅▃▄   ▆ ▅▅
+           3 ▗▅ █▇     ▇
+             ▄▇
+           0 ▅
+             0  2    4 5   7"
+        `);
     });
 });

@@ -2,25 +2,18 @@ import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
 import { BarChart } from '../../src/components/BarChart';
 import { InkHudProvider } from '../../src/components/InkHudProvider';
+import { TerminalDetector } from '../../src/detect/terminal';
+import { BAR_FIXTURE_SERIES } from '../fixtures/chartFixtures';
+import { stripAnsi } from '../helpers/stripAnsi';
 
-function stripAnsi(input: string): string {
-    let output = '';
-    let i = 0;
-    while (i < input.length) {
-        const char = input[i];
-        if (char === '\u001b' && input[i + 1] === '[') {
-            i += 2;
-            while (i < input.length && input[i] !== 'm') {
-                i++;
-            }
-            i++;
-            continue;
-        }
-        output += char ?? '';
-        i++;
-    }
-    return output;
-}
+const brailleDetector = new TerminalDetector({
+    LANG: 'en_US.UTF-8',
+    TERM_PROGRAM: 'iTerm.app',
+    COLORTERM: 'truecolor',
+});
+
+const CHART_WIDTH = 30;
+const CHART_HEIGHT = 8;
 
 describe('BarChart', () => {
     it('should output empty content when data is empty and axes/legends are disabled', () => {
@@ -28,37 +21,29 @@ describe('BarChart', () => {
         expect(lastFrame()).toBe('');
     });
 
-    it('should output fixed height canvas content with Block renderer', () => {
-        const height = 8;
+    it('renders vertical block — height matches prop', () => {
         const { lastFrame } = render(
             <InkHudProvider renderers={{ bar: 'block' }}>
                 <BarChart
-                    series={[
-                        { name: 'A', data: [1, 2, 3] },
-                        { name: 'B', data: [3, 2, 1] },
-                    ]}
+                    series={BAR_FIXTURE_SERIES}
                     showLegend={false}
                     showAxis={false}
-                    width={30}
-                    height={height}
+                    width={CHART_WIDTH}
+                    height={CHART_HEIGHT}
                 />
             </InkHudProvider>,
         );
-
         const output = stripAnsi(lastFrame() ?? '');
-        expect(output.split('\n')).toHaveLength(height);
+        expect(output.split('\n')).toHaveLength(CHART_HEIGHT);
         expect(output.trim()).not.toBe('');
     });
 
-    it('should output fixed height canvas content in horizontal mode', () => {
+    it('renders horizontal block — height matches prop', () => {
         const height = 10;
         const { lastFrame } = render(
             <InkHudProvider renderers={{ bar: 'block' }}>
                 <BarChart
-                    series={[
-                        { name: 'A', data: [1, 2, 3] },
-                        { name: 'B', data: [3, 2, 1] },
-                    ]}
+                    series={BAR_FIXTURE_SERIES}
                     showLegend={false}
                     showAxis={false}
                     orientation="horizontal"
@@ -67,9 +52,84 @@ describe('BarChart', () => {
                 />
             </InkHudProvider>,
         );
-
         const output = stripAnsi(lastFrame() ?? '');
         expect(output.split('\n')).toHaveLength(height);
         expect(output.trim()).not.toBe('');
+    });
+
+    it('renders block path inline snapshot', () => {
+        const { lastFrame } = render(
+            <InkHudProvider renderers={{ bar: 'block' }}>
+                <BarChart
+                    series={BAR_FIXTURE_SERIES}
+                    showLegend={false}
+                    showAxis={false}
+                    width={CHART_WIDTH}
+                    height={CHART_HEIGHT}
+                />
+            </InkHudProvider>,
+        );
+        expect(stripAnsi(lastFrame() ?? '')).toMatchInlineSnapshot(`
+          "                  ██████
+                            ██████
+                ▃▃▃▃▃▃      ██████
+                ██████      ██████
+                ██████      ██████
+                ██████▆▆▆▆▆▆██████
+                ██████████████████▃▃▃▃▃▃
+          ▂▂▂▂▂▂████████████████████████"
+        `);
+    });
+
+    it('renders braille path inline snapshot', () => {
+        const { lastFrame } = render(
+            <InkHudProvider detector={brailleDetector} renderers={{ bar: 'braille' }}>
+                <BarChart
+                    series={BAR_FIXTURE_SERIES}
+                    showLegend={false}
+                    showAxis={false}
+                    width={CHART_WIDTH}
+                    height={CHART_HEIGHT}
+                />
+            </InkHudProvider>,
+        );
+        expect(stripAnsi(lastFrame() ?? '')).toMatchInlineSnapshot(`
+          "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀
+          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀
+          ⠀⠀⠀⠀⠀⠀⣤⣤⣤⣤⣤⣤⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀
+          ⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀
+          ⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀
+          ⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣶⣶⣶⣶⣶⣶⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀
+          ⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣤⣤⣤⣤⣤⣤
+          ⣀⣀⣀⣀⣀⣀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"
+        `);
+    });
+
+    it('renders with axis and legend inline snapshot', () => {
+        const { lastFrame } = render(
+            <InkHudProvider renderers={{ bar: 'block' }}>
+                <BarChart
+                    series={BAR_FIXTURE_SERIES}
+                    showLegend={true}
+                    showAxis={true}
+                    width={40}
+                    height={12}
+                />
+            </InkHudProvider>,
+        );
+        expect(stripAnsi(lastFrame() ?? '')).toMatchInlineSnapshot(`
+          "40          ███     ● A
+                      ███
+                      ███
+          33    ▃▃▃   ███
+                ███   ███
+          25    ███   ███
+                ███   ███
+                ███▆▆▆███
+          18    █████████
+                █████████▇▇▇
+          10 ▂▂▂████████████
+             0  1   2  3   4"
+        `);
     });
 });
