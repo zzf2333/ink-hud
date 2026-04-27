@@ -11,8 +11,8 @@
 import { render } from 'ink-testing-library';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Showcase } from '../../examples/demo';
-import { InkHudProvider, ThemeProvider } from '../../src/index';
 import { TerminalDetector } from '../../src/detect/terminal';
+import { InkHudProvider, ThemeProvider } from '../../src/index';
 import { stripAnsi } from '../helpers/stripAnsi';
 
 // Inject a braille-capable detector so the test renders identically on
