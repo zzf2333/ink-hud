@@ -212,7 +212,7 @@ export const AllPage = () => {
                     </Panel>
                 </GridItem>
                 <GridItem>
-                    <Panel title="PieChart — Request breakdown" borderStyle="round" borderColor={C.purple}>
+                    <Panel title="PieChart — Request breakdown" borderStyle="round" borderColor={C.purple} padding={1}>
                         <PieChart
                             data={CHART_PIE_DATA}
                             showLegend
@@ -223,8 +223,8 @@ export const AllPage = () => {
                 </GridItem>
             </Grid>
 
-            {/* Row 4 — Sparkline (3 variants) + Heatmap */}
-            <Grid columns={4} rowHeight={4}>
+            {/* Row 4a — Sparkline (3 variants) */}
+            <Grid columns={3} rowHeight={4}>
                 <GridItem>
                     <Panel title="Sparkline — block" borderStyle="single" borderColor={C.accent}>
                         <Sparkline
@@ -255,6 +255,10 @@ export const AllPage = () => {
                         />
                     </Panel>
                 </GridItem>
+            </Grid>
+
+            {/* Row 4b — Heatmap (7 days × 24 hours needs rowHeight=9 for 7 inner rows) */}
+            <Grid columns={1} rowHeight={9}>
                 <GridItem>
                     <Panel title="Heatmap — Server Activity" borderStyle="single" borderColor={C.accent}>
                         <Heatmap data={HEATMAP_MATRIX} mode="character" colors={HEATMAP_COLORS} />
@@ -266,13 +270,13 @@ export const AllPage = () => {
             <Grid columns={3} rowHeight={14}>
                 <GridItem span={2}>
                     <Box flexDirection="column" height={14}>
-                        <Box height={9}>
-                            <Panel title="LogStream — System Logs" height={9} borderStyle="round">
+                        <Box height={8}>
+                            <Panel title="LogStream — System Logs" height={8} borderStyle="round">
                                 <LogStream logs={logs} maxLines={40} />
                             </Panel>
                         </Box>
-                        <Box height={5}>
-                            <Panel title="PulseBar — Network Heartbeat" height={5} borderStyle="single">
+                        <Box height={6}>
+                            <Panel title="PulseBar — Network Heartbeat" height={6} borderStyle="single">
                                 <PulseBar records={pings} maxBars={36} />
                                 <Text dimColor>
                                     {'  '}
