@@ -60,10 +60,26 @@ export interface InkHudContextValue {
 
     /**
      * Get the renderer configured for a specific chart kind.
-     * Falls back silently to BlockRenderer if the configured renderer is
-     * not supported by the current terminal (e.g. braille on a legacy console).
+     * In development mode, emits a one-time console.warn when falling back to
+     * BlockRenderer because the configured renderer is not supported by the
+     * current terminal. In production, the fallback is silent.
      */
     getRendererFor: (kind: ChartKind) => Renderer;
+}
+
+// Module-level dedup set — one warning per (kind, target) pair per process
+const warnedFallbacks = new Set<string>();
+
+function warnFallback(kind: ChartKind, target: RendererType): void {
+    if (process.env.NODE_ENV === 'production') return;
+    const key = `${kind}:${target}`;
+    if (warnedFallbacks.has(key)) return;
+    warnedFallbacks.add(key);
+    console.warn(
+        `[ink-hud] Renderer '${target}' is not supported by the current terminal; ` +
+            `falling back to 'block' for chart kind '${kind}'. ` +
+            `Override via <InkHudProvider renderers={{ ${kind}: 'block' }}>.`,
+    );
 }
 
 /**
@@ -79,6 +95,7 @@ const defaultContext: InkHudContextValue = {
         if (defaultSelector.isRendererTypeSupported(target)) {
             return defaultSelector.getRenderer(target);
         }
+        warnFallback(kind, target);
         return defaultSelector.getRenderer('block');
     },
 };
@@ -155,6 +172,7 @@ export const InkHudProvider: React.FC<InkHudProviderProps> = ({
             if (selector.isRendererTypeSupported(target)) {
                 return selector.getRenderer(target);
             }
+            warnFallback(kind, target);
             return selector.getRenderer('block');
         };
 
