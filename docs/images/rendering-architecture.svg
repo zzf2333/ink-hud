@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 760" width="960" height="760">
+  <style>text { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }</style>
+  <defs>
+    <marker id="ab" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/></marker>
+    <marker id="ap" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#9333ea"/></marker>
+    <marker id="ao" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#ea580c"/></marker>
+    <marker id="ag" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#9ca3af"/></marker>
+  </defs>
+  <rect width="960" height="760" fill="#ffffff"/>
+  <text x="480" y="24" font-size="18" font-weight="600" fill="#111827" text-anchor="middle">ink-hud Rendering Architecture</text>
+  <rect x="120" y="36" width="720" height="68" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+  <text x="480" y="57" font-size="14" font-weight="600" fill="#c2410c" text-anchor="middle">InkHudProvider</text>
+  <text x="480" y="74" font-size="12" fill="#9a3412" text-anchor="middle">RendererSelector injected into React Context</text>
+  <text x="480" y="91" font-size="11" fill="#c2410c" text-anchor="middle">renderers?: Partial&lt;ChartRenderers&gt;   ·   detector?: TerminalDetector (for testing)</text>
+  <line x1="480" y1="115" x2="480" y2="730" stroke="#e5e7eb" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="240" y="120" font-size="13" font-weight="600" fill="#2563eb" text-anchor="middle">Pixel Canvas Path</text>
+  <text x="720" y="120" font-size="13" font-weight="600" fill="#9333ea" text-anchor="middle">Image Protocol Path</text>
+  <rect x="150" y="132" width="180" height="46" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="240" y="151" font-size="13" font-weight="600" fill="#1d4ed8" text-anchor="middle">User Data</text>
+  <text x="240" y="168" font-size="11" fill="#3b82f6" text-anchor="middle">series[] · data: number[]</text>
+  <rect x="135" y="207" width="210" height="58" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="240" y="229" font-size="13" font-weight="600" fill="#1d4ed8" text-anchor="middle">useChartCore</text>
+  <text x="240" y="246" font-size="11" fill="#3b82f6" text-anchor="middle">series processing</text>
+  <text x="240" y="260" font-size="11" fill="#3b82f6" text-anchor="middle">color assignment · min/max</text>
+  <rect x="135" y="295" width="210" height="58" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="240" y="317" font-size="13" font-weight="600" fill="#1d4ed8" text-anchor="middle">useChartRenderer</text>
+  <text x="240" y="334" font-size="11" fill="#3b82f6" text-anchor="middle">resolves Renderer from Context</text>
+  <text x="240" y="348" font-size="11" fill="#3b82f6" text-anchor="middle">applies fallback chain</text>
+  <rect x="26" y="368" width="428" height="84" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="240" y="384" font-size="10" fill="#64748b" text-anchor="middle">Renderer Selection</text>
+  <rect x="36" y="392" width="122" height="52" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="97" y="412" font-size="12" font-weight="600" fill="#1d4ed8" text-anchor="middle">BrailleRenderer</text>
+  <text x="97" y="427" font-size="10" fill="#2563eb" text-anchor="middle">2×4 dots · 8× res</text>
+  <text x="97" y="440" font-size="10" fill="#6b7280" text-anchor="middle">line · area · pie</text>
+  <rect x="179" y="392" width="122" height="52" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="240" y="412" font-size="12" font-weight="600" fill="#15803d" text-anchor="middle">BlockRenderer</text>
+  <text x="240" y="427" font-size="10" fill="#16a34a" text-anchor="middle">2×2 dots</text>
+  <text x="240" y="440" font-size="10" fill="#6b7280" text-anchor="middle">bar · pie (default)</text>
+  <rect x="322" y="392" width="122" height="52" rx="6" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1.5"/>
+  <text x="383" y="412" font-size="12" font-weight="600" fill="#374151" text-anchor="middle">AsciiRenderer</text>
+  <text x="383" y="427" font-size="10" fill="#6b7280" text-anchor="middle">text characters</text>
+  <text x="383" y="440" font-size="10" fill="#9ca3af" text-anchor="middle">fallback</text>
+  <rect x="135" y="480" width="210" height="58" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="240" y="502" font-size="13" font-weight="600" fill="#1d4ed8" text-anchor="middle">renderCanvas</text>
+  <text x="240" y="519" font-size="11" fill="#3b82f6" text-anchor="middle">Pixel[][] → ANSI colored</text>
+  <text x="240" y="533" font-size="11" fill="#3b82f6" text-anchor="middle">text lines</text>
+  <rect x="135" y="568" width="210" height="58" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="240" y="590" font-size="13" font-weight="600" fill="#1d4ed8" text-anchor="middle">ChartContainer</text>
+  <text x="240" y="607" font-size="11" fill="#3b82f6" text-anchor="middle">axes · legend · border</text>
+  <text x="240" y="621" font-size="11" fill="#3b82f6" text-anchor="middle">final ANSI output</text>
+  <rect x="100" y="648" width="280" height="36" rx="6" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1"/>
+  <text x="240" y="664" font-size="11" font-weight="600" fill="#0369a1" text-anchor="middle">LineChart · AreaChart</text>
+  <text x="240" y="678" font-size="11" fill="#0284c7" text-anchor="middle">BarChart · PieChart</text>
+  <rect x="630" y="132" width="180" height="46" rx="8" fill="#faf5ff" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="720" y="151" font-size="13" font-weight="600" fill="#7e22ce" text-anchor="middle">User Data</text>
+  <text x="720" y="168" font-size="11" fill="#a855f7" text-anchor="middle">data: number[][]</text>
+  <rect x="615" y="207" width="210" height="58" rx="8" fill="#faf5ff" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="720" y="229" font-size="13" font-weight="600" fill="#7e22ce" text-anchor="middle">capabilities.ts</text>
+  <text x="720" y="246" font-size="11" fill="#a855f7" text-anchor="middle">reads $TERM_PROGRAM</text>
+  <text x="720" y="260" font-size="11" fill="#a855f7" text-anchor="middle">detects Kitty / iTerm2</text>
+  <rect x="615" y="295" width="210" height="58" rx="8" fill="#faf5ff" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="720" y="320" font-size="13" font-weight="600" fill="#7e22ce" text-anchor="middle">Protocol Selection</text>
+  <text x="720" y="340" font-size="11" fill="#a855f7" text-anchor="middle">selects optimal render mode</text>
+  <rect x="506" y="368" width="428" height="84" rx="8" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="720" y="384" font-size="10" fill="#7c3aed" text-anchor="middle">Protocol Selection</text>
+  <rect x="516" y="392" width="122" height="52" rx="6" fill="#ede9fe" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="577" y="412" font-size="12" font-weight="600" fill="#7e22ce" text-anchor="middle">Kitty</text>
+  <text x="577" y="427" font-size="10" fill="#9333ea" text-anchor="middle">PNG via kitty protocol</text>
+  <text x="577" y="440" font-size="10" fill="#9333ea" text-anchor="middle">U+10EEEE placeholders</text>
+  <rect x="659" y="392" width="122" height="52" rx="6" fill="#ede9fe" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="720" y="412" font-size="12" font-weight="600" fill="#7e22ce" text-anchor="middle">iTerm2</text>
+  <text x="720" y="427" font-size="10" fill="#9333ea" text-anchor="middle">cursor-up escape</text>
+  <text x="720" y="440" font-size="10" fill="#9333ea" text-anchor="middle">sequence fallback</text>
+  <rect x="802" y="392" width="122" height="52" rx="6" fill="#fed7aa" stroke="#ea580c" stroke-width="1.5"/>
+  <text x="863" y="412" font-size="12" font-weight="600" fill="#9a3412" text-anchor="middle">Character</text>
+  <text x="863" y="427" font-size="10" fill="#ea580c" text-anchor="middle">chalk colored</text>
+  <text x="863" y="440" font-size="10" fill="#ea580c" text-anchor="middle">block characters</text>
+  <rect x="615" y="480" width="210" height="58" rx="8" fill="#faf5ff" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="720" y="502" font-size="13" font-weight="600" fill="#7e22ce" text-anchor="middle">Image Output</text>
+  <text x="720" y="519" font-size="11" fill="#a855f7" text-anchor="middle">inline terminal image</text>
+  <text x="720" y="533" font-size="11" fill="#a855f7" text-anchor="middle">or ANSI block chars</text>
+  <rect x="575" y="562" width="290" height="36" rx="6" fill="#fdf4ff" stroke="#e9d5ff" stroke-width="1"/>
+  <text x="720" y="578" font-size="11" font-weight="600" fill="#7e22ce" text-anchor="middle">Heatmap</text>
+  <text x="720" y="592" font-size="11" fill="#a855f7" text-anchor="middle">Sparkline (image mode)</text>
+  <line x1="240" y1="104" x2="240" y2="130" stroke="#ea580c" stroke-width="1.5" marker-end="url(#ao)"/>
+  <line x1="720" y1="104" x2="720" y2="130" stroke="#ea580c" stroke-width="1.5" marker-end="url(#ao)"/>
+  <line x1="240" y1="178" x2="240" y2="205" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
+  <line x1="240" y1="265" x2="240" y2="293" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
+  <path d="M 240,353 L 240,363 L 97,363 L 97,390" stroke="#2563eb" stroke-width="1.5" fill="none" marker-end="url(#ab)"/>
+  <line x1="240" y1="353" x2="240" y2="390" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
+  <path d="M 240,353 L 240,363 L 383,363 L 383,390" stroke="#9ca3af" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#ag)"/>
+  <line x1="240" y1="452" x2="240" y2="478" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
+  <line x1="240" y1="538" x2="240" y2="566" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
+  <line x1="240" y1="626" x2="240" y2="646" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
+  <line x1="720" y1="178" x2="720" y2="205" stroke="#9333ea" stroke-width="1.5" marker-end="url(#ap)"/>
+  <line x1="720" y1="265" x2="720" y2="293" stroke="#9333ea" stroke-width="1.5" marker-end="url(#ap)"/>
+  <path d="M 720,353 L 720,363 L 577,363 L 577,390" stroke="#9333ea" stroke-width="1.5" fill="none" marker-end="url(#ap)"/>
+  <line x1="720" y1="353" x2="720" y2="390" stroke="#9333ea" stroke-width="1.5" marker-end="url(#ap)"/>
+  <path d="M 720,353 L 720,363 L 863,363 L 863,390" stroke="#ea580c" stroke-width="1.5" fill="none" marker-end="url(#ao)"/>
+  <line x1="720" y1="452" x2="720" y2="478" stroke="#9333ea" stroke-width="1.5" marker-end="url(#ap)"/>
+  <line x1="720" y1="538" x2="720" y2="560" stroke="#9333ea" stroke-width="1.5" marker-end="url(#ap)"/>
+  <rect x="345" y="298" width="126" height="48" rx="5" fill="#fefce8" stroke="#fbbf24" stroke-width="1"/>
+  <text x="408" y="312" font-size="10" font-weight="600" fill="#92400e" text-anchor="middle">Defaults</text>
+  <text x="408" y="325" font-size="10" fill="#78350f" text-anchor="middle">line/area → braille</text>
+  <text x="408" y="338" font-size="10" fill="#78350f" text-anchor="middle">bar/pie → block</text>
+  <rect x="20" y="700" width="450" height="50" rx="6" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="35" y="715" font-size="11" font-weight="600" fill="#374151">Legend</text>
+  <line x1="35" y1="730" x2="65" y2="730" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
+  <text x="70" y="734" font-size="10" fill="#6b7280">Pixel canvas flow</text>
+  <line x1="155" y1="730" x2="185" y2="730" stroke="#9333ea" stroke-width="1.5" marker-end="url(#ap)"/>
+  <text x="190" y="734" font-size="10" fill="#6b7280">Image protocol flow</text>
+  <line x1="285" y1="730" x2="315" y2="730" stroke="#ea580c" stroke-width="1.5" marker-end="url(#ao)"/>
+  <text x="320" y="734" font-size="10" fill="#6b7280">Context injection</text>
+  <line x1="405" y1="730" x2="435" y2="730" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#ag)"/>
+  <text x="440" y="734" font-size="10" fill="#6b7280">Fallback</text>
+</svg>

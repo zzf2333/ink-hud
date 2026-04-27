@@ -1,52 +1,69 @@
-# ink-hud
+<div align="center">
 
-> 💎 Retina-grade terminal data visualization dashboard - High-resolution chart library based on Braille characters
+<h1>ink-hud</h1>
 
-[![npm version](https://badge.fury.io/js/ink-hud.svg)](https://www.npmjs.com/package/ink-hud)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<p><strong>Retina-grade data visualization for the terminal — built on React and Ink.</strong></p>
 
-**ink-hud** is a high-fidelity data visualization component library designed for the terminal, built on React and Ink. By utilizing Braille dot matrix characters (⣿), it achieves 8x higher vertical resolution than standard block characters, delivering smooth and detailed charts and data visualizations right in your terminal.
+<p>
+  <a href="https://github.com/zzf2333/ink-hud/stargazers"><img src="https://img.shields.io/github/stars/zzf2333/ink-hud?style=flat-square&color=2563eb" alt="GitHub Stars"/></a>
+  <a href="https://www.npmjs.com/package/ink-hud"><img src="https://img.shields.io/npm/v/ink-hud?style=flat-square&color=16a34a" alt="npm version"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-6b7280?style=flat-square" alt="License MIT"/></a>
+  <img src="https://img.shields.io/badge/node-18%2B-6b7280?style=flat-square" alt="Node 18+"/>
+  <img src="https://img.shields.io/badge/react-18%2B-6b7280?style=flat-square" alt="React 18+"/>
+</p>
 
-![Dashboard Demo](./docs/images/dashboard.png)
+</div>
 
-## ✨ Core Features
+---
 
-- **🎯 High-Resolution Rendering**: Uses Braille dot matrix characters (2×4 dots) for 8x vertical resolution
-- **🎨 Multi-Renderer Architecture**: Auto-detects terminal capabilities, supports Braille, Block, and ASCII rendering modes
-- **📊 Rich Component Library**: 13+ ready-to-use components covering charts, metrics, and layouts
-- **🎭 VS Code Dark+ Theme**: Carefully designed default color scheme, beautiful and readable
-- **📐 Responsive Layout**: Built-in Grid and Panel system for easy adaptive terminal interfaces
-- **⚡ Smooth Animations**: Built-in data smoothing Hooks with multiple easing functions
-- **🔧 TypeScript First**: Complete type definitions for excellent developer experience
-- **🌈 Compatibility Guaranteed**: Auto-degrades to block characters or ASCII for universal terminal support
+ink-hud renders 13+ chart and layout components directly in the terminal. It uses Braille dot-matrix characters (⣿) to achieve 8× higher vertical resolution than standard block characters, and falls back gracefully to block or ASCII mode on terminals that don't support Braille.
 
-## 📦 Installation
+![Dashboard Demo](./docs/images/all.png)
+
+---
+
+## Components
+
+**Charts** — LineChart · AreaChart · BarChart · PieChart · Sparkline · Heatmap
+
+**Metrics** — BigNumber · Gauge
+
+**Data** — Table · LogStream · PulseBar
+
+**Layout** — Panel · Grid
+
+---
+
+## Installation
 
 ```bash
 npm install ink-hud ink react
-# or with pnpm
+# or
 pnpm add ink-hud ink react
 ```
 
-**Requirements:**
-- Node.js >= 18.0.0
-- React >= 18.0.0
-- Ink >= 4.0.0
+Requires Node.js 18+, React 18+, Ink 4+.
 
-## 🚀 Quick Start
+---
+
+## Quick Start
 
 ```tsx
 import React from 'react';
 import { render } from 'ink';
-import { LineChart } from 'ink-hud';
+import { InkHudProvider, LineChart } from 'ink-hud';
 
 const App = () => {
     const data = [
-        { name: 'CPU', data: [12, 15, 45, 32, 60, 75, 20, 10], color: 'cyan' },
+        { name: 'CPU',    data: [12, 15, 45, 32, 60, 75, 20, 10], color: 'cyan' },
         { name: 'Memory', data: [40, 42, 45, 48, 40, 38, 42, 45], color: 'magenta' },
     ];
 
-    return <LineChart series={data} width={60} height={15} />;
+    return (
+        <InkHudProvider>
+            <LineChart series={data} width={60} height={15} showLegend />
+        </InkHudProvider>
+    );
 };
 
 render(<App />);
@@ -56,162 +73,147 @@ render(<App />);
 npx tsx app.tsx
 ```
 
-## 📊 Components
+---
 
-### Chart Components
+## Component Reference
 
-#### LineChart
-Multi-series line chart for trend analysis and time series comparison.
+### LineChart
 
-![LineChart](./docs/images/linechart.png)
+Multi-series line chart for trend analysis and time-series comparison.
 
 ```tsx
-<LineChart 
-    series={[{ name: 'CPU', data: [12, 15, 45, 32], color: 'cyan' }]} 
-    width={60} 
+<LineChart
+    series={[{ name: 'CPU', data: [12, 15, 45, 32], color: 'cyan' }]}
+    width={60}
     height={15}
-    showLegend={true}
+    showLegend
 />
 ```
 
-#### AreaChart
-Stacked area chart for cumulative data and proportion trends.
+### AreaChart
 
-![AreaChart](./docs/images/areachart.png)
+Filled area chart for cumulative data and proportion trends.
 
 ```tsx
-<AreaChart 
-    series={[{ name: 'Usage', data: [10, 20, 15, 25], color: 'green' }]} 
-    width={60} 
+<AreaChart
+    series={[{ name: 'Traffic', data: [10, 20, 15, 25], color: 'green' }]}
+    width={60}
     height={15}
 />
 ```
 
-#### BarChart
-Vertical and horizontal bar charts for category comparison.
+### BarChart
 
-![BarChart](./docs/images/barchart.png)
-![BarChart Horizontal](./docs/images/barchart-horizontal.png)
+Vertical bar chart for category comparison. Uses BlockRenderer by default for clean rectangular fills.
 
 ```tsx
-<BarChart 
-    series={[{ name: 'Sales', data: [100, 200, 150], color: 'blue' }]} 
-    width={40} 
+<BarChart
+    series={[{ name: 'Requests', data: [100, 200, 150, 180], color: 'blue' }]}
+    width={40}
     height={15}
     orientation="vertical"
 />
 ```
 
-#### PieChart
-Pie chart for distribution and resource allocation visualization.
+### PieChart
 
-![PieChart](./docs/images/piechart.png)
+Circular sector chart for distribution and resource allocation. The canvas is constrained to a visual square so the circle always fills the container.
 
 ```tsx
-<PieChart 
+<PieChart
     data={[
-        { name: 'System', value: 30, color: 'cyan' },
-        { name: 'Apps', value: 50, color: 'green' },
-        { name: 'Free', value: 20, color: 'yellow' },
-    ]} 
-    width={30} 
+        { name: 'API',    value: 45, color: 'cyan' },
+        { name: 'DB',     value: 25, color: 'blue' },
+        { name: 'Cache',  value: 20, color: 'green' },
+        { name: 'Static', value: 10, color: 'yellow' },
+    ]}
+    width={30}
     height={15}
 />
 ```
 
-#### Sparkline
-Compact inline trend chart for embedded metrics.
+### Sparkline
 
-![Sparkline](./docs/images/sparkline.png)
+Compact inline trend chart for embedded metrics. Uses a static character table (`SPARK_LEVELS`) — its `variant` prop (`'block' | 'braille'`) is independent of `InkHudProvider renderers`. Supports an `image` mode that renders via the Kitty/iTerm2 image protocol when available.
 
 ```tsx
 <Sparkline data={[1, 4, 2, 5, 3, 6]} width={20} color="cyan" />
+<Sparkline data={[1, 4, 2, 5, 3, 6]} width={20} mode="auto" colors={['#00ff00', '#ff0000']} />
 ```
 
-#### Heatmap
-2D grid visualization for matrix data and density distribution.
+### Heatmap
 
-![Heatmap](./docs/images/heatmap.png)
+2D grid visualization for matrix data and density distribution. Uses the Kitty or iTerm2 image protocol for pixel-perfect rendering when available; falls back to `mode="character"` (chalk-colored block characters) on other terminals.
 
 ```tsx
-<Heatmap 
-    data={[[0.2, 0.5, 0.8], [0.1, 0.4, 0.7], [0.3, 0.6, 0.9]]} 
+<Heatmap
+    data={[[0.2, 0.5, 0.8], [0.1, 0.4, 0.7], [0.3, 0.6, 0.9]]}
 />
 ```
 
-### Metric Components
+### BigNumber
 
-#### BigNumber
-Large number card for KPI display with trend indicators.
-
-![BigNumber](./docs/images/bignumber.png)
+Large-number KPI card with trend indicator.
 
 ```tsx
-<BigNumber value={125000} label="Revenue" trend={12.5} color="green" />
+<BigNumber value={14328} label="Requests/s" trend={4.5} color="cyan" />
 ```
 
-#### Gauge
-Circular or linear progress indicator for percentages and load.
+### Gauge
 
-![Gauge](./docs/images/gauge.png)
+Progress bar for percentages and load metrics.
 
 ```tsx
-<Gauge value={75} label="CPU" max={100} color="yellow" />
+<Gauge value={96} max={100} label="CPU" color="yellow" />
 ```
 
-### Data Components
+### Table
 
-#### Table
-Interactive sortable data table with keyboard navigation.
-
-![Table](./docs/images/table.png)
+Sortable data table with keyboard navigation and optional zebra striping.
 
 ```tsx
-<Table 
-    data={[{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]}
-    columns={[
-        { header: 'ID', accessor: 'id' },
-        { header: 'Name', accessor: 'name' },
+<Table
+    data={[
+        { pid: 1704, name: 'node',     cpu: '12%', mem: '150 MB', status: 'Running' },
+        { pid: 2048, name: 'postgres', cpu: '5.2%', mem: '100 MB', status: 'Running' },
     ]}
-    zebra={true}
+    columns={[
+        { header: 'PID',    accessor: 'pid' },
+        { header: 'NAME',   accessor: 'name' },
+        { header: 'CPU',    accessor: 'cpu' },
+        { header: 'MEM',    accessor: 'mem' },
+        { header: 'STATUS', accessor: 'status' },
+    ]}
+    zebra
 />
 ```
 
-#### LogStream
-Real-time scrolling log display with syntax highlighting.
+### LogStream
 
-![LogStream](./docs/images/logstream.png)
+Real-time scrolling log display with per-level color coding.
 
 ```tsx
-<LogStream 
-    logs={['[INFO] Started', '[WARN] High CPU', '[ERROR] Failed']}
+<LogStream
+    logs={['[INFO] Started', '[WARN] High CPU', '[ERROR] Connection failed']}
     maxLines={10}
 />
 ```
 
-#### PulseBar
+### PulseBar
+
 Heartbeat-style connection status history.
 
-![PulseBar](./docs/images/pulsebar.png)
-
 ```tsx
-<PulseBar 
-    records={[
-        { status: 'good' },
-        { status: 'unstable' },
-        { status: 'bad' },
-    ]}
+<PulseBar
+    records={[{ status: 'good' }, { status: 'unstable' }, { status: 'bad' }]}
     maxBars={30}
     variant="unicode"
 />
 ```
 
-### Layout Components
+### Panel
 
-#### Panel
-Bordered container with optional title for content grouping.
-
-![Panel](./docs/images/panel.png)
+Bordered container with an optional title for content grouping.
 
 ```tsx
 <Panel title="System Status" borderColor="cyan">
@@ -219,93 +221,177 @@ Bordered container with optional title for content grouping.
 </Panel>
 ```
 
-#### Grid
-Responsive grid layout system for dashboard construction.
+### Grid
 
-![Grid](./docs/images/grid.png)
+Responsive grid layout system. Children are `<GridItem>` elements that can span multiple columns.
 
 ```tsx
 <Grid columns={3} width={120} rowHeight={10}>
     <GridItem><Panel title="A">Content</Panel></GridItem>
-    <GridItem span={2}><Panel title="B">Wide</Panel></GridItem>
+    <GridItem span={2}><Panel title="B">Wide content</Panel></GridItem>
 </Grid>
 ```
 
-## 🎨 Renderer System
+---
 
-ink-hud auto-detects terminal capabilities and selects the best renderer per chart kind:
+## Renderer System
 
-| Renderer | Resolution | Characters | Default For |
-|----------|------------|------------|-------------|
-| **Braille** | 2×4 dots, 8x vertical | `⠀⠁⠂...⣿` | LineChart, AreaChart, PieChart |
-| **Block** | 2×8 dots, 8x vertical | `▁▂▃▄▅▆▇█` | BarChart |
+ink-hud uses two independent rendering systems:
 
-Each chart ships with a pre-tuned default — no configuration required. To override:
+![Rendering Architecture](./docs/images/rendering-architecture.png)
+
+### Pixel Canvas (charts)
+
+LineChart, AreaChart, BarChart, and PieChart share a five-stage pipeline:
+
+1. `useChartCore` — process series data, compute min/max, assign colors
+2. `useChartRenderer` — resolve a `Renderer` instance from the `InkHudProvider` context
+3. `renderXxxChartCanvas` — draw to a `Pixel[][]` grid via `renderer.setPixel()` / `drawLine()`
+4. `renderer.renderCanvas()` — convert `Pixel[][]` to ANSI-colored text lines
+5. `ChartContainer` — wrap with axes, legend, and border
+
+Each chart ships with a pre-tuned default renderer:
+
+| Chart kind | Default renderer | Reason |
+|------------|-----------------|--------|
+| `line` | Braille | 2×4 sub-pixel grid renders smooth diagonals |
+| `area` | Braille | Fine-grained fill under curves |
+| `bar` | Block | Clean rectangular bar edges |
+| `pie` | Block | Solid fills create clean sector boundaries |
+
+The three renderer implementations:
+
+| Renderer | Characters | Resolution |
+|----------|-----------|-----------|
+| `BrailleRenderer` | `⠀⠁⠂…⣿` | 2×4 dots per cell |
+| `BlockRenderer` | `▁▂▃▄▅▆▇█` | 2×2 dots per cell |
+| `AsciiRenderer` | ASCII text | 1×1 per cell (fallback) |
+
+### Image Protocol (Heatmap, Sparkline image mode)
+
+`capabilities.ts` detects terminal support from environment variables (`$TERM_PROGRAM`, `$TERM`). For Kitty terminals, components upload a PNG via `encodeKittyUpload()` and render `U+10EEEE` Unicode Placeholder characters — this survives Ink re-renders without cursor flicker. For iTerm2, a cursor-up escape sequence fallback is used. On other terminals, `mode="character"` renders chalk-colored block characters.
+
+---
+
+## Configuration
+
+### InkHudProvider
+
+Wrap your app in `<InkHudProvider>` to enable renderer selection and dependency injection. Without the provider, components use the global `TerminalDetector` singleton.
 
 ```tsx
-// Override per chart kind via InkHudProvider
+// Auto-detect terminal, use default renderer per chart kind
+<InkHudProvider>
+    <MyApp />
+</InkHudProvider>
+
+// Override renderer for specific chart kinds
 <InkHudProvider renderers={{ line: 'block', bar: 'braille' }}>
     <MyApp />
 </InkHudProvider>
 
-// Inject mock detector for testing
+// Inject a mock detector for testing (no env-var manipulation needed)
 <InkHudProvider detector={mockDetector}>
     <MyApp />
 </InkHudProvider>
 ```
 
-If the configured renderer is not supported by the terminal (e.g. braille on a legacy console), BlockRenderer is used as a fallback. In development mode, a `console.warn` is emitted once per affected chart kind to help diagnose why the configured renderer is not active.
+When the configured renderer is not supported by the terminal (e.g. Braille on a legacy console), `BlockRenderer` is used as a fallback. In development mode, a one-time `console.warn` is emitted per affected chart kind to help diagnose why the configured renderer is not active.
 
-> **Note — Sparkline:** The `Sparkline` component uses a static character table (`SPARK_LEVELS`) rather than the pixel-canvas pipeline, so its `variant` prop (`'block' | 'braille'`) is independent of `InkHudProvider renderers`. Set `variant` directly on the component when you need to override the default (`'block'`).
+### Smooth animations
 
-## 🖥 Terminal Compatibility
+```tsx
+import { useSmooth, useSmoothArray } from 'ink-hud';
 
-| Support Level | Terminals |
-|---------------|-----------|
-| ✅ **Full (Braille)** | iTerm2, Warp, Alacritty, Kitty, Windows Terminal, VS Code |
-| ⚠️ **Partial (Block)** | macOS Terminal.app, some SSH sessions |
+// Animate a single number
+const smoothValue = useSmooth(rawValue, { duration: 300, easing: 'easeOutCubic' });
 
-## 📚 Examples
+// Animate a data series
+const smoothSeries = useSmoothArray(rawSeries, { duration: 400 });
+```
+
+### Theme
+
+```tsx
+import { ThemeProvider, ONE_DARK_THEME } from 'ink-hud';
+
+<ThemeProvider theme={ONE_DARK_THEME}>
+    <MyApp />
+</ThemeProvider>
+```
+
+---
+
+## Terminal Compatibility
+
+| Support level | Terminals |
+|--------------|-----------|
+| Full (Braille + image protocol) | iTerm2, Warp, Alacritty, Kitty, Windows Terminal, VS Code |
+| Partial (Block only) | macOS Terminal.app, some SSH sessions |
+| Minimum (ASCII fallback) | Any ANSI-capable terminal |
+
+---
+
+## Examples
+
+Run the full dashboard:
 
 ```bash
 git clone https://github.com/zzf2333/ink-hud.git
 cd ink-hud
 pnpm install
-
-# Run complete dashboard
-npx tsx examples/dashboard.tsx
-
-# Run individual components
-npx tsx examples/basic/pulsebar.tsx
-npx tsx examples/basic/linechart.tsx
-npx tsx examples/basic/piechart.tsx
-npx tsx examples/basic/table.tsx
+pnpm demo
 ```
 
-## 🛠 Development
+The `examples/` directory also contains individual page demos:
 
 ```bash
-pnpm install    # Install dependencies
-pnpm build      # Build library
-pnpm test       # Run tests
-pnpm lint       # Lint code
-pnpm typecheck  # Type check
+node --import tsx examples/pages/charts.tsx
+node --import tsx examples/pages/streams.tsx
+node --import tsx examples/pages/layout.tsx
+node --import tsx examples/pages/image.tsx
 ```
-
-## 📖 Documentation
-
-- [Component API Reference](./docs/api.md)
-- [Component Usage Guide](./docs/components.md)
-- [Getting Started Tutorial](./docs/getting-started.md)
-
-## 🤝 Contributing
-
-Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
-
-## 📄 License
-
-MIT © [saonian](https://github.com/zzf2333)
 
 ---
 
-**If this project helps you, please give it a ⭐️!**
+## Development
+
+```bash
+pnpm install    # install dependencies
+pnpm build      # build (ESM + CJS + declarations)
+pnpm test       # run test suite
+pnpm typecheck  # tsc --noEmit
+pnpm lint       # biome check
+pnpm demo       # run examples/demo.tsx
+```
+
+Tests use `ink-testing-library`. The standard pattern for controlling renderer selection in tests:
+
+```tsx
+// Inject a mock detector — no env-var manipulation required
+const detector = new TerminalDetector({ TERM_PROGRAM: 'iTerm.app' });
+
+render(
+    <InkHudProvider detector={detector}>
+        <LineChart series={data} width={40} height={10} />
+    </InkHudProvider>
+);
+```
+
+Or bypass detection entirely with `forceRenderer`:
+
+```tsx
+<LineChart series={data} width={40} height={10} forceRenderer="block" />
+```
+
+---
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
+
+---
+
+## License
+
+MIT © [saonian](https://github.com/zzf2333)
