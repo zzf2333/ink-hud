@@ -48,7 +48,7 @@ export const ChartsPage = () => {
             {/* Override bar renderer via nested InkHudProvider */}
             <InkHudProvider renderers={{ bar: barMode }}>
                 {/* 2×2 chart grid */}
-                <Grid columns={2} rowHeight={14}>
+                <Grid columns={2} rowHeight={14} widthOffset={4}>
                     <GridItem>
                         <Panel title="LineChart — Requests & Errors" borderStyle="round">
                             <LineChart
@@ -95,7 +95,7 @@ export const ChartsPage = () => {
                 </Grid>
 
                 {/* Horizontal BarChart */}
-                <Grid columns={1} rowHeight={7}>
+                <Grid columns={1} rowHeight={7} widthOffset={4}>
                     <GridItem>
                         <Panel title="BarChart — horizontal orientation">
                             <BarChart
