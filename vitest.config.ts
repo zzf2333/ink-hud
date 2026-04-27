@@ -1,8 +1,14 @@
+import path from 'node:path';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
     esbuild: {
         jsx: 'automatic',
+    },
+    resolve: {
+        alias: {
+            'ink-hud': path.resolve(__dirname, 'src/index.ts'),
+        },
     },
     test: {
         globals: true,
