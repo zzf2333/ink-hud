@@ -112,14 +112,14 @@ describe('PieChart', () => {
         );
         expect(stripAnsi(lastFrame() ?? '')).toMatchInlineSnapshot(`
           "               ● Alpha (40.0%)
+              ▃▆▇█▇▅▖
+             ▐███████
+             ▅████████   ● Beta (35.0%)
+              ▅▂███▃▇
+                 █
+                         ● Gamma (25.0%)
 
 
-             ▗▄▅▆▅▅▃     ● Beta (35.0%)
-           ▗▆████████▃
-           ▐██████████
-           ▅███████████  ● Gamma (25.0%)
-           ▇▇████████▅
-             ▇▄▂▂▂▃▅█
 
 
           "

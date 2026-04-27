@@ -224,7 +224,13 @@ export const PieChart: React.FC<PieChartProps> = ({
         legendNamesForLayout,
     );
 
-    const { totalWidth, plotWidth: canvasWidth, plotHeight: canvasHeight } = layout;
+    // Constrain canvas to a visual square so the circle's container matches its shape.
+    // Terminal cells are ~2:1 (height:width), so a visual square = 2:1 chars (W:H).
+    // Without this, wide panels render the circle small on a wide rectangle, leaving
+    // huge empty bands on left/right.
+    const { totalWidth, plotWidth: plotW, plotHeight: plotH } = layout;
+    const canvasHeight = Math.max(1, Math.min(plotH, Math.floor(plotW / 2)));
+    const canvasWidth = canvasHeight * 2;
 
     const renderer = useChartRenderer('pie');
 
