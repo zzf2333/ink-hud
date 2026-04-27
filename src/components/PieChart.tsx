@@ -110,23 +110,34 @@ function resolveDataItems(
 const TWO_PI = Math.PI * 2;
 const START_ANGLE = -Math.PI / 2;
 
+// Geometry proof (renderer-agnostic):
+//   ratio = 2 * horizontal / vertical  (braille 1.0, block 0.5)
+//   dy_effective = (y - centerY) * ratio
+//   For a point at y = centerY ± k pixels, distance = |k * ratio|
+//   → outerRadius = k * ratio → k = outerRadius / ratio
+//   vertical span in pixels = 2 * outerRadius / ratio
+//   vertical span in char-rows = 2 * outerRadius / ratio / vertical
+//     = 2R / (2 * horizontal / vertical) / vertical   (substituting ratio)
+//     = 2R / (2 * horizontal)
+//     = R / horizontal  (= R/2 for both braille h=2 and block h=2)
+//   horizontal span in pixels = 2 * outerRadius (no ratio on x)
+//   horizontal span in char-rows = 2 * outerRadius / horizontal = R  (= R for h=2)
+// → With 1 char margin each side: R ≤ canvasWChars - 2  AND  R/2 ≤ canvasHChars - 2
 function resolveRadius(
-    pixelWidth: number,
-    pixelHeight: number,
+    canvasWChars: number,
+    canvasHChars: number,
+    renderer: import('../core/renderer').Renderer,
     customRadius: number | undefined,
 ): { centerX: number; centerY: number; radius: number } {
-    const centerX = Math.floor(pixelWidth / 2);
-    const centerY = Math.floor(pixelHeight / 2);
-    // Reserve 2 full char-rows at top & bottom (4 px per braille row, same for block
-    // due to its 0.5 ratio correction). Without this the apex pixel is a near-invisible
-    // single point that looks like the circle is clipped.
-    const maxRadius = Math.max(
-        0,
-        Math.min(Math.floor(pixelWidth / 2) - 4, Math.floor(pixelHeight / 2) - 8),
-    );
-    const radius = customRadius ?? maxRadius;
-
-    return { centerX, centerY, radius };
+    const { horizontal, vertical } = renderer.getResolution();
+    const pixelW = canvasWChars * horizontal;
+    const pixelH = canvasHChars * vertical;
+    const centerX = Math.floor(pixelW / 2);
+    const centerY = Math.floor(pixelH / 2);
+    // 1 char-row margin left/right → R ≤ canvasW - 2
+    // 1 char-row margin top/bottom → R/2 ≤ canvasH - 2 → R ≤ 2*(canvasH - 2)
+    const maxRadius = Math.max(0, Math.min(canvasWChars - 2, 2 * (canvasHChars - 2)));
+    return { centerX, centerY, radius: customRadius ?? maxRadius };
 }
 
 function buildAngleStops(
@@ -186,6 +197,19 @@ export const PieChart: React.FC<PieChartProps> = ({
     // Parse data input
     const data = useMemo(() => resolveDataItems(dataProp, labels), [dataProp, labels]);
 
+    // Pre-compute percentages early so legendNames can be passed to layout for wrapping estimate
+    const percentagesEarly = useMemo(() => {
+        const sum = data.reduce((acc, item) => acc + item.value, 0);
+        return data.map((item) => (sum > 0 ? (item.value / sum) * 100 : 0));
+    }, [data]);
+
+    const legendNamesForLayout = useMemo(() => {
+        if (!showLegend) return undefined;
+        return data.map((item, i) =>
+            showLabels ? `${item.name} (${percentagesEarly[i]?.toFixed(1)}%)` : item.name,
+        );
+    }, [data, showLegend, showLabels, percentagesEarly]);
+
     // 1. Layout calculation (Use simplified API, disable axes)
     const layout = useChartLayoutSimple(
         {
@@ -197,6 +221,7 @@ export const PieChart: React.FC<PieChartProps> = ({
         },
         0,
         0,
+        legendNamesForLayout,
     );
 
     const { totalWidth, plotWidth: canvasWidth, plotHeight: canvasHeight } = layout;
@@ -224,11 +249,9 @@ export const PieChart: React.FC<PieChartProps> = ({
         return assignColors(data.length, colorPalette);
     }, [data.length, colors, colorPalette]);
 
-    const { total, percentages } = useMemo(() => {
-        const sum = data.reduce((acc, item) => acc + item.value, 0);
-        const pcts = data.map((item) => (sum > 0 ? (item.value / sum) * 100 : 0));
-        return { total: sum, percentages: pcts };
-    }, [data]);
+    const total = useMemo(() => data.reduce((acc, item) => acc + item.value, 0), [data]);
+    // percentagesEarly and percentages are identical — reuse to avoid double computation
+    const percentages = percentagesEarly;
 
     const coloredLines = useMemo(() => {
         if (data.length === 0 || total <= 0) {
@@ -242,7 +265,7 @@ export const PieChart: React.FC<PieChartProps> = ({
             centerX,
             centerY,
             radius: outerRadius,
-        } = resolveRadius(pixelWidth, pixelHeight, customRadius);
+        } = resolveRadius(canvasWidth, canvasHeight, renderer, customRadius);
 
         const innerRadius = outerRadius * donutRatio;
         const angleStops = buildAngleStops(data, total);

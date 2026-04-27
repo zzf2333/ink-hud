@@ -5,9 +5,30 @@ import { linearScale } from '../../utils/scale';
 import { GridItemContext } from '../Grid';
 
 /**
- * Chart Layout Configuration
+ * Estimate how many visual rows a horizontal legend needs given an available width.
+ * Mimics the Legend component's <Box flexDirection="row" gap={2}> layout.
  */
-/* ... existing code ... */
+function estimateHorizontalLegendRows(
+    names: string[] | undefined,
+    availableWidth: number,
+): number {
+    if (!names || names.length === 0) return 1;
+    const SYMBOL_WIDTH = 2; // '● '
+    const ITEM_GAP = 2;     // <Box gap={2}>
+    let rows = 1;
+    let used = 0;
+    for (const n of names) {
+        const itemWidth = SYMBOL_WIDTH + n.length;
+        const needed = used === 0 ? itemWidth : itemWidth + ITEM_GAP;
+        if (used + needed > availableWidth && used > 0) {
+            rows++;
+            used = itemWidth;
+        } else {
+            used += needed;
+        }
+    }
+    return rows;
+}
 
 export function resolveSeriesColors(
     series: ChartSeries[],
@@ -167,8 +188,11 @@ export function useChartLayout(
                     ? Math.max(...legendNames.map((n) => n.length)) + 2
                     : 20;
         } else {
-            // Top or Bottom
-            legendHeight = 2; // 1 line content + 1 line margin
+            // Top or Bottom: estimate actual visual rows (legend may wrap in narrow panels).
+            // Deduct yAxis area from available width; use 1 as legendHeight floor.
+            const legendAvailWidth = Math.max(1, totalWidth - yAxisWidth - (showYAxis ? 1 : 0));
+            const contentRows = estimateHorizontalLegendRows(legendNames, legendAvailWidth);
+            legendHeight = contentRows + 1; // +1 = marginTop / marginBottom gap
         }
     }
 
