@@ -17,16 +17,16 @@ export interface BaseChartProps {
     height?: number;
 
     /**
-     * Width offset
-     * @deprecated Recommend wrapping chart with `<Panel>`, Panel automatically handles border overhead
+     * @deprecated Per-chart `renderer` prop has been removed.
+     * Configure via `<InkHudProvider renderers={{ line: 'block' }}>` instead.
      */
-    widthOffset?: number;
+    renderer?: never;
 
     /**
-     * Height offset
-     * @deprecated Recommend wrapping chart with `<Panel>`, Panel automatically handles border overhead
+     * @deprecated Per-chart `rendererChain` prop has been removed.
+     * Configure via `<InkHudProvider renderers={{ line: 'block' }}>` instead.
      */
-    heightOffset?: number;
+    rendererChain?: never;
 }
 
 /**

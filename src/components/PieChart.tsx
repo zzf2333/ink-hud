@@ -72,16 +72,16 @@ export interface PieChartProps {
     colorPalette?: ColorPalette;
 
     /**
-     * Height offset
-     * @deprecated Recommend wrapping chart with `<Panel>`, Panel automatically handles border overhead
+     * @deprecated Per-chart `renderer` prop has been removed.
+     * Configure via `<InkHudProvider renderers={{ pie: 'block' }}>` instead.
      */
-    heightOffset?: number;
+    renderer?: never;
 
     /**
-     * Width offset
-     * @deprecated Recommend wrapping chart with `<Panel>`, Panel automatically handles border overhead
+     * @deprecated Per-chart `rendererChain` prop has been removed.
+     * Configure via `<InkHudProvider renderers={{ pie: 'block' }}>` instead.
      */
-    widthOffset?: number;
+    rendererChain?: never;
 }
 
 /**
@@ -179,8 +179,6 @@ export const PieChart: React.FC<PieChartProps> = ({
     legendPosition = 'right',
     colors,
     colorPalette,
-    heightOffset = 0,
-    widthOffset = 0,
 }) => {
     // Parse data input
     const data = useMemo(() => resolveDataItems(dataProp, labels), [dataProp, labels]);
@@ -193,8 +191,6 @@ export const PieChart: React.FC<PieChartProps> = ({
             showAxis: false,
             showLegend,
             legendPosition,
-            widthOffset,
-            heightOffset,
         },
         0,
         0,
