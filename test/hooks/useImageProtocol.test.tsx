@@ -99,6 +99,7 @@ describe('useImageProtocol — Kitty protocol (via env var)', () => {
             expect(result.hasIterm2).toBe(false);
             expect(result.kittyLineCount).toBe(2);
         } finally {
+            // biome-ignore lint/performance/noDelete: must delete to fully unset env var (= undefined sets to string "undefined")
             if (prev === undefined) delete process.env.KITTY_WINDOW_ID;
             else process.env.KITTY_WINDOW_ID = prev;
         }
@@ -121,6 +122,7 @@ describe('useImageProtocol — Kitty protocol (via env var)', () => {
             expect(result.hasKitty).toBe(true);
             expect(result.kittyLineCount).toBe(1);
         } finally {
+            // biome-ignore lint/performance/noDelete: must delete to fully unset env var (= undefined sets to string "undefined")
             if (prev === undefined) delete process.env.KITTY_WINDOW_ID;
             else process.env.KITTY_WINDOW_ID = prev;
         }
@@ -146,6 +148,7 @@ describe('useImageProtocol — iTerm2 iterm2Cols calculation', () => {
             expect(result.hasIterm2).toBe(true);
             expect(result.iterm2Cols).toBe(10); // 5 * 2
         } finally {
+            // biome-ignore lint/performance/noDelete: must delete to fully unset env var (= undefined sets to string "undefined")
             if (prev === undefined) delete process.env.TERM_PROGRAM;
             else process.env.TERM_PROGRAM = prev;
         }
@@ -167,6 +170,7 @@ describe('useImageProtocol — iTerm2 iterm2Cols calculation', () => {
             const result = parse(lastFrame());
             expect(result.iterm2Cols).toBe(5); // 5 * 1
         } finally {
+            // biome-ignore lint/performance/noDelete: must delete to fully unset env var (= undefined sets to string "undefined")
             if (prev === undefined) delete process.env.TERM_PROGRAM;
             else process.env.TERM_PROGRAM = prev;
         }
