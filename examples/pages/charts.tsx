@@ -55,7 +55,7 @@ export const ChartsPage = () => {
                                 series={CHART_LINE_SERIES}
                                 showLegend
                                 showAxis
-                                legendPosition="right"
+                                legendPosition="bottom"
                             />
                         </Panel>
                     </GridItem>
@@ -65,7 +65,7 @@ export const ChartsPage = () => {
                                 series={CHART_AREA_SERIES}
                                 showLegend
                                 showAxis
-                                legendPosition="right"
+                                legendPosition="bottom"
                             />
                         </Panel>
                     </GridItem>
@@ -78,6 +78,7 @@ export const ChartsPage = () => {
                                 series={CHART_BAR_SERIES}
                                 showLegend
                                 orientation="vertical"
+                                legendPosition="bottom"
                             />
                         </Panel>
                     </GridItem>
@@ -87,7 +88,7 @@ export const ChartsPage = () => {
                                 data={CHART_PIE_DATA}
                                 showLegend
                                 showLabels
-                                legendPosition="right"
+                                legendPosition="bottom"
                             />
                         </Panel>
                     </GridItem>

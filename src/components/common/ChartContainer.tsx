@@ -120,7 +120,12 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
 
             {/* Bottom Legend */}
             {showLegend && legendPosition === 'bottom' && (
-                <Box marginTop={1} marginLeft={showYAxis ? yAxisWidth + 1 : 0}>
+                <Box
+                    marginTop={1}
+                    marginLeft={showYAxis ? yAxisWidth + 1 : 0}
+                    width={plotWidth}
+                    justifyContent="center"
+                >
                     <Legend items={legendItems} position="horizontal" />
                 </Box>
             )}

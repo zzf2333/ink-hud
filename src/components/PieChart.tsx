@@ -322,7 +322,7 @@ export const PieChart: React.FC<PieChartProps> = ({
             </Box>
 
             {showLegend && legendPosition === 'bottom' && (
-                <Box marginTop={1}>
+                <Box marginTop={1} width={totalWidth} justifyContent="center">
                     <Legend items={legendItems} position="horizontal" />
                 </Box>
             )}
