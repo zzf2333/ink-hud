@@ -330,7 +330,6 @@ export const HftDashboard = () => {
                                     <Box justifyContent='center'>
                                         <Heatmap
                                             data={data.serverHeatmap}
-                                            variant="unicode"
                                         />
                                     </Box>
                                 </Panel>

@@ -15,7 +15,7 @@ import { getSymbolSet, symbolSetForRenderer, withSymbols } from '../_shared/symb
 
 const charsetMode = parseCharsetMode(process.argv);
 const comparedRenderers: RendererType[] = ['braille', 'block'];
-const renderersToShow: Array<{ label: string; rendererOverride: RendererType | undefined; symbolSetId: 'braille' | 'unicode-blocks' | 'ascii' }> =
+const renderersToShow: Array<{ label: string; rendererOverride: RendererType | undefined; symbolSetId: 'braille' | 'unicode-blocks' | 'punctuation' }> =
     charsetMode === 'compare'
         ? comparedRenderers.map((r) => ({ label: r, rendererOverride: r, symbolSetId: symbolSetForRenderer(r) }))
         : charsetMode === 'auto'

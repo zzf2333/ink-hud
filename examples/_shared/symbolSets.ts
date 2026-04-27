@@ -1,7 +1,7 @@
 import type { LegendItem } from 'ink-hud';
 import type { RendererType } from 'ink-hud';
 
-export type SymbolSetId = 'braille' | 'unicode-blocks' | 'ascii';
+export type SymbolSetId = 'braille' | 'unicode-blocks' | 'punctuation';
 
 export const SYMBOL_SETS: Array<{
     id: SymbolSetId;
@@ -22,8 +22,8 @@ export const SYMBOL_SETS: Array<{
             symbols: ['▇', '▆', '▅', '▄', '▃', '▂', '▁'],
         },
         {
-            id: 'ascii',
-            title: 'ASCII',
+            id: 'punctuation',
+            title: 'Punctuation',
             description: 'Maximum compatibility (legacy terminals/SSH)',
             symbols: ['*', '+', 'x', '#', 'o', '@'],
         },
