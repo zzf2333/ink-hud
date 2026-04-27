@@ -42,7 +42,7 @@ export interface Process {
 
 export function useSystemMetrics(): SystemMetrics {
     const [state, setState] = useState<SystemMetrics>({
-        reqs: 12450,
+        reqs: 9450,
         reqsTrend: 3.2,
         latency: 45,
         latencyTrend: -8.1,

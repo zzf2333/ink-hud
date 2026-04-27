@@ -12,11 +12,20 @@ import { render } from 'ink-testing-library';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Showcase } from '../../examples/demo';
 import { InkHudProvider, ThemeProvider } from '../../src/index';
+import { TerminalDetector } from '../../src/detect/terminal';
 import { stripAnsi } from '../helpers/stripAnsi';
 
-// Wrap Showcase in required providers (same as production render call)
+// Inject a braille-capable detector so the test renders identically on
+// CI (no braille terminal) and local. Block renderer causes chart overflow
+// in the Showcase layout, so braille is intentionally required here.
+const brailleDetector = new TerminalDetector({
+    TERM_PROGRAM: 'kitty',
+    COLORTERM: 'truecolor',
+    LANG: 'en_US.UTF-8',
+});
+
 const WrappedShowcase = () => (
-    <InkHudProvider>
+    <InkHudProvider detector={brailleDetector}>
         <ThemeProvider>
             <Showcase />
         </ThemeProvider>
@@ -26,8 +35,14 @@ const WrappedShowcase = () => (
 describe('Showcase integration', () => {
     let warnSpy: ReturnType<typeof vi.spyOn>;
     let errorSpy: ReturnType<typeof vi.spyOn>;
+    let originalColumns: number | undefined;
 
     beforeEach(() => {
+        // Fix terminal width so the Showcase 4-panel layout renders correctly on
+        // CI (which defaults to 80 cols) and any local terminal width.
+        originalColumns = process.stdout.columns;
+        Object.defineProperty(process.stdout, 'columns', { value: 120, configurable: true });
+
         vi.useFakeTimers();
         vi.setSystemTime(new Date('2025-01-01T09:25:13'));
         vi.spyOn(Math, 'random').mockReturnValue(0.5);
@@ -36,6 +51,10 @@ describe('Showcase integration', () => {
     });
 
     afterEach(() => {
+        Object.defineProperty(process.stdout, 'columns', {
+            value: originalColumns,
+            configurable: true,
+        });
         vi.useRealTimers();
         vi.restoreAllMocks();
     });
@@ -89,10 +108,10 @@ describe('Showcase integration', () => {
           │ ╰──────────────────────────────────────────────────────────────────────────────────────────────╯  │
           │                                                                                                   │
           │ ╭── Requests/s ────────╮╭── p99 Latency ───────╮╭── Error Rate ────────╮╭── Active Users ──────╮  │
-          │ │ █  ▀▀█     █ █ █▀▀   ││       █ █ █▀▀        ││   █▀█      █  ▀▀█    ││  █      █▀█ █ █ ▀▀█  │  │
-          │ │ █   ▀▄     █▄█ ▀▀▄ █ ││       █▄█ ▀▀▄        ││   █ █      █   ▀▄    ││  █      █▀█ █▄█  ▀▄  │  │
-          │ │ █  █▄▄  ▙    █ ▄▄█   ││         █ ▄▄█        ││   █▄█  ▄   █  █▄▄    ││  █   ▙  █▄█   █ █▄▄  │  │
-          │ │█▄█                   ││                      ││                      ││                      │  │
+          │ │ █▀█     █ █ █▀▀ █▀█  ││      █ █ █▀▀         ││  █▀█      █  ▀▀█     ││  █      █▀█ █ █ ▀▀█  │  │
+          │ │ ▀▀█     █▄█ ▀▀▄ █ █  ││      █▄█ ▀▀▄         ││  █ █      █   ▀▄     ││  █      █▀█ █▄█  ▀▄  │  │
+          │ │   █  ▙    █ ▄▄█ █▄█  ││        █ ▄▄█  ms     ││  █▄█  ▄   █  █▄▄  %  ││  █   ▙  █▄█   █ █▄▄  │  │
+          │ │                      ││                      ││                      ││                      │  │
           │ │     req/s ▲ +3.2%    ││      p99 ▲ -8.1%     ││    errors ▼ +0.02    ││     users ▲ +5.4%    │  │
           │ ╰──────────────────────╯╰──────────────────────╯╰──────────────────────╯╰──────────────────────╯  │
           │ ╭── Throughput — CPU / Memory / Network ────────────────────────────────────╮╭── CPU ──────────╮  │
@@ -107,10 +126,10 @@ describe('Showcase integration', () => {
           │ │35 ⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀││                 │  │
           │ │                  7                   15               22                29││                 │  │
           │ │                                                                           │╰─────────────────╯  │
-          │ │   ● CPU  ● Memory  ● Network                                              │                     │
+          │ │                          ● CPU  ● Memory  ● Network                       │                     │
           │ ╰───────────────────────────────────────────────────────────────────────────╯                     │
           │ ┌── CPU — block variant ───────┐┌── Memory — braille variant ──┐┌── Network — auto + gradient──┐  │
-          │ │                              ││⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀          ││                              │  │
+          │ │                              ││⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││                              │  │
           │ │                              ││                              ││                              │  │
           │ └──────────────────────────────┘└──────────────────────────────┘└──────────────────────────────┘  │
           └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
