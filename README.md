@@ -254,7 +254,9 @@ Each chart ships with a pre-tuned default — no configuration required. To over
 </InkHudProvider>
 ```
 
-If the configured renderer is not supported by the terminal (e.g. braille on a legacy console), BlockRenderer is used as a silent fallback.
+If the configured renderer is not supported by the terminal (e.g. braille on a legacy console), BlockRenderer is used as a fallback. In development mode, a `console.warn` is emitted once per affected chart kind to help diagnose why the configured renderer is not active.
+
+> **Note — Sparkline:** The `Sparkline` component uses a static character table (`SPARK_LEVELS`) rather than the pixel-canvas pipeline, so its `variant` prop (`'block' | 'braille'`) is independent of `InkHudProvider renderers`. Set `variant` directly on the component when you need to override the default (`'block'`).
 
 ## 🖥 Terminal Compatibility
 

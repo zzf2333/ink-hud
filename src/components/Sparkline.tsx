@@ -1,5 +1,11 @@
 /**
  * Sparkline - Mini trend chart component
+ *
+ * Note: Sparkline does NOT consume the InkHudProvider `renderers` configuration.
+ * Its `variant` prop ('block' | 'braille') is independent because Sparkline uses
+ * a static character table (SPARK_LEVELS), not the pixel-canvas pipeline used by
+ * LineChart / AreaChart / BarChart / PieChart. Set `variant` directly on the
+ * component when you need to override the default ('block').
  */
 
 import { Box, Text } from 'ink';

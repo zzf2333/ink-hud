@@ -17,6 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`DEFAULT_CHART_RENDERERS`** exported constant with pre-tuned per-chart defaults.
 - **`getRendererFor(kind: ChartKind): Renderer`** added to `InkHudContextValue`.
 - **`renderers?: Partial<ChartRenderers>`** prop on `InkHudProvider` for per-kind override.
+- **Dev-mode fallback warning**: When a configured renderer is not supported by the current terminal, `InkHudProvider` now emits a one-time `console.warn` in non-production environments. In production (`NODE_ENV=production`) the fallback is still silent.
+
+### Deprecated
+- **`RendererSelector.selectBest()`**: Use `<InkHudProvider renderers={{...}}>` + `useChartRenderer(kind)` instead. Method retained as a low-level escape hatch.
+- **`widthOffset` / `heightOffset` props** on `BaseChartProps` and `PieChartProps`: Removed. Wrap charts with `<Panel>` which automatically handles border overhead.
+
+### Breaking Changes (soft)
+- **`renderer?: never` / `rendererChain?: never`** added to `BaseChartProps` and `PieChartProps`. Passing these props now produces a TypeScript error with a migration message. The underlying behaviour was already removed in the previous release; this change only improves the diagnostic.
 
 ### Added (previous)
 - **Image protocol rendering for Heatmap**: The `Heatmap` component now accepts a `mode` prop (`'auto' | 'image' | 'character'`). In `'auto'` mode it auto-detects the terminal's image protocol (Kitty Graphics / iTerm2 Inline Images) and renders the heatmap as a true bitmap, falling back to character mode when unsupported.
