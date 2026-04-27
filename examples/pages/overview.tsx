@@ -150,21 +150,32 @@ export const OverviewPage = () => {
             {/* Sparklines — block / braille / image-mode with gradient */}
             <Grid columns={3} rowHeight={4}>
                 <GridItem>
-                    <Panel title="CPU — block variant" borderStyle="single">
-                        <Sparkline data={m.sparkCpu} mode="character" variant="block" />
+                    <Panel title="CPU — block variant" borderStyle="single" borderColor={C.accent}>
+                        <Sparkline
+                            data={m.sparkCpu}
+                            mode="character"
+                            variant="block"
+                            color={C.accent}
+                        />
                     </Panel>
                 </GridItem>
                 <GridItem>
-                    <Panel title="Memory — braille variant" borderStyle="single">
-                        <Sparkline data={m.sparkMem} mode="character" variant="braille" />
+                    <Panel title="Memory — braille variant" borderStyle="single" borderColor={C.purple}>
+                        <Sparkline
+                            data={m.sparkMem}
+                            mode="character"
+                            variant="braille"
+                            color={C.purple}
+                        />
                     </Panel>
                 </GridItem>
                 <GridItem>
-                    <Panel title="Network — auto + gradient" borderStyle="single">
+                    <Panel title="Network — auto + gradient" borderStyle="single" borderColor={C.warn}>
                         <Sparkline
                             data={m.sparkNet}
                             mode="auto"
-                            colors={['#22c55e', '#eab308', '#ef4444']}
+                            color={C.warn}
+                            colors={[C.success, C.warn, C.error]}
                         />
                     </Panel>
                 </GridItem>
