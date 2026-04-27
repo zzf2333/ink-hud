@@ -163,14 +163,15 @@ export const Sparkline: React.FC<SparklineProps> = ({
     }
 
     const levels = SPARK_LEVELS[variant];
-    const text = processedData
-        .map((v) => {
-            const value = Math.max(min, Math.min(max, v));
-            const normalized = (value - min) / (max - min);
-            const index = Math.round(normalized * (levels.length - 1));
-            return levels[index];
-        })
-        .join('');
+    const outputCols = charCols > 0 ? charCols : processedData.length;
+    const text = Array.from({ length: outputCols }, (_, i) => {
+        const dataIndex = Math.floor((i * processedData.length) / outputCols);
+        const v = processedData[dataIndex] ?? 0;
+        const value = Math.max(min, Math.min(max, v));
+        const normalized = (value - min) / (max - min);
+        const index = Math.round(normalized * (levels.length - 1));
+        return levels[index];
+    }).join('');
 
     return <Text {...(color ? { color } : {})}>{text}</Text>;
 };
