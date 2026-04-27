@@ -186,4 +186,76 @@ describe('RendererSelector', () => {
             expect(renderer.getName()).toBe('block');
         });
     });
+
+    describe('isRendererTypeSupported', () => {
+        it('should return true for braille on a braille-capable terminal', () => {
+            const detector = new TerminalDetector({
+                LANG: 'en_US.UTF-8',
+                TERM_PROGRAM: 'iTerm.app',
+                COLORTERM: 'truecolor',
+            });
+            const selector = new RendererSelector(detector);
+
+            expect(selector.isRendererTypeSupported('braille')).toBe(true);
+        });
+
+        it('should return false for braille when terminal does not support it', () => {
+            const detector = new TerminalDetector({
+                LANG: 'en_US.UTF-8',
+                TERM: 'xterm-256color',
+                TERM_PROGRAM: 'Apple_Terminal', // not in braille whitelist
+            });
+            const selector = new RendererSelector(detector);
+
+            expect(selector.isRendererTypeSupported('braille')).toBe(false);
+        });
+
+        it('should return true for block on a UTF-8 terminal (minScore=30 satisfied)', () => {
+            const detector = new TerminalDetector({
+                LANG: 'en_US.UTF-8',
+                TERM: 'xterm-256color',
+            });
+            const selector = new RendererSelector(detector);
+            const caps = detector.detect();
+
+            expect(caps.score).toBeGreaterThanOrEqual(30);
+            expect(selector.isRendererTypeSupported('block')).toBe(true);
+        });
+
+        it('should return false for block on a dumb terminal with score below minScore', () => {
+            const detector = new TerminalDetector({
+                LANG: 'C', // no UTF-8
+                TERM: 'dumb',
+            });
+            const selector = new RendererSelector(detector);
+            const caps = detector.detect();
+
+            expect(caps.score).toBeLessThan(30);
+            expect(selector.isRendererTypeSupported('block')).toBe(false);
+        });
+    });
+
+    describe('selectBest (deprecated — regression guard)', () => {
+        it('should still select braille on a capable terminal despite deprecation', () => {
+            const detector = new TerminalDetector({
+                LANG: 'en_US.UTF-8',
+                TERM_PROGRAM: 'iTerm.app',
+                COLORTERM: 'truecolor',
+            });
+            const selector = new RendererSelector(detector);
+
+            expect(selector.selectBest().getName()).toBe('braille');
+        });
+
+        it('should still fall back to block on an incapable terminal', () => {
+            const detector = new TerminalDetector({
+                LANG: 'en_US.UTF-8',
+                TERM: 'xterm-256color',
+                TERM_PROGRAM: 'Apple_Terminal',
+            });
+            const selector = new RendererSelector(detector);
+
+            expect(selector.selectBest().getName()).toBe('block');
+        });
+    });
 });
