@@ -8,13 +8,10 @@ import { GridItemContext } from '../Grid';
  * Estimate how many visual rows a horizontal legend needs given an available width.
  * Mimics the Legend component's <Box flexDirection="row" gap={2}> layout.
  */
-function estimateHorizontalLegendRows(
-    names: string[] | undefined,
-    availableWidth: number,
-): number {
+function estimateHorizontalLegendRows(names: string[] | undefined, availableWidth: number): number {
     if (!names || names.length === 0) return 1;
     const SYMBOL_WIDTH = 2; // '● '
-    const ITEM_GAP = 2;     // <Box gap={2}>
+    const ITEM_GAP = 2; // <Box gap={2}>
     let rows = 1;
     let used = 0;
     for (const n of names) {

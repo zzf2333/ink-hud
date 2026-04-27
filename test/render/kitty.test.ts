@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { encodeKittyUpload, encodeKittyPlaceholders, encodeKittyDelete } from '../../src/render/image/kitty';
+import {
+    encodeKittyDelete,
+    encodeKittyPlaceholders,
+    encodeKittyUpload,
+} from '../../src/render/image/kitty';
 
 const TINY_PNG = Buffer.from(
     '89504e470d0a1a0a0000000d4948445200000001000000010802000000907753de0000000c4944415478016360f8cf000001820181d0a8f600000000049454e44ae426082',
@@ -65,9 +69,9 @@ describe('encodeKittyPlaceholders', () => {
     it('each line has cols placeholder groups', () => {
         const cols = 3;
         const result = encodeKittyPlaceholders(cols, 1, 1);
-        const line = result.split('\n')[0]!;
+        const line = result.split('\n')[0] ?? '';
         // Count occurrences of U+10EEEE
-        const count = [...line].filter(ch => ch === '\u{10EEEE}').length;
+        const count = [...line].filter((ch) => ch === '\u{10EEEE}').length;
         expect(count).toBe(cols);
     });
 });
@@ -94,7 +98,8 @@ describe('encodeKittyPlaceholders — trailingSpace option', () => {
     it('default (trailingSpace=true) adds a space after each placeholder', () => {
         const result = encodeKittyPlaceholders(2, 1, 1);
         // Each cell: U+10EEEE + rowMark + colMark + ' ' — count spaces between placeholders
-        const line = result.split('\n')[0]!.replace(/\x1b\[[^m]*m/g, '');
+        // biome-ignore lint/suspicious/noControlCharactersInRegex: intentionally matches ANSI ESC sequences
+        const line = result.split('\n')[0]?.replace(/\x1b\[[^m]*m/g, '');
         expect(line).toContain(' ');
     });
 
@@ -102,13 +107,14 @@ describe('encodeKittyPlaceholders — trailingSpace option', () => {
         const withSpace = encodeKittyPlaceholders(2, 1, 1);
         const withoutSpace = encodeKittyPlaceholders(2, 1, 1, { trailingSpace: false });
         // Strip ANSI codes for comparison
+        // biome-ignore lint/suspicious/noControlCharactersInRegex: intentionally matches ANSI ESC sequences
         const strip = (s: string) => s.replace(/\x1b\[[^m]*m/g, '');
         expect(strip(withoutSpace).length).toBeLessThan(strip(withSpace).length);
     });
 
     it('trailingSpace=false still contains U+10EEEE placeholders', () => {
         const result = encodeKittyPlaceholders(3, 2, 1, { trailingSpace: false });
-        const count = [...result].filter(ch => ch === '\u{10EEEE}').length;
+        const count = [...result].filter((ch) => ch === '\u{10EEEE}').length;
         expect(count).toBe(6); // 3 cols × 2 rows
     });
 });

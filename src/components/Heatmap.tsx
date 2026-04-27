@@ -1,11 +1,11 @@
 import { Box, Text } from 'ink';
 import React, { useMemo } from 'react';
-import { HEATMAP } from '../symbols';
 import tinygradient from 'tinygradient';
+import { useImageProtocol } from '../hooks/useImageProtocol';
 import { createRgbPng, hexToRgb } from '../render/image/png';
+import { HEATMAP } from '../symbols';
 import { useTheme } from '../theme/ThemeContext';
 import { createGradient } from '../utils/gradient';
-import { useImageProtocol } from '../hooks/useImageProtocol';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -56,10 +56,7 @@ function findMinMax(data: number[][]): { min: number; max: number } {
     return { min: minVal, max: maxVal };
 }
 
-function gradientRgbPalette(
-    colors: string[],
-    steps: number,
-): [number, number, number][] {
+function gradientRgbPalette(colors: string[], steps: number): [number, number, number][] {
     if (steps === 0) return [];
     if (colors.length === 0) return Array(steps).fill([128, 128, 128] as [number, number, number]);
     if (colors.length === 1) {
@@ -67,7 +64,7 @@ function gradientRgbPalette(
         return Array(steps).fill(rgb);
     }
     const g = tinygradient(colors);
-    return g.rgb(steps).map((c) => hexToRgb('#' + c.toHex()));
+    return g.rgb(steps).map((c) => hexToRgb(`#${c.toHex()}`));
 }
 
 // ---------------------------------------------------------------------------

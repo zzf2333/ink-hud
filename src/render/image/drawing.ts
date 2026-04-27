@@ -23,11 +23,11 @@ function darken(rgb: RGB, factor: number): RGB {
 export function gradientColorFn(colors: string[]): (normalized: number) => RGB {
     if (colors.length === 0) return () => [128, 128, 128];
     if (colors.length === 1) {
-        const rgb = hexToRgb(colors[0]!);
+        const rgb = hexToRgb(colors[0] ?? '');
         return () => rgb;
     }
     const g = tinygradient(colors);
-    const palette = g.rgb(256).map((c): RGB => hexToRgb('#' + c.toHex()));
+    const palette = g.rgb(256).map((c): RGB => hexToRgb(`#${c.toHex()}`));
     return (normalized: number) => {
         const idx = clamp(Math.floor(normalized * 256), 0, 255);
         return palette[idx] ?? [128, 128, 128];
@@ -83,16 +83,20 @@ export function buildSparklinePixelGrid(
 
         // Area fill below the line
         for (let y = yLine + 2; y < heightPx; y++) {
-            grid[y]![x] = fillRgb;
+            const row = grid[y];
+            if (row !== undefined) row[x] = fillRgb;
         }
         // Soft transition pixel between line and fill
         if (yLine + 1 < heightPx) {
-            grid[yLine + 1]![x] = darken(lineRgb, 0.55);
+            const row = grid[yLine + 1];
+            if (row !== undefined) row[x] = darken(lineRgb, 0.55);
         }
         // Line: 2 px (full brightness + dimmer cap above)
-        grid[yLine]![x] = lineRgb;
+        const lineRow = grid[yLine];
+        if (lineRow !== undefined) lineRow[x] = lineRgb;
         if (yLine - 1 >= 0) {
-            grid[yLine - 1]![x] = darken(lineRgb, 0.75);
+            const capRow = grid[yLine - 1];
+            if (capRow !== undefined) capRow[x] = darken(lineRgb, 0.75);
         }
     }
 

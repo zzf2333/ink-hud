@@ -12,9 +12,7 @@ export const AREA_FIXTURE_SERIES = [
     { name: 'Load', data: [10, 20, 15, 25, 30, 20, 35, 28], color: 'green' },
 ];
 
-export const BAR_FIXTURE_SERIES = [
-    { name: 'A', data: [10, 30, 20, 40, 15], color: 'blue' },
-];
+export const BAR_FIXTURE_SERIES = [{ name: 'A', data: [10, 30, 20, 40, 15], color: 'blue' }];
 
 export const PIE_FIXTURE_DATA = [
     { name: 'Alpha', value: 40, color: 'cyan' },

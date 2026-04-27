@@ -1,7 +1,6 @@
-import { render } from 'ink-testing-library';
-import React from 'react';
 import { Text } from 'ink';
-import { describe, expect, it, vi, afterEach } from 'vitest';
+import { render } from 'ink-testing-library';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useImageProtocol } from '../../src/hooks/useImageProtocol';
 
 // Minimal PNG: 1×1 transparent pixel
@@ -64,9 +63,7 @@ describe('useImageProtocol — no image protocol detected', () => {
 
 describe('useImageProtocol — null pngBuf', () => {
     it('returns useImage=false when pngBuf is null', () => {
-        const { lastFrame } = render(
-            <Probe mode="auto" charCols={4} charRows={2} pngBuf={null} />,
-        );
+        const { lastFrame } = render(<Probe mode="auto" charCols={4} charRows={2} pngBuf={null} />);
         const result = parse(lastFrame());
         expect(result.useImage).toBe(false);
     });
@@ -90,8 +87,8 @@ describe('useImageProtocol — zero dimensions', () => {
 
 describe('useImageProtocol — Kitty protocol (via env var)', () => {
     it('returns kittyLines when KITTY_WINDOW_ID is set', () => {
-        const prev = process.env['KITTY_WINDOW_ID'];
-        process.env['KITTY_WINDOW_ID'] = '1';
+        const prev = process.env.KITTY_WINDOW_ID;
+        process.env.KITTY_WINDOW_ID = '1';
         try {
             const { lastFrame } = render(
                 <Probe mode="auto" charCols={4} charRows={2} pngBuf={TINY_PNG} />,
@@ -102,58 +99,76 @@ describe('useImageProtocol — Kitty protocol (via env var)', () => {
             expect(result.hasIterm2).toBe(false);
             expect(result.kittyLineCount).toBe(2);
         } finally {
-            if (prev === undefined) delete process.env['KITTY_WINDOW_ID'];
-            else process.env['KITTY_WINDOW_ID'] = prev;
+            if (prev === undefined) delete process.env.KITTY_WINDOW_ID;
+            else process.env.KITTY_WINDOW_ID = prev;
         }
     });
 
     it('trailingSpace=true doubles kittyLine count of placeholder chars', () => {
-        const prev = process.env['KITTY_WINDOW_ID'];
-        process.env['KITTY_WINDOW_ID'] = '1';
+        const prev = process.env.KITTY_WINDOW_ID;
+        process.env.KITTY_WINDOW_ID = '1';
         try {
             const { lastFrame } = render(
-                <Probe mode="auto" charCols={3} charRows={1} pngBuf={TINY_PNG} trailingSpace={true} />,
+                <Probe
+                    mode="auto"
+                    charCols={3}
+                    charRows={1}
+                    pngBuf={TINY_PNG}
+                    trailingSpace={true}
+                />,
             );
             const result = parse(lastFrame());
             expect(result.hasKitty).toBe(true);
             expect(result.kittyLineCount).toBe(1);
         } finally {
-            if (prev === undefined) delete process.env['KITTY_WINDOW_ID'];
-            else process.env['KITTY_WINDOW_ID'] = prev;
+            if (prev === undefined) delete process.env.KITTY_WINDOW_ID;
+            else process.env.KITTY_WINDOW_ID = prev;
         }
     });
 });
 
 describe('useImageProtocol — iTerm2 iterm2Cols calculation', () => {
     it('trailingSpace=true (default) → iterm2Cols = charCols * 2', () => {
-        const prev = process.env['TERM_PROGRAM'];
-        process.env['TERM_PROGRAM'] = 'iTerm.app';
+        const prev = process.env.TERM_PROGRAM;
+        process.env.TERM_PROGRAM = 'iTerm.app';
         try {
             const { lastFrame } = render(
-                <Probe mode="auto" charCols={5} charRows={2} pngBuf={TINY_PNG} trailingSpace={true} />,
+                <Probe
+                    mode="auto"
+                    charCols={5}
+                    charRows={2}
+                    pngBuf={TINY_PNG}
+                    trailingSpace={true}
+                />,
             );
             const result = parse(lastFrame());
             expect(result.useImage).toBe(true);
             expect(result.hasIterm2).toBe(true);
             expect(result.iterm2Cols).toBe(10); // 5 * 2
         } finally {
-            if (prev === undefined) delete process.env['TERM_PROGRAM'];
-            else process.env['TERM_PROGRAM'] = prev;
+            if (prev === undefined) delete process.env.TERM_PROGRAM;
+            else process.env.TERM_PROGRAM = prev;
         }
     });
 
     it('trailingSpace=false → iterm2Cols = charCols * 1', () => {
-        const prev = process.env['TERM_PROGRAM'];
-        process.env['TERM_PROGRAM'] = 'iTerm.app';
+        const prev = process.env.TERM_PROGRAM;
+        process.env.TERM_PROGRAM = 'iTerm.app';
         try {
             const { lastFrame } = render(
-                <Probe mode="auto" charCols={5} charRows={2} pngBuf={TINY_PNG} trailingSpace={false} />,
+                <Probe
+                    mode="auto"
+                    charCols={5}
+                    charRows={2}
+                    pngBuf={TINY_PNG}
+                    trailingSpace={false}
+                />,
             );
             const result = parse(lastFrame());
             expect(result.iterm2Cols).toBe(5); // 5 * 1
         } finally {
-            if (prev === undefined) delete process.env['TERM_PROGRAM'];
-            else process.env['TERM_PROGRAM'] = prev;
+            if (prev === undefined) delete process.env.TERM_PROGRAM;
+            else process.env.TERM_PROGRAM = prev;
         }
     });
 });

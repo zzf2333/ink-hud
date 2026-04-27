@@ -12,15 +12,15 @@ export type ImageProtocol = 'kitty' | 'iterm2' | null;
  */
 export function detectImageProtocol(env: NodeJS.ProcessEnv = process.env): ImageProtocol {
     // Manual override
-    const override = env['INKHU_IMAGE_PROTOCOL'];
+    const override = env.INKHU_IMAGE_PROTOCOL;
     if (override === 'kitty') return 'kitty';
     if (override === 'iterm2') return 'iterm2';
     if (override === 'none') return null;
 
     // Kitty — dedicated env var
-    if (env['KITTY_WINDOW_ID']) return 'kitty';
+    if (env.KITTY_WINDOW_ID) return 'kitty';
 
-    const tp = (env['TERM_PROGRAM'] ?? '').toLowerCase();
+    const tp = (env.TERM_PROGRAM ?? '').toLowerCase();
 
     // WezTerm and Ghostty speak Kitty Graphics natively
     if (tp === 'wezterm' || tp === 'ghostty') return 'kitty';

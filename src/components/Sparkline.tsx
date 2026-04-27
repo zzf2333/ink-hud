@@ -10,12 +10,12 @@
 
 import { Box, Text } from 'ink';
 import React, { useContext, useMemo } from 'react';
-import { lttb } from '../utils/downsampling';
-import { gradientColorFn, buildSparklinePixelGrid } from '../render/image/drawing';
+import { useImageProtocol } from '../hooks/useImageProtocol';
+import { buildSparklinePixelGrid, gradientColorFn } from '../render/image/drawing';
 import { createRgbPng } from '../render/image/png';
 import { SPARK_LEVELS } from '../symbols';
 import { useTheme } from '../theme/ThemeContext';
-import { useImageProtocol } from '../hooks/useImageProtocol';
+import { lttb } from '../utils/downsampling';
 import { GridItemContext } from './Grid';
 
 export interface SparklineProps {
@@ -123,7 +123,18 @@ export const Sparkline: React.FC<SparklineProps> = ({
             colorFn,
         );
         return createRgbPng(pixelGrid);
-    }, [mode, charCols, charRows, cellPx, colors, color, theme.heatmapGradient, processedData, min, max]);
+    }, [
+        mode,
+        charCols,
+        charRows,
+        cellPx,
+        colors,
+        color,
+        theme.heatmapGradient,
+        processedData,
+        min,
+        max,
+    ]);
 
     // --- Image protocol: upload, effects, and placeholder data ---
     // trailingSpace=false → each Kitty placeholder cell = 1 terminal col (matches character mode width)

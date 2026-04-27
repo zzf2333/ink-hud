@@ -35,42 +35,41 @@ describe('demo smoke', () => {
         }
     });
 
-    it(
-        'boots without JavaScript errors',
-        async () => {
-            let stderr = '';
+    it('boots without JavaScript errors', async () => {
+        let stderr = '';
 
-            child = spawn('node_modules/.bin/tsx', ['examples/demo.tsx'], {
-                cwd: ROOT_DIR,
-                env: { ...process.env, FORCE_COLOR: '0' },
-                stdio: ['ignore', 'ignore', 'pipe'],
-            });
+        child = spawn('node_modules/.bin/tsx', ['examples/demo.tsx'], {
+            cwd: ROOT_DIR,
+            env: { ...process.env, FORCE_COLOR: '0' },
+            stdio: ['ignore', 'ignore', 'pipe'],
+        });
 
-            child.stderr?.on('data', (d: Buffer) => {
-                stderr += d.toString();
-            });
+        child.stderr?.on('data', (d: Buffer) => {
+            stderr += d.toString();
+        });
 
-            // Let the process run for 1.5s to surface any startup crashes
-            await new Promise<void>((resolve) => setTimeout(resolve, 1500));
+        // Let the process run for 1.5s to surface any startup crashes
+        await new Promise<void>((resolve) => setTimeout(resolve, 1500));
 
-            // Capture exit code before killing
-            const exitedEarly = child.exitCode !== null;
-            const earlyExitCode = child.exitCode;
+        // Capture exit code before killing
+        const exitedEarly = child.exitCode !== null;
+        const earlyExitCode = child.exitCode;
 
-            await killAndWait(child);
-            child = null;
+        await killAndWait(child);
+        child = null;
 
-            // An early exit with a non-zero code (not SIGTERM=143) means a crash
-            if (exitedEarly) {
-                expect(earlyExitCode, `Process crashed with exit code ${earlyExitCode}:\n${stderr}`).toBe(0);
-            }
+        // An early exit with a non-zero code (not SIGTERM=143) means a crash
+        if (exitedEarly) {
+            expect(
+                earlyExitCode,
+                `Process crashed with exit code ${earlyExitCode}:\n${stderr}`,
+            ).toBe(0);
+        }
 
-            // No JavaScript runtime errors on stderr
-            const jsErrors = stderr
-                .split('\n')
-                .filter((line) => /TypeError|ReferenceError|SyntaxError/.test(line));
-            expect(jsErrors, `JavaScript errors in stderr:\n${jsErrors.join('\n')}`).toHaveLength(0);
-        },
-        8000,
-    );
+        // No JavaScript runtime errors on stderr
+        const jsErrors = stderr
+            .split('\n')
+            .filter((line) => /TypeError|ReferenceError|SyntaxError/.test(line));
+        expect(jsErrors, `JavaScript errors in stderr:\n${jsErrors.join('\n')}`).toHaveLength(0);
+    }, 8000);
 });

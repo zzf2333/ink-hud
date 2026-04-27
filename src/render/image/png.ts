@@ -2,7 +2,7 @@
  * Minimal RGB PNG encoder — no dependencies (uses Node.js built-in zlib).
  */
 
-import { deflateSync } from 'zlib';
+import { deflateSync } from 'node:zlib';
 
 // ---------------------------------------------------------------------------
 // CRC-32
@@ -23,7 +23,7 @@ const CRC_TABLE = (() => {
 function crc32(buf: Buffer): number {
     let crc = 0xffffffff;
     for (let i = 0; i < buf.length; i++) {
-        crc = CRC_TABLE[(crc ^ (buf[i] as number)) & 0xff]! ^ (crc >>> 8);
+        crc = (CRC_TABLE[(crc ^ (buf[i] as number)) & 0xff] ?? 0) ^ (crc >>> 8);
     }
     return (crc ^ 0xffffffff) >>> 0;
 }
@@ -92,6 +92,6 @@ export function createRgbPng(pixels: [number, number, number][][]): Buffer {
  */
 export function hexToRgb(hex: string): [number, number, number] {
     const h = hex.startsWith('#') ? hex.slice(1) : hex;
-    const n = parseInt(h, 16);
+    const n = Number.parseInt(h, 16);
     return [(n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff];
 }

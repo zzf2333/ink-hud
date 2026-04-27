@@ -1,8 +1,8 @@
 import { Text } from 'ink';
 import { render } from 'ink-testing-library';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
-import { InkHudProvider, type ChartKind } from '../../../src/components/InkHudProvider';
+import { type ChartKind, InkHudProvider } from '../../../src/components/InkHudProvider';
 import { useChartRenderer } from '../../../src/components/common/useChartRenderer';
 import { TerminalDetector } from '../../../src/detect/terminal';
 
@@ -19,13 +19,11 @@ const KindDisplay = ({ kind }: { kind: ChartKind }) => {
 };
 
 // Helper: allows toggling the kind via external state
-const SwitchableKindDisplay = () => {
+const _SwitchableKindDisplay = () => {
     const [kind, setKind] = useState<ChartKind>('line');
     const renderer = useChartRenderer(kind);
     return (
-        <Text
-            onPress={() => setKind('bar')}
-        >
+        <Text onPress={() => setKind('bar')}>
             {kind}:{renderer.getName()}
         </Text>
     );

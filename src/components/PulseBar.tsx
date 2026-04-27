@@ -40,7 +40,6 @@ export interface PulseBarProps {
     };
 }
 
-
 /**
  * PulseBar - network connection status component
  *
@@ -49,11 +48,7 @@ export interface PulseBarProps {
  * - Yellow: connection unstable
  * - Red: connection failed
  */
-export const PulseBar: React.FC<PulseBarProps> = ({
-    records = [],
-    maxBars = 30,
-    colors,
-}) => {
+export const PulseBar: React.FC<PulseBarProps> = ({ records = [], maxBars = 30, colors }) => {
     const theme = useTheme();
 
     const getColor = (status: PingStatus): string => {
@@ -70,8 +65,14 @@ export const PulseBar: React.FC<PulseBarProps> = ({
     const displayRecords = records.slice(-maxBars);
     const paddingCount = maxBars - displayRecords.length;
     const borderColor = theme.semantic.muted;
-    const topBorder = BORDER_ROUNDED.topLeft + BORDER_ROUNDED.horizontal.repeat(maxBars) + BORDER_ROUNDED.topRight;
-    const bottomBorder = BORDER_ROUNDED.bottomLeft + BORDER_ROUNDED.horizontal.repeat(maxBars) + BORDER_ROUNDED.bottomRight;
+    const topBorder =
+        BORDER_ROUNDED.topLeft +
+        BORDER_ROUNDED.horizontal.repeat(maxBars) +
+        BORDER_ROUNDED.topRight;
+    const bottomBorder =
+        BORDER_ROUNDED.bottomLeft +
+        BORDER_ROUNDED.horizontal.repeat(maxBars) +
+        BORDER_ROUNDED.bottomRight;
 
     return (
         <Box flexDirection="column">

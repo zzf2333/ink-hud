@@ -1,8 +1,12 @@
-import { useEffect, useMemo, useRef } from 'react';
 import { useStdout } from 'ink';
+import { useEffect, useMemo, useRef } from 'react';
 import { detectImageProtocol } from '../render/capabilities';
-import { encodeKittyUpload, encodeKittyPlaceholders, encodeKittyDelete } from '../render/image/kitty';
 import { encodeIterm2 } from '../render/image/iterm2';
+import {
+    encodeKittyDelete,
+    encodeKittyPlaceholders,
+    encodeKittyUpload,
+} from '../render/image/kitty';
 
 // Single shared counter — all image-mode components draw from this namespace
 // so Kitty image IDs are unique across the entire application.
@@ -96,7 +100,14 @@ export function useImageProtocol({
     // useImage is intentionally excluded from deps — its constituent values
     // (protocol, pngBuf, charCols, charRows, mode) are already listed individually.
     useEffect(() => {
-        if (protocol !== 'kitty' || !pngBuf || charCols <= 0 || charRows <= 0 || mode === 'character') return;
+        if (
+            protocol !== 'kitty' ||
+            !pngBuf ||
+            charCols <= 0 ||
+            charRows <= 0 ||
+            mode === 'character'
+        )
+            return;
         stdout.write(encodeKittyUpload(pngBuf, charCols, charRows, imageId));
         return () => {
             stdout.write(encodeKittyDelete(imageId));
@@ -105,7 +116,14 @@ export function useImageProtocol({
 
     // iTerm2: overwrite the placeholder region on each pngBuf change.
     useEffect(() => {
-        if (protocol !== 'iterm2' || !pngBuf || charCols <= 0 || charRows <= 0 || mode === 'character') return;
+        if (
+            protocol !== 'iterm2' ||
+            !pngBuf ||
+            charCols <= 0 ||
+            charRows <= 0 ||
+            mode === 'character'
+        )
+            return;
         const terminalCols = charCols * (trailingSpace ? 2 : 1);
         const seq = encodeIterm2(pngBuf, terminalCols);
         stdout.write(`\x1b[${charRows}A\x1b[0G${seq}\x1b[${charRows}B`);

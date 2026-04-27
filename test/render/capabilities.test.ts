@@ -37,9 +37,9 @@ describe('detectImageProtocol', () => {
     });
 
     it('KITTY_WINDOW_ID takes priority over TERM_PROGRAM', () => {
-        expect(
-            detectImageProtocol({ KITTY_WINDOW_ID: '1', TERM_PROGRAM: 'iTerm.app' }),
-        ).toBe('kitty');
+        expect(detectImageProtocol({ KITTY_WINDOW_ID: '1', TERM_PROGRAM: 'iTerm.app' })).toBe(
+            'kitty',
+        );
     });
 
     it('returns null for unknown terminals', () => {

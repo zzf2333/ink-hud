@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { gradientColorFn, buildSparklinePixelGrid } from '../../src/render/image/drawing';
+import { buildSparklinePixelGrid, gradientColorFn } from '../../src/render/image/drawing';
 
 describe('gradientColorFn', () => {
     it('returns grey for empty colors array', () => {
@@ -58,7 +58,7 @@ describe('buildSparklinePixelGrid', () => {
         const grid = buildSparklinePixelGrid([100], 1, 8, 0, 100, identity);
         // Row 0 should be the bright line (not bgColor)
         const bg: [number, number, number] = [10, 10, 14];
-        expect(grid[0]![0]).not.toEqual(bg);
+        expect(grid[0]?.[0]).not.toEqual(bg);
     });
 
     it('low value produces a filled bottom with line near bottom', () => {
@@ -66,18 +66,14 @@ describe('buildSparklinePixelGrid', () => {
         const grid = buildSparklinePixelGrid([0], 1, 8, 0, 100, identity);
         // Bottom row (index 7) should be the line, not bg
         const bg: [number, number, number] = [10, 10, 14];
-        expect(grid[7]![0]).not.toEqual(bg);
+        expect(grid[7]?.[0]).not.toEqual(bg);
     });
 
     it('handles single data point without crashing', () => {
-        expect(() =>
-            buildSparklinePixelGrid([42], 10, 10, 0, 100, identity),
-        ).not.toThrow();
+        expect(() => buildSparklinePixelGrid([42], 10, 10, 0, 100, identity)).not.toThrow();
     });
 
     it('handles widthPx=1 without crashing', () => {
-        expect(() =>
-            buildSparklinePixelGrid([10, 50, 90], 1, 8, 0, 100, identity),
-        ).not.toThrow();
+        expect(() => buildSparklinePixelGrid([10, 50, 90], 1, 8, 0, 100, identity)).not.toThrow();
     });
 });

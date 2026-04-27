@@ -23,5 +23,4 @@ describe('PulseBar', () => {
         expect(lines[1].endsWith('│')).toBe(true);
         expect((lines[1].match(/▌/g) ?? []).length).toBe(4);
     });
-
 });

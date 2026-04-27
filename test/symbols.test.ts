@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TREND, LEGEND, BAR, HEATMAP, BORDER_ROUNDED, SPARK_LEVELS } from '../src/symbols';
+import { BAR, BORDER_ROUNDED, HEATMAP, LEGEND, SPARK_LEVELS, TREND } from '../src/symbols';
 
 describe('SPARK_LEVELS', () => {
     it('block has 8 levels', () => {
@@ -21,7 +21,15 @@ describe('TREND', () => {
 
 describe('BORDER_ROUNDED', () => {
     it('has all 7 keys', () => {
-        const keys = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight', 'horizontal', 'vertical', 'bar'];
+        const keys = [
+            'topLeft',
+            'topRight',
+            'bottomLeft',
+            'bottomRight',
+            'horizontal',
+            'vertical',
+            'bar',
+        ];
         for (const key of keys) {
             expect(BORDER_ROUNDED).toHaveProperty(key);
         }

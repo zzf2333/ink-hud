@@ -31,6 +31,6 @@ export const BORDER_ROUNDED = {
 
 /** Multi-level bar characters for Sparkline character mode */
 export const SPARK_LEVELS = {
-    block:   [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'] as const,
+    block: [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'] as const,
     braille: ['⠀', '⡀', '⣀', '⣄', '⣤', '⣦', '⣶', '⣷', '⣿'] as const,
 } as const;

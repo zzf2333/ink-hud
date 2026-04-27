@@ -1,11 +1,10 @@
 import { Text } from 'ink';
 import { render } from 'ink-testing-library';
-import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+    type ChartKind,
     DEFAULT_CHART_RENDERERS,
     InkHudProvider,
-    type ChartKind,
     useInkHud,
 } from '../../src/components/InkHudProvider';
 import { TerminalDetector } from '../../src/detect/terminal';
@@ -21,7 +20,11 @@ const RendererNameDisplay = ({ kind }: { kind: ChartKind }) => {
 const CapabilityDisplay = () => {
     const { getCapabilities } = useInkHud();
     const caps = getCapabilities();
-    return <Text>score:{caps.score} braille:{String(caps.supportsBraille)}</Text>;
+    return (
+        <Text>
+            score:{caps.score} braille:{String(caps.supportsBraille)}
+        </Text>
+    );
 };
 
 // Braille-capable detector (iTerm2)

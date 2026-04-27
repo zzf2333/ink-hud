@@ -8,9 +8,7 @@ const SPARKLINE_DATA = [5, 10, 7, 15, 12, 8, 20, 14];
 
 describe('Sparkline', () => {
     it('renders data points', () => {
-        const { lastFrame } = render(
-            <Sparkline data={SPARKLINE_DATA} mode="character" />,
-        );
+        const { lastFrame } = render(<Sparkline data={SPARKLINE_DATA} mode="character" />);
         expect(lastFrame()).not.toBe('');
     });
 
@@ -48,7 +46,9 @@ describe('Sparkline', () => {
 
         const overrideFrame = render(
             // renderers override is irrelevant for Sparkline
-            <InkHudProvider renderers={{ line: 'block', area: 'block', bar: 'braille', pie: 'block' }}>
+            <InkHudProvider
+                renderers={{ line: 'block', area: 'block', bar: 'braille', pie: 'block' }}
+            >
                 <Sparkline data={SPARKLINE_DATA} mode="character" variant="block" />
             </InkHudProvider>,
         ).lastFrame();
