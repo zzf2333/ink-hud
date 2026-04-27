@@ -34,3 +34,5 @@ Thumbs.db
 # AI assistant files
 AGENTS.md
 CLAUDE.md
+tasks
+docs/architecture.md
