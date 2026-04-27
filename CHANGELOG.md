@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.1.4] - 2026-04-27
+
 ### Breaking Changes
 - **Renderer selection centralised in `InkHudProvider`**: The `renderer` and `rendererChain` props have been removed from `LineChart`, `AreaChart`, `BarChart`, and `PieChart`. The `forceRenderer` prop has been removed from `InkHudProvider`.
   - **Migration**: Use `<InkHudProvider renderers={{ line: 'block', bar: 'braille' }}>` to override the renderer for specific chart kinds. Unspecified kinds keep their pre-tuned defaults (line/area/pie → braille; bar → block).
@@ -76,7 +78,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🧪 Comprehensive test suite with >90% coverage
 - 📦 npm package configuration with TypeScript support
 
-[unreleased]: https://github.com/zzf2333/ink-hud/compare/v0.1.3...HEAD
+[unreleased]: https://github.com/zzf2333/ink-hud/compare/v0.1.4...HEAD
+[v0.1.4]: https://github.com/zzf2333/ink-hud/compare/v0.1.3...v0.1.4
 [v0.1.3]: https://github.com/zzf2333/ink-hud/compare/v0.1.2...v0.1.3
 [v0.1.2]: https://github.com/zzf2333/ink-hud/compare/v0.1.1...v0.1.2
 [v0.1.1]: https://github.com/zzf2333/ink-hud/compare/v0.1.0...v0.1.1
