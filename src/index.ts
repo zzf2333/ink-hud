@@ -43,11 +43,6 @@ export type { TerminalCapabilities, EnvironmentInfo } from './detect/types';
 export { TerminalDetector, terminalDetector } from './detect/terminal';
 
 /**
- * Renderer selector (automatically selects optimal renderer)
- */
-export { RendererSelector, rendererSelector } from './detect/selector';
-
-/**
  * InkHud Context Provider (dependency injection)
  */
 export {
@@ -270,3 +265,16 @@ export { encodeIterm2 } from './render/image/iterm2';
  * Shared image-mode drawing utilities
  */
 export { gradientColorFn, buildSparklinePixelGrid } from './render/image/drawing';
+
+// ============================================
+// Low-level API (advanced use only)
+// ============================================
+
+/**
+ * Low-level renderer selector — most users should configure renderers via
+ * `<InkHudProvider renderers={{...}}>` instead.
+ *
+ * `RendererSelector.selectBest()` is deprecated; prefer `getRendererFor(kind)`
+ * from the Provider context.
+ */
+export { RendererSelector, rendererSelector } from './detect/selector';

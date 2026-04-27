@@ -100,10 +100,11 @@ export class RendererSelector {
     }
 
     /**
-     * Automatically select the best renderer
+     * Automatically select the best renderer from a priority chain.
      *
-     * Try in the order of the priority chain, returning the first renderer that meets terminal capability requirements
-     * If none are satisfied, fallback to Block (UTF-8 terminals all qualify at minScore=30)
+     * @deprecated Prefer `<InkHudProvider renderers={{ line: 'block' }}>` combined
+     *   with `useChartRenderer(kind)`. This method remains as a low-level escape
+     *   hatch for custom renderer selection outside the React component tree.
      *
      * @param preferredChain - Priority chain (default: ['braille', 'block'])
      * @returns Selected renderer instance
