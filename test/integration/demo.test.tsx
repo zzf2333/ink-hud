@@ -82,7 +82,7 @@ describe('Showcase integration', () => {
         // t=0: initial state, no timers fired
         const output = stripAnsi(lastFrame() ?? '');
         expect(output).toMatchInlineSnapshot(`
-          "  [1] Overview   [2] Charts   [3] Image   [4] Streams   [5] Layout
+          "  [1] Overview   [2] Charts   [3] Image   [4] Streams   [5] Layout   [6] All
           ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
           │ ╭────────────────────────────────────────────────────────────────────────────────────────────────╮│
           │ │  ink-hud showcase                                                                    ● ONLINE  ││
@@ -115,7 +115,7 @@ describe('Showcase integration', () => {
           │ │                               ││                               ││                              ││
           │ └───────────────────────────────┘└───────────────────────────────┘└──────────────────────────────┘│
           └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-            q quit  ·  ← → or Tab navigate  ·  1-5 jump to page"
+            q quit  ·  ← → or Tab navigate  ·  1-6 jump to page"
         `);
 
         unmount();

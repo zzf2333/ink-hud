@@ -1,6 +1,7 @@
 import { Box, Text, render, useApp, useInput, useStdout } from 'ink';
 import React, { useEffect, useState } from 'react';
 import { InkHudProvider, ThemeProvider } from 'ink-hud';
+import { AllPage } from './pages/all';
 import { ChartsPage } from './pages/charts';
 import { ImagePage } from './pages/image';
 import { LayoutPage } from './pages/layout';
@@ -15,6 +16,7 @@ const PAGES = [
     { label: 'Image',    component: ImagePage     },
     { label: 'Streams',  component: StreamsPage   },
     { label: 'Layout',   component: LayoutPage    },
+    { label: 'All',      component: AllPage       },
 ] as const;
 
 // --- Tab bar ---
@@ -43,7 +45,7 @@ const Footer = () => (
         <Text dimColor>quit  ·  </Text>
         <Text dimColor>{'← → '}</Text>
         <Text dimColor>or Tab navigate  ·  </Text>
-        <Text dimColor>1-5 </Text>
+        <Text dimColor>1-6 </Text>
         <Text dimColor>jump to page</Text>
     </Box>
 );
