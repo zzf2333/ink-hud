@@ -119,7 +119,7 @@ function resolveRadius(
     const centerY = Math.floor(pixelHeight / 2);
     const maxRadius = Math.max(
         0,
-        Math.min(Math.floor(pixelWidth / 2) - 1, Math.floor(pixelHeight / 2) - 1),
+        Math.min(Math.floor(pixelWidth / 2) - 4, Math.floor(pixelHeight / 2) - 4),
     );
     const radius = customRadius ?? maxRadius;
 
