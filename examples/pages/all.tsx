@@ -98,7 +98,7 @@ export const AllPage = () => {
 			</Box>
 
 			{/* Row 1 — KPI BigNumbers */}
-			<Grid columns={4} rowHeight={7}>
+			<Grid columns={4} rowHeight={7} widthOffset={4}>
 				<GridItem>
 					<Panel title="Requests/s" borderColor={C.accent}>
 						<BigNumber
@@ -152,7 +152,7 @@ export const AllPage = () => {
 			</Grid>
 
 			{/* Row 2 — LineChart + Gauges */}
-			<Grid columns={5} rowHeight={14}>
+			<Grid columns={5} rowHeight={14} widthOffset={4}>
 				<GridItem span={4}>
 					<Panel
 						title="LineChart — Throughput (CPU/Memory/Network)"
@@ -229,7 +229,7 @@ export const AllPage = () => {
 			</Grid>
 
 			{/* Row 3 — AreaChart + BarChart + PieChart */}
-			<Grid columns={3} rowHeight={14}>
+			<Grid columns={3} rowHeight={18} widthOffset={4}>
 				<GridItem>
 					<Panel
 						title="AreaChart — Traffic & Cached"
@@ -275,7 +275,7 @@ export const AllPage = () => {
 			</Grid>
 
 			{/* Row 4a — Sparkline (3 variants) */}
-			<Grid columns={3} rowHeight={4}>
+			<Grid columns={3} rowHeight={4} widthOffset={4}>
 				<GridItem>
 					<Panel
 						title="Sparkline — block"
@@ -321,7 +321,7 @@ export const AllPage = () => {
 			</Grid>
 
 			{/* Row 4b — Heatmap (7 days × 24 hours needs rowHeight=9 for 7 inner rows) */}
-			<Grid columns={1} rowHeight={9}>
+			<Grid columns={1} rowHeight={9} widthOffset={4}>
 				<GridItem>
 					<Panel
 						title="Heatmap — Server Activity"
@@ -338,7 +338,7 @@ export const AllPage = () => {
 			</Grid>
 
 			{/* Row 5 — LogStream + PulseBar (left) | Table (right) */}
-			<Grid columns={3} rowHeight={14}>
+			<Grid columns={3} rowHeight={14} widthOffset={4}>
 				<GridItem span={2}>
 					<Box flexDirection="column" height={14}>
 						<Box height={8}>

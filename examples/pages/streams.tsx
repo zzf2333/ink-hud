@@ -67,7 +67,7 @@ export const StreamsPage = () => {
                 </Text>
             </Box>
 
-            <Grid columns={3} rowHeight={18}>
+            <Grid columns={3} rowHeight={18} widthOffset={4}>
                 {/* Left: logs + pulse stacked */}
                 <GridItem span={2}>
                     <Box flexDirection="column" height={18}>

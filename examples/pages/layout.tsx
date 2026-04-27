@@ -25,7 +25,7 @@ export const LayoutPage = () => {
             </Box>
 
             {/* Panel borderStyle variants + BigNumber titleAlignment */}
-            <Grid columns={3} rowHeight={8}>
+            <Grid columns={3} rowHeight={8} widthOffset={4}>
                 <GridItem>
                     <Panel
                         title="Round border — left align"
@@ -83,7 +83,7 @@ export const LayoutPage = () => {
             </Grid>
 
             {/* Gauge variants */}
-            <Grid columns={3} rowHeight={7}>
+            <Grid columns={3} rowHeight={7} widthOffset={4}>
                 <GridItem>
                     <Panel title="Gauge — default chars" borderColor={C.success}>
                         <Box flexDirection="column" alignItems="center" justifyContent="center">
@@ -135,7 +135,7 @@ export const LayoutPage = () => {
                 <Box paddingX={1} marginBottom={0}>
                     <Text dimColor>Grid columns=12 · span composition →</Text>
                 </Box>
-                <Grid columns={12} rowHeight={5}>
+                <Grid columns={12} rowHeight={5} widthOffset={4}>
                     <GridItem span={4}>
                         <Panel title="span 4" borderStyle="round" borderColor={C.blue}>
                             <Text dimColor>4/12</Text>

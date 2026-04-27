@@ -50,7 +50,7 @@ export const OverviewPage = () => {
             </Box>
 
             {/* KPI row — BigNumber with trendDirection + trendLabel */}
-            <Grid columns={4} rowHeight={7}>
+            <Grid columns={4} rowHeight={7} widthOffset={4}>
                 <GridItem>
                     <Panel title="Requests/s" borderColor={C.accent}>
                         <BigNumber
@@ -104,7 +104,7 @@ export const OverviewPage = () => {
             </Grid>
 
             {/* Main chart + gauges */}
-            <Grid columns={5} rowHeight={14}>
+            <Grid columns={5} rowHeight={14} widthOffset={4}>
                 <GridItem span={4}>
                     <Panel title="Throughput — CPU / Memory / Network" borderStyle="round">
                         <LineChart
@@ -148,7 +148,7 @@ export const OverviewPage = () => {
             </Grid>
 
             {/* Sparklines — block / braille / image-mode with gradient */}
-            <Grid columns={3} rowHeight={4}>
+            <Grid columns={3} rowHeight={4} widthOffset={4}>
                 <GridItem>
                     <Panel title="CPU — block variant" borderStyle="single" borderColor={C.accent}>
                         <Sparkline
