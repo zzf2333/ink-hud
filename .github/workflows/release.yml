@@ -6,12 +6,9 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  validate:
+    name: Validate
     runs-on: ubuntu-latest
-    permissions:
-      contents: write  # Requires write access to create a Release
-      id-token: write
-
     steps:
       - uses: actions/checkout@v4
 
@@ -21,8 +18,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: '20'
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -40,12 +36,64 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 1
+
+  publish:
+    name: Publish to npm
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Verify package version matches tag
+        run: |
+          PKG_VERSION="v$(node -p "require('./package.json').version")"
+          TAG_VERSION="${{ github.ref_name }}"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::package.json version ($PKG_VERSION) does not match tag ($TAG_VERSION)"
+            exit 1
+          fi
+
       - name: Publish
-        run: npm publish --access public
+        run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # Read the current version changes from CHANGELOG.md
+  github-release:
+    name: Create GitHub Release
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
       - name: Read changelog
         id: changelog
         uses: mindsers/changelog-reader-action@v2
@@ -53,12 +101,11 @@ jobs:
           version: ${{ github.ref_name }}
           path: ./CHANGELOG.md
 
-      # Create GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           body: ${{ steps.changelog.outputs.changes }}
           draft: false
-          prerelease: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
