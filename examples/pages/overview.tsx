@@ -104,14 +104,14 @@ export const OverviewPage = () => {
             </Grid>
 
             {/* Main chart + gauges */}
-            <Grid columns={5} rowHeight={12}>
+            <Grid columns={5} rowHeight={14}>
                 <GridItem span={4}>
                     <Panel title="Throughput — CPU / Memory / Network" borderStyle="round">
                         <LineChart
                             series={m.throughput}
                             showLegend
                             showAxis
-                            legendPosition="right"
+                            legendPosition="bottom"
                         />
                     </Panel>
                 </GridItem>
