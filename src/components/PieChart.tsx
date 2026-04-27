@@ -117,9 +117,12 @@ function resolveRadius(
 ): { centerX: number; centerY: number; radius: number } {
     const centerX = Math.floor(pixelWidth / 2);
     const centerY = Math.floor(pixelHeight / 2);
+    // Reserve 2 full char-rows at top & bottom (4 px per braille row, same for block
+    // due to its 0.5 ratio correction). Without this the apex pixel is a near-invisible
+    // single point that looks like the circle is clipped.
     const maxRadius = Math.max(
         0,
-        Math.min(Math.floor(pixelWidth / 2) - 4, Math.floor(pixelHeight / 2) - 4),
+        Math.min(Math.floor(pixelWidth / 2) - 4, Math.floor(pixelHeight / 2) - 8),
     );
     const radius = customRadius ?? maxRadius;
 
