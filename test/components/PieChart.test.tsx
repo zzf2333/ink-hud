@@ -73,7 +73,7 @@ describe('PieChart', () => {
 
     it('renders braille path inline snapshot', () => {
         const { lastFrame } = render(
-            <InkHudProvider detector={brailleDetector}>
+            <InkHudProvider renderers={{ pie: 'braille' }} detector={brailleDetector}>
                 <PieChart
                     data={PIE_FIXTURE_DATA}
                     showLegend={false}
@@ -139,7 +139,7 @@ describe('PieChart', () => {
         ).lastFrame();
 
         const brailleFrame = render(
-            <InkHudProvider detector={brailleDetector}>
+            <InkHudProvider renderers={{ pie: 'braille' }} detector={brailleDetector}>
                 <PieChart
                     data={PIE_FIXTURE_DATA}
                     showLegend={false}

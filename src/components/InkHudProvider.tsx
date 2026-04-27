@@ -32,13 +32,13 @@ export type ChartRenderers = Record<ChartKind, RendererType>;
  * | line  | braille  | 2×4 sub-pixel grid renders smooth diagonals |
  * | area  | braille  | Fine-grained fill under curves |
  * | bar   | block    | 2×2 cells produce clean rectangular bar edges |
- * | pie   | braille  | Radial pixels benefit from higher resolution |
+ * | pie   | block    | Solid fills create clean sector boundaries |
  */
 export const DEFAULT_CHART_RENDERERS: ChartRenderers = {
     line: 'braille',
     area: 'braille',
     bar: 'block',
-    pie: 'braille',
+    pie: 'block',
 };
 
 // ============================================
