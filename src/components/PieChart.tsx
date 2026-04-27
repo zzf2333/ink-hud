@@ -110,34 +110,33 @@ function resolveDataItems(
 const TWO_PI = Math.PI * 2;
 const START_ANGLE = -Math.PI / 2;
 
-// Geometry proof (renderer-agnostic):
-//   ratio = 2 * horizontal / vertical  (braille 1.0, block 0.5)
-//   dy_effective = (y - centerY) * ratio
-//   For a point at y = centerY ± k pixels, distance = |k * ratio|
-//   → outerRadius = k * ratio → k = outerRadius / ratio
-//   vertical span in pixels = 2 * outerRadius / ratio
-//   vertical span in char-rows = 2 * outerRadius / ratio / vertical
-//     = 2R / (2 * horizontal / vertical) / vertical   (substituting ratio)
-//     = 2R / (2 * horizontal)
-//     = R / horizontal  (= R/2 for both braille h=2 and block h=2)
-//   horizontal span in pixels = 2 * outerRadius (no ratio on x)
-//   horizontal span in char-rows = 2 * outerRadius / horizontal = R  (= R for h=2)
-// → With 1 char margin each side: R ≤ canvasWChars - 2  AND  R/2 ≤ canvasHChars - 2
 function resolveRadius(
     canvasWChars: number,
     canvasHChars: number,
     renderer: import('../core/renderer').Renderer,
     customRadius: number | undefined,
-): { centerX: number; centerY: number; radius: number } {
-    const { horizontal, vertical } = renderer.getResolution();
-    const pixelW = canvasWChars * horizontal;
-    const pixelH = canvasHChars * vertical;
-    const centerX = Math.floor(pixelW / 2);
-    const centerY = Math.floor(pixelH / 2);
-    // 1 char-row margin left/right → R ≤ canvasW - 2
-    // 1 char-row margin top/bottom → R/2 ≤ canvasH - 2 → R ≤ 2*(canvasH - 2)
-    const maxRadius = Math.max(0, Math.min(canvasWChars - 2, 2 * (canvasHChars - 2)));
-    return { centerX, centerY, radius: customRadius ?? maxRadius };
+    aspectRatioCorrection: number,
+): { pixelWidth: number; pixelHeight: number; centerX: number; centerY: number; radius: number } {
+    const { pixelWidth, pixelHeight } = getPixelDimensions(renderer, canvasWChars, canvasHChars);
+    const { vertical } = renderer.getResolution();
+    const centerX = (pixelWidth - 1) / 2;
+    const centerY = (pixelHeight - 1) / 2;
+
+    // Fit the circle to the actual pixel bounds instead of a char-based heuristic.
+    // This keeps pie charts round in shorter layouts (for example with bottom legends)
+    // and avoids the even-height bias from integer center coordinates.
+    // We also reserve half a glyph of vertical breathing room so braille/block rows
+    // do not look visually clipped when their first/last pixel buckets touch the edge.
+    const maxRadiusByWidth = Math.min(centerX, pixelWidth - 1 - centerX);
+    const verticalInsetPixels = Math.ceil(vertical / 2);
+    const maxRadiusByHeight =
+        Math.max(0, Math.min(centerY, pixelHeight - 1 - centerY) - verticalInsetPixels) *
+        aspectRatioCorrection;
+    const maxRadius = Math.max(0, Math.min(maxRadiusByWidth, maxRadiusByHeight));
+    const radius =
+        customRadius !== undefined ? Math.min(Math.max(0, customRadius), maxRadius) : maxRadius;
+
+    return { pixelWidth, pixelHeight, centerX, centerY, radius };
 }
 
 function buildAngleStops(
@@ -264,14 +263,14 @@ export const PieChart: React.FC<PieChartProps> = ({
             return [];
         }
 
-        const { pixelWidth, pixelHeight } = getPixelDimensions(renderer, canvasWidth, canvasHeight);
-        const canvas = renderer.createCanvas(pixelWidth, pixelHeight);
-
         const {
+            pixelWidth,
+            pixelHeight,
             centerX,
             centerY,
             radius: outerRadius,
-        } = resolveRadius(canvasWidth, canvasHeight, renderer, customRadius);
+        } = resolveRadius(canvasWidth, canvasHeight, renderer, customRadius, ratio);
+        const canvas = renderer.createCanvas(pixelWidth, pixelHeight);
 
         const innerRadius = outerRadius * donutRatio;
         const angleStops = buildAngleStops(data, total);

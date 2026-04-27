@@ -1,6 +1,8 @@
 import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
+import { Grid, GridItem } from '../../src/components/Grid';
 import { InkHudProvider } from '../../src/components/InkHudProvider';
+import { Panel } from '../../src/components/Panel';
 import { PieChart } from '../../src/components/PieChart';
 import { TerminalDetector } from '../../src/detect/terminal';
 import { PIE_FIXTURE_DATA } from '../fixtures/chartFixtures';
@@ -55,20 +57,22 @@ describe('PieChart', () => {
                 />
             </InkHudProvider>,
         );
-        expect(stripAnsi(lastFrame() ?? '')).toMatchInlineSnapshot(`
-          "
-                ▗▃▅▆▇▇█▇▇▆▄▂
-              ▗▅████████████▇▃
-             ▄████████████████▇▖
-            ▗██████████████████▆
-            ▐███████████████████
-            ▅████████████████████
-            ▆██████████████████▇
-             ▄████████████████▇▇
-              ▇▃█████████████▄█
-                ▇▅▃▂█████▂▄▆█
-                      █"
-        `);
+        expect(stripAnsi(lastFrame() ?? '')).toBe(
+            [
+                '        ▂▃▃▃▃▃▃▂',
+                '     ▃▆██████████▆▃',
+                '   ▃████████████████▃',
+                '  ▅██████████████████▆',
+                ' ▐████████████████████▌',
+                ' ██████████████████████',
+                ' ██████████████████████',
+                ' ▅████████████████████▅',
+                '  ▄██████████████████▄',
+                '   ▅████████████████▅',
+                '     ▅▃██████████▃▅',
+                '        ▇▆▅▅▅▅▆▇',
+            ].join('\n'),
+        );
     });
 
     it('renders braille path inline snapshot', () => {
@@ -83,18 +87,18 @@ describe('PieChart', () => {
             </InkHudProvider>,
         );
         expect(stripAnsi(lastFrame() ?? '')).toMatchInlineSnapshot(`
-          "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-          ⠀⠀⠀⠀⠀⠀⠀⣀⣤⣶⣶⣶⣷⣶⣶⣦⣄⡀⠀⠀⠀⠀⠀⠀
-          ⠀⠀⠀⠀⢀⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣄⠀⠀⠀⠀
-          ⠀⠀⠀⢠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠀⠀
-          ⠀⠀⢠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠀
-          ⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀
-          ⠀⠀⢹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠁⠀
-          ⠀⠀⠸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠀⠀
-          ⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠁⠀⠀
-          ⠀⠀⠀⠀⠙⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀⠀⠀
-          ⠀⠀⠀⠀⠀⠀⠉⠛⠿⣿⣿⣿⣿⣿⣿⡿⠟⠋⠁⠀⠀⠀⠀⠀
-          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+          "⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+          ⠀⠀⠀⠀⠀⣀⣴⣾⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⣀⠀⠀⠀⠀⠀
+          ⠀⠀⠀⢠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡄⠀⠀⠀
+          ⠀⠀⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀
+          ⠀⢠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄⠀
+          ⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀
+          ⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀
+          ⠀⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀
+          ⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠏⠀⠀
+          ⠀⠀⠀⠘⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠃⠀⠀⠀
+          ⠀⠀⠀⠀⠀⠉⠻⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠉⠀⠀⠀⠀⠀
+          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀"
         `);
     });
 
@@ -111,18 +115,61 @@ describe('PieChart', () => {
             </InkHudProvider>,
         );
         expect(stripAnsi(lastFrame() ?? '')).toMatchInlineSnapshot(`
-          "               ● Alpha (40.0%)
-              ▃▆▇█▇▅▖
-             ▐███████
-             ▅████████   ● Beta (35.0%)
-              ▅▂███▃▇
-                 █
+          "    ▗▃▃▃▃▖     ● Alpha (40.0%)
+            ▗▆██████▆▖
+            ▆████████▆
+            ▆████████▆   ● Beta (35.0%)
+            ▇▃██████▃▇
+              █▆▅▅▆█
                          ● Gamma (25.0%)
 
 
 
 
           "
+        `);
+    });
+
+    it('keeps the pie fully visible inside panel grid layouts', () => {
+        const { lastFrame } = render(
+            <InkHudProvider renderers={{ pie: 'braille' }} detector={brailleDetector}>
+                <Grid columns={2} rowHeight={16} width={80}>
+                    <GridItem>
+                        <Panel title="PieChart — Request breakdown" borderStyle="round">
+                            <PieChart
+                                data={[
+                                    { name: 'API', value: 45, color: '#61afef' },
+                                    { name: 'DB', value: 25, color: '#c678dd' },
+                                    { name: 'Cache', value: 20, color: '#98c379' },
+                                    { name: 'Static', value: 10, color: '#e5c07b' },
+                                ]}
+                                showLegend
+                                showLabels
+                                legendPosition="bottom"
+                            />
+                        </Panel>
+                    </GridItem>
+                </Grid>
+            </InkHudProvider>,
+        );
+
+        expect(stripAnsi(lastFrame() ?? '')).toMatchInlineSnapshot(`
+          "╭── PieChart — Request breakdown ──────╮
+          │        ⠀⠀⠀⠀⢀⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀        │
+          │        ⠀⠀⠀⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠀⠀⠀        │
+          │        ⠀⠀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠀⠀        │
+          │        ⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀        │
+          │        ⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀        │
+          │        ⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀        │
+          │        ⠀⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠀⠀        │
+          │        ⠀⠀⠀⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠀⠀⠀        │
+          │        ⠀⠀⠀⠀⠈⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠛⠁⠀⠀⠀⠀        │
+          │        ⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀        │
+          │                                      │
+          │●API     ●DB (25  ●Cache     ● Static │
+          │ (45.0%)  .0%)     (20.0%)     (10.0%)│
+          │                                      │
+          ╰──────────────────────────────────────╯"
         `);
     });
 
